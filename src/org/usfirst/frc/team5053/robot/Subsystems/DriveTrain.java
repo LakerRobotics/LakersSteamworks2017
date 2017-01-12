@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SpeedController;
 /**
  * Drivetrain subsystem that extends the FRC RobotDrive class.
- * @author Colin Ross
+ * 
  *
  */
 
@@ -68,6 +68,10 @@ public class DriveTrain extends RobotDrive implements Subsystem
 	}
 	public HashMap<String, Double> GetDashboardData() {
 		return null;
+		// TODO Auto-generated method stub
+		
+	}
+	public void WriteDashboardData() {
 		// TODO Auto-generated method stub
 		
 	}

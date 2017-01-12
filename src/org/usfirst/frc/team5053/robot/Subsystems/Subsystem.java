@@ -1,10 +1,9 @@
 package org.usfirst.frc.team5053.robot.Subsystems;
 
-import java.util.HashMap;
 
 public interface Subsystem
 {
-	public HashMap<String, Double> GetDashboardData();
+	public void WriteDashboardData();
 	
 	/*
 	 *  Serves as a template that includes all methods a subsystem should have

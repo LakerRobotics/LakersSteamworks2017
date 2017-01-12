@@ -4,10 +4,7 @@ import org.usfirst.frc.team5053.robot.RobotInterfaceMap.joystickType;
 import org.usfirst.frc.team5053.robot.Subsystems.Arm;
 import org.usfirst.frc.team5053.robot.Subsystems.DriveTrain;
 import org.usfirst.frc.team5053.robot.Subsystems.Intake;
-import org.usfirst.frc.team5053.robot.Subsystems.Kicker;
-import org.usfirst.frc.team5053.robot.Subsystems.LeftShooter;
-import org.usfirst.frc.team5053.robot.Subsystems.RightShooter;
-import org.usfirst.frc.team5053.robot.Subsystems.ShooterAim;
+import org.usfirst.frc.team5053.robot.Subsystems.Shooter;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.SpeedController;
@@ -16,8 +13,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * 
- * RUDY FOR PRESIDENT 2016
- * Laker Robotics 2016 Summer Rewrite
+ * STEAMWORKS 2017
+ * Laker Robotics 
  * 
  */
 
@@ -38,12 +35,8 @@ public class Robot extends IterativeRobot
 	//Robot Subsystem Declaration
 	DriveTrain m_DriveTrain;
 	Arm m_Arm;
-	LeftShooter m_LeftShooter;
-	RightShooter m_RightShooter;
 	Intake m_Intake;
-	ShooterAim m_ShooterAim;
-	Kicker m_Kicker;
-	
+	Shooter m_Shooter;
 	//Arm setpoints
 	final double ARM_NEUTRAL	= 0.209;
 	final double ARM_AUTO		= 0.300;
@@ -78,11 +71,9 @@ public class Robot extends IterativeRobot
     	//Robot Subsystem Initialization
     	m_DriveTrain = new DriveTrain(m_RobotControllers.GetLeftDrive(), m_RobotControllers.GetRightDrive());
     	m_Arm = new Arm(m_RobotControllers.GetArm(), m_RobotSensors.GetArmPot());
-    	m_LeftShooter = new LeftShooter(m_RobotControllers.GetLeftShooter(), m_RobotSensors.GetLeftShooterEncoder());
-    	m_RightShooter = new RightShooter(m_RobotControllers.GetRightShooter(), m_RobotSensors.GetRightShooterEncoder());
+    	
+    	m_Shooter = new Shooter(m_RobotControllers.GetShooter(), m_RobotSensors.GetShooterEncoder());
     	m_Intake = new Intake(m_RobotControllers.GetIntake());
-    	m_ShooterAim = new ShooterAim(m_RobotControllers.GetShooterBattery(), m_RobotSensors.GetShooterHigh(), m_RobotSensors.GetShooterLow());
-    	m_Kicker = new Kicker(m_RobotSensors.GetKickerSolenoid());
     }
 
     public void autonomousInit() 
@@ -122,10 +113,10 @@ public class Robot extends IterativeRobot
     	intake();
     	
     	//Shooter
-    	shoot();
+    	//shoot();
     	
     	//Update Dashboard Variables
-    	UpdateSmartDashboard();
+    	GetDashboardData();
     	
     	
     }
@@ -143,14 +134,18 @@ public class Robot extends IterativeRobot
     	m_DriveTrain.arcadeDrive(m_RobotInterface.GetDriverLeftY(), m_RobotInterface.GetDriverRightX());
     }
     
-    //Arm
+    //We don't have an arm... yet!
     public void manualArmControl() 
     {
+    	//Gives the operator manual control over the arm if setpoints aren't working (sensor failure)
     	m_Arm.DisablePID();
         m_Arm.SetTalonOutput(-m_RobotInterface.GetOperatorJoystick().getRawAxis(1));
     }
+    
+    
     public void armSetpoints() 
     {	
+    	//Gives the operator several different preset positions for an arm.
     	if(!m_Arm.isPIDEnabled())
     	{
     		m_Arm.SetTalonOutput(0);
@@ -179,115 +174,62 @@ public class Robot extends IterativeRobot
 	    if(m_RobotInterface.GetOperatorButton(8))
 		{
 			m_Intake.SetTalonOutput(INTAKE_FAST);
-
-			m_LeftShooter.DisablePID();
-			m_LeftShooter.SetTalonOutput(SHOOTER_INTAKE);
-			
-			m_RightShooter.DisablePID();
-			m_RightShooter.SetTalonOutput(SHOOTER_INTAKE);
 		}
 		else if(m_RobotInterface.GetOperatorButton(10))
 		{
 			m_Intake.SetTalonOutput(INTAKE_SLOW);
 			
-			m_LeftShooter.DisablePID();
-			m_LeftShooter.SetTalonOutput(SHOOTER_INTAKE);
-			
-			m_RightShooter.DisablePID();
-			m_RightShooter.SetTalonOutput(SHOOTER_INTAKE);
 		}
 		else if(m_RobotInterface.GetOperatorButton(12))
 		{
 			m_Intake.SetTalonOutput(INTAKE_REVERSE);
 
-			m_LeftShooter.DisablePID();
-			m_LeftShooter.SetTalonOutput(SHOOTER_INTAKE);
-			
-			m_RightShooter.DisablePID();
-			m_RightShooter.SetTalonOutput(SHOOTER_INTAKE);
 		}
 		else
 		{
 			m_Intake.SetTalonOutput(0);
-			
-			if(!m_LeftShooter.isPIDEnabled() && !m_RightShooter.isPIDEnabled())
-			{
-				m_LeftShooter.SetTalonOutput(0);
-				m_RightShooter.SetTalonOutput(0);
-			}
 		}
     }
     
     //Shooter
     public void shoot()
     {
+    	
     	if(m_RobotInterface.GetOperatorButton(3))
     	{
-    	   	m_LeftShooter.EnablePID();
-        	m_RightShooter.EnablePID();
-        	m_LeftShooter.SetShooterSetpoint(SHOOTER_FAST);
-        	m_RightShooter.SetShooterSetpoint(SHOOTER_FAST);
-        	if(m_LeftShooter.ShooterOnTarget() && m_RightShooter.ShooterOnTarget())
+    		//Fast Shot
+    		//Enable the PID Controller for the Shooter
+    		m_Shooter.SetShooterSetpoint(SHOOTER_FAST);
+    	   	m_Shooter.EnablePID();
+        	
+        	
+        	if(m_Shooter.ShooterOnTarget() && m_Shooter.ShooterOnTarget())
         	{
-        		m_Kicker.SetSolenoidState(true);
+        		//Shooter is ready to fire.
         	}
     	}
     	else if(m_RobotInterface.GetOperatorButton(4))
     	{
-    		m_LeftShooter.EnablePID();
-        	m_RightShooter.EnablePID();
-        	m_LeftShooter.SetShooterSetpoint(SHOOTER_SLOW);
-        	m_RightShooter.SetShooterSetpoint(SHOOTER_SLOW);
-        	if(m_LeftShooter.ShooterOnTarget() && m_RightShooter.ShooterOnTarget())
+    		//Slow Shot
+    		//Enable the PID Controller for the Shooter
+    		m_Shooter.SetShooterSetpoint(SHOOTER_SLOW);
+    	   	m_Shooter.EnablePID();
+        	
+        	
+        	if(m_Shooter.ShooterOnTarget() && m_Shooter.ShooterOnTarget())
         	{
-        		m_Kicker.SetSolenoidState(true);
+        		//Shooter is ready to fire.
         	}
     	}
     	else
     	{
-    		m_LeftShooter.SetTalonOutput(0);
-    		m_RightShooter.SetTalonOutput(0);
+    		//STOP
+    		m_Shooter.SetTalonOutput(0);
     	}
     }
-    
-    //Shooter Aim | this code uses limit switches may want to revisit this and use PID control
-    public void shooterAim()
+    public void GetDashboardData()
     {
-    	boolean buttonPressed = false;
-    	
-    	while(m_RobotInterface.GetOperatorButton(12) || buttonPressed) {
-    		buttonPressed = true;
-    		if(m_ShooterAim.LimitSwitchLow())
-    		{
-    			m_ShooterAim.SetTalonOutput(.6);
-    			if(m_ShooterAim.LimitSwitchHigh()) 
-    			{
-    				m_ShooterAim.SetTalonOutput(0);
-    				buttonPressed = false;
-    			}
-    		}
-    		else if(m_ShooterAim.LimitSwitchHigh()) 
-    		{
-    			m_ShooterAim.SetTalonOutput(-.6);
-    			if(m_ShooterAim.LimitSwitchLow()) 
-    			{
-    				m_ShooterAim.SetTalonOutput(0);
-    				buttonPressed = false;
-    			}
-    		}
-    	}
-    }
-    public void UpdateSmartDashboard()
-    {
-    	SmartDashboard.putNumber("ArmPot", m_Arm.GetDashboardData().get("ArmPot"));
-    	/* Not Implemented Yet
-    	//Encoder Rates
-    	SmartDashboard.putNumber("Left Encoder Rate", m_RobotSensors.getLeftEncoderRate());
-    	SmartDashboard.putNumber("Right Encoder Rate", m_RobotSensors.getRightEncoderRate());
-    	
-    	//Encoder Distance
-    	SmartDashboard.putNumber("Left Encoder Distance", m_RobotSensors.getLeftEncoderDistance());
-    	SmartDashboard.putNumber("Right Encoder Distance", m_RobotSensors.getRightEncoderDistance());
-    	*/
+    	//Use this to retrieve values from the Driver Station
+    	//e.g Which autonomous to use or processed image information.
     }
 }

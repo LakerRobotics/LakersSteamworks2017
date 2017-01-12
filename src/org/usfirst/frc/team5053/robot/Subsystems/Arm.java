@@ -1,11 +1,10 @@
 package org.usfirst.frc.team5053.robot.Subsystems;
 
-import java.util.HashMap;
-
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Arm implements Subsystem {
 	
@@ -17,6 +16,8 @@ public class Arm implements Subsystem {
 		m_Arm = armTalon;
 		m_StringPot = armStringPot;
 		m_StringPot.setPIDSourceType(PIDSourceType.kDisplacement);
+		
+		//Magic numbers AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
 		m_PID = new PIDController(15.0, 0.05, 0.0, m_StringPot, m_Arm);
 	}
 	
@@ -39,6 +40,8 @@ public class Arm implements Subsystem {
 		return m_StringPot.get();
 	}
 	public void SetTargetPosition(double target) {
+		
+		//Get rid of these magic numbers! AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
 		if(target < .353 && target > .179)
 		{
 			m_PID.setSetpoint(target);
@@ -47,10 +50,8 @@ public class Arm implements Subsystem {
 	public void SetTalonOutput(double speed) { 
 		m_Arm.set(speed);
 	}
-	public HashMap<String, Double> GetDashboardData() {
-		HashMap<String, Double> data = new HashMap<String, Double>();
-		data.put("ArmPot", GetPosition());
-		return data;
+	public void WriteDashboardData() {
+		SmartDashboard.putNumber("ArmPot", GetPosition());
 	}
 	
 	

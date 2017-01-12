@@ -26,24 +26,18 @@ public class RobotControllerMap
 
 	private final int leftDrivePWM = 0;
 	private final int rightDrivePWM = 1;
-	private final int leftShooterPWM = 2;
-	private final int rightShooterPWM = 3;
-	private final int intakePWM = 4;
-	private final int armPWM = 5;
-	private final int shooterBatteryPWM = 6;
+	private final int shooterPWM = 2;
+	private final int intakePWM = 3;
+	private final int armPWM = 4;
 	
 	
 	private Talon m_LeftDrive;
 	private Talon m_RightDrive;
 	
 	private Talon m_Arm;
-	
-	private Talon m_LeftShooter;
-	private Talon m_RightShooter;
+	private Talon m_Shooter;
 	
 	private Talon m_Intake;
-	
-	private Talon m_ShooterBattery;
 
 	
 	/**
@@ -57,12 +51,9 @@ public class RobotControllerMap
 		
 		m_Arm = new Talon(armPWM);
 		
-		m_LeftShooter = new Talon(leftShooterPWM);
-		m_RightShooter = new Talon(rightShooterPWM);
+		m_Shooter = new Talon(shooterPWM);
 		
 		m_Intake = new Talon(intakePWM);
-		
-		m_ShooterBattery = new Talon(shooterBatteryPWM);
 		
 	}
 	
@@ -78,21 +69,13 @@ public class RobotControllerMap
 	{
 		return m_Arm;
 	}
-	public Talon GetLeftShooter()
+	public Talon GetShooter()
 	{
-		return m_LeftShooter;
-	}
-	public Talon GetRightShooter()
-	{
-		return m_RightShooter;
+		return m_Shooter;
 	}
 	public Talon GetIntake()
 	{
 		return m_Intake;
-	}
-	public Talon GetShooterBattery() 
-	{
-		return m_ShooterBattery;
 	}
 	
 }

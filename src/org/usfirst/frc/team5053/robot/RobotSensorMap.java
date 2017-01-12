@@ -26,24 +26,15 @@ public class RobotSensorMap
 	private final int leftDriveEncoderBDIO = 1;
 	private final int rightDriveEncoderADIO = 2;
 	private final int rightDriveEncoderBDIO = 3;
-	private final int leftShooterEncoderADIO = 4;
-	private final int leftShooterEncoderBDIO = 5;
-	private final int rightShooterEncoderADIO = 6;
-	private final int rightShooterEncoderBDIO = 7;
-	private final int shooterLimitSwitchHighDIO = 8;
-	private final int shooterLimitSwitchLowDIO = 9;
+	private final int shooterEncoderADIO = 4;
+	private final int shooterEncoderBDIO = 5;
 	
-	private final int solenoidKicker = 0;
 	private final int armStringPotentiometerAnalog = 1;
 	
 	private Encoder m_LeftDrive;
 	private Encoder m_RightDrive;
 	private Encoder m_LeftShooter;
-	private Encoder m_RightShooter;
-	private DigitalInput m_ShooterHigh;
-	private DigitalInput m_ShooterLow;
 	
-	private Solenoid m_Kicker;
 	private AnalogPotentiometer m_ArmPot;
 	private ADXRS450_Gyro m_Gyro;
 	
@@ -58,13 +49,8 @@ public class RobotSensorMap
 	{
 		m_LeftDrive = new Encoder(leftDriveEncoderADIO, leftDriveEncoderBDIO);
 		m_RightDrive = new Encoder(rightDriveEncoderADIO, rightDriveEncoderBDIO);
-		m_LeftShooter = new Encoder(leftShooterEncoderADIO, leftShooterEncoderBDIO);
-		m_RightShooter = new Encoder(rightShooterEncoderADIO, rightShooterEncoderBDIO);
+		m_LeftShooter = new Encoder(shooterEncoderADIO, shooterEncoderBDIO);
 		
-		m_ShooterHigh = new DigitalInput(shooterLimitSwitchHighDIO);
-		m_ShooterLow = new DigitalInput(shooterLimitSwitchLowDIO);
-		
-		m_Kicker = new Solenoid(solenoidKicker);
 		m_ArmPot = new AnalogPotentiometer(armStringPotentiometerAnalog);
 		m_Gyro = new ADXRS450_Gyro();
 	}
@@ -75,20 +61,8 @@ public class RobotSensorMap
 	public Encoder GetRightDriveEncoder() {
 		return m_RightDrive;
 		}
-	public Encoder GetLeftShooterEncoder() {
+	public Encoder GetShooterEncoder() {
 		return m_LeftShooter;
-	}
-	public Encoder GetRightShooterEncoder() {
-		return m_RightShooter;
-	}
-	public DigitalInput GetShooterHigh() {
-		return m_ShooterHigh;
-	}
-	public DigitalInput GetShooterLow() {
-		return m_ShooterLow;
-	}
-	public Solenoid GetKickerSolenoid() {
-		return m_Kicker;
 	}
 	public AnalogPotentiometer GetArmPot() {
 		return m_ArmPot;
