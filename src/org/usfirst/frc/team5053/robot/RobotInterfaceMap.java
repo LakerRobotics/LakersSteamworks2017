@@ -27,39 +27,39 @@ public class RobotInterfaceMap
 	private final int driverJoystickSlot = 0;
 	private final int operatorJoystickSlot = 1;
 	
-	private int driverButtonX = 2;
+	private int driverButtonX = 0;
 	private int driverButtonA = 0;
-	private int driverButtonB = 1;
-	private int driverButtonY = 3;
-	private int driverSelectButton = 6;
-	private int driverStartButton = 7;
-	private int driverLeftBumper = 4;
-	private int driverRightBumper = 5;
-	private int driverLeftTrigger = 2;
-	private int driverRightTrigger = 3;
-	private int driverLeftJoystickButton = 8;
-	private int driverRightJoystickButton = 9;
-	private int driverLeftY = 1;
+	private int driverButtonB = 0;
+	private int driverButtonY = 0;
+	private int driverSelectButton = 0;
+	private int driverStartButton = 0;
+	private int driverLeftBumper = 0;
+	private int driverRightBumper = 0;
+	private int driverLeftTrigger = 0;
+	private int driverRightTrigger = 0;
+	private int driverLeftJoystickButton = 0;
+	private int driverRightJoystickButton = 0;
+	private int driverLeftY = 0;
 	private int driverLeftX = 0;
-	private int driverRightX = 4;
-	private int driverRightY = 5;
+	private int driverRightX = 0;
+	private int driverRightY = 0;
 	
-	private int operatorButtonX = 2;
+	private int operatorButtonX = 0;
 	private int operatorButtonA = 0;
-	private int operatorButtonB = 1;
-	private int operatorButtonY = 3;
-	private int operatorSelectButton = 6;
-	private int operatorStartButton = 7;
-	private int operatorLeftBumper = 4;
-	private int operatorRightBumper = 5;
-	private int operatorLeftTrigger = 2;
-	private int operatorRightTrigger = 3;
-	private int operatorLeftJoystickButton = 8;
-	private int operatorRightJoystickButton = 9;
-	private int operatorLeftY = 1;
+	private int operatorButtonB = 0;
+	private int operatorButtonY = 0;
+	private int operatorSelectButton = 0;
+	private int operatorStartButton = 0;
+	private int operatorLeftBumper = 0;
+	private int operatorRightBumper = 0;
+	private int operatorLeftTrigger = 0;
+	private int operatorRightTrigger = 0;
+	private int operatorLeftJoystickButton = 0;
+	private int operatorRightJoystickButton = 0;
+	private int operatorLeftY = 0;
 	private int operatorLeftX = 0;
-	private int operatorRightX = 4;
-	private int operatorRightY = 5;
+	private int operatorRightX = 0;
+	private int operatorRightY = 0;
 	
 	
 	private Joystick driverJoystick;
@@ -106,23 +106,22 @@ public class RobotInterfaceMap
 			
 			break;
 		case XBOX:
-			driverButtonX = 0;
-			driverButtonY = 1;
-			driverButtonA = 2;
-			driverButtonB = 3;
-			driverSelectButton = 4;
-			driverStartButton = 5;
-			driverLeftBumper = 6;
-			driverRightBumper = 7;
-			driverLeftTrigger = 8;
-			driverRightTrigger = 9;
-			driverLeftJoystickButton = 10;
-			driverRightJoystickButton = 11;
-			
+			driverButtonX = 2;
+			driverButtonA = 0;
+			driverButtonB = 1;
+			driverButtonY = 3;
+			driverSelectButton = 6;
+			driverStartButton = 7;
+			driverLeftBumper = 4;
+			driverRightBumper = 5;
+			driverLeftTrigger = 2;
+			driverRightTrigger = 3;
+			driverLeftJoystickButton = 8;
+			driverRightJoystickButton = 9;
 			driverLeftY = 1;
-			driverLeftX = 2;
-			driverRightX = 3;
-			driverRightY = 4;
+			driverLeftX = 0;
+			driverRightX = 4;
+			driverRightY = 5;
 			
 			break;
 		default:
@@ -152,23 +151,22 @@ public class RobotInterfaceMap
 			
 			break;
 		case XBOX:
-			operatorButtonX = 0;
-			operatorButtonY = 1;
-			operatorButtonA = 2;
-			operatorButtonB = 3;
-			operatorSelectButton = 4;
-			operatorStartButton = 5;
-			operatorLeftBumper = 6;
-			operatorRightBumper = 7;
-			operatorLeftTrigger = 8;
-			operatorRightTrigger = 9;
-			operatorLeftJoystickButton = 10;
-			operatorRightJoystickButton = 11;
-			
+			operatorButtonX = 2;
+			operatorButtonA = 0;
+			operatorButtonB = 1;
+			operatorButtonY = 3;
+			operatorSelectButton = 6;
+			operatorStartButton = 7;
+			operatorLeftBumper = 4;
+			operatorRightBumper = 5;
+			operatorLeftTrigger = 2;
+			operatorRightTrigger = 3;
+			operatorLeftJoystickButton = 8;
+			operatorRightJoystickButton = 9;
 			operatorLeftY = 1;
-			operatorLeftX = 2;
-			operatorRightX = 3;
-			operatorRightY = 4;
+			operatorLeftX = 0;
+			operatorRightX = 4;
+			operatorRightY = 5;
 			
 			break;
 		default:
