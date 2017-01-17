@@ -11,14 +11,20 @@ public class Arm implements Subsystem {
 	private Talon m_Arm;
 	private AnalogPotentiometer m_StringPot;
 	private PIDController m_PID;
+
+	private double KP = 15.0;
+	private double KI = 0.05;
+	private double KD = 0.0;
+	
+	private double HIGHEST_POSITION = .353;
+	private double LOWEST_POSITION = .179;
 	
 	public Arm(Talon armTalon, AnalogPotentiometer armStringPot) {
 		m_Arm = armTalon;
 		m_StringPot = armStringPot;
 		m_StringPot.setPIDSourceType(PIDSourceType.kDisplacement);
 		
-		//Magic numbers AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
-		m_PID = new PIDController(15.0, 0.05, 0.0, m_StringPot, m_Arm);
+		m_PID = new PIDController(KP, KI, KD, m_StringPot, m_Arm);
 	}
 	
 	public void EnablePID() {
@@ -40,9 +46,7 @@ public class Arm implements Subsystem {
 		return m_StringPot.get();
 	}
 	public void SetTargetPosition(double target) {
-		
-		//Get rid of these magic numbers! AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
-		if(target < .353 && target > .179)
+		if(target < HIGHEST_POSITION && target > LOWEST_POSITION) 
 		{
 			m_PID.setSetpoint(target);
 		}

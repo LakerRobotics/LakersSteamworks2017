@@ -11,13 +11,16 @@ public class Shooter implements Subsystem{
 	private Encoder m_Encoder;
 	private PIDController m_PID;
 	
+	private double KP = 0.001;
+	private double KI = 5.0E-4;
+	private double KD = 0.0;
+	
 	public Shooter(Talon shooterTalon, Encoder shooterEncoder) {
 		m_Shooter = shooterTalon;
 		m_Encoder = shooterEncoder;
 		m_Encoder.setPIDSourceType(PIDSourceType.kRate);
 		
-		//More magic numbers AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
-		m_PID = new PIDController(0.001, 5.0E-4, 0.0, m_Encoder, m_Shooter);
+		m_PID = new PIDController(KP, KI, KD, m_Encoder, m_Shooter);
 	}
 	
 	public void EnablePID() {
