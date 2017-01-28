@@ -81,6 +81,7 @@ public class Robot extends IterativeRobot
          * used for any initialization code.
          */
     	
+    	// the RobotInterfaceMap detects the controller and set the key mapping accordingly
     	m_RobotInterface = new RobotInterfaceMap();
     	
     	
