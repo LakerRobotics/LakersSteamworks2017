@@ -5,7 +5,7 @@ import org.usfirst.frc.team5053.robot.Subsystems.Arm;
 import org.usfirst.frc.team5053.robot.Subsystems.DriveTrain;
 import org.usfirst.frc.team5053.robot.Subsystems.Intake;
 import org.usfirst.frc.team5053.robot.Subsystems.Shooter;
-import org.usfirst.frc.team5053.robot.Subsystems.Vision.GRIPVision;
+import org.usfirst.frc.team5053.robot.Subsystems.Utilities.GRIPVision;
 import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
 
@@ -65,8 +65,9 @@ public class Robot extends IterativeRobot
 	final double SHOOTER_SLOW	= -360;
 	final double SHOOTER_INTAKE	=  360;
 
-	private static final int IMG_WIDTH = 320;
-	private static final int IMG_HEIGHT = 240;
+	private final int IMG_WIDTH		= 320;
+	private final int IMG_HEIGHT 	= 240;
+	private final int CAMERA_ANGLE 	= 52;
 	
 	private VisionThread m_VisionThread;
 	private double m_CenterX = 0.0;
@@ -131,7 +132,7 @@ public class Robot extends IterativeRobot
     	synchronized (m_ImgLock) {
     		centerX = this.m_CenterX;
     	}
-    	double turn = centerX - (IMG_WIDTH / 2);
+    	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
 
     	SmartDashboard.putNumber("Vision Turn", turn);
     	//m_DriveTrain.arcadeDrive(-0.6, turn * 0.005);
