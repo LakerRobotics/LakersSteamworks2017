@@ -16,6 +16,8 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.*;
 import org.opencv.objdetect.*;
 
+import edu.wpi.first.wpilibj.vision.VisionPipeline;
+
 /**
 * GRIPVision class.
 *
@@ -23,7 +25,7 @@ import org.opencv.objdetect.*;
 *
 * @author GRIP
 */
-public class GRIPVision {
+public class GRIPVision implements VisionPipeline {
 
 	//Outputs
 	private Mat hsvThresholdOutput = new Mat();
@@ -41,9 +43,9 @@ public class GRIPVision {
 	public void process(Mat source0) {
 		// Step HSV_Threshold0:
 		Mat hsvThresholdInput = source0;
-		double[] hsvThresholdHue = {80.0, 110.0};
-		double[] hsvThresholdSaturation = {77.96762589928058, 255.0};
-		double[] hsvThresholdValue = {45.86330935251798, 156.26262626262627};
+		double[] hsvThresholdHue = {60.0, 120.0};
+		double[] hsvThresholdSaturation = {97.96762589928056, 255.0};
+		double[] hsvThresholdValue = {25.86330935251798, 156.26262626262627};
 		hsvThreshold(hsvThresholdInput, hsvThresholdHue, hsvThresholdSaturation, hsvThresholdValue, hsvThresholdOutput);
 
 		// Step Find_Contours0:
@@ -57,7 +59,7 @@ public class GRIPVision {
 
 		// Step Filter_Contours0:
 		ArrayList<MatOfPoint> filterContoursContours = convexHullsOutput;
-		double filterContoursMinArea = 5000.0;
+		double filterContoursMinArea = 2500.0;
 		double filterContoursMinPerimeter = 0.0;
 		double filterContoursMinWidth = 0.0;
 		double filterContoursMaxWidth = 1000.0;
@@ -215,3 +217,4 @@ public class GRIPVision {
 		}
 	}
 }
+
