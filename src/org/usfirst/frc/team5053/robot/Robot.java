@@ -81,8 +81,8 @@ public class Robot extends IterativeRobot
          * used for any initialization code.
          */
     	
-    	m_RobotInterface = new RobotInterfaceMap(joystickType.XBOX, joystickType.JOYSTICK);
-    	//m_RobotInterface = new RobotInterfaceMap();
+    	m_RobotInterface = new RobotInterfaceMap();
+    	
     	
     	m_RobotControllers = new RobotControllerMap();
     	m_RobotSensors = new RobotSensorMap();

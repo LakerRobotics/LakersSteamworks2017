@@ -65,27 +65,36 @@ public class RobotInterfaceMap
 	private Joystick driverJoystick;
 	private Joystick operatorJoystick;
 	
-	/** Default constructor. Will not initialize any useful abstraction methods (All gamepad calls will return zero)
-	 *    Use GetDriverButton(int) and GetOperatorButton(int) to get the direct button number
+	/** Default constructor. Will detect if the plugged in controller is xbox  and adjust setting accordingly.
 	 * 
 	 */
 	public RobotInterfaceMap()
 	{
-		
 		driverJoystick = new Joystick(driverJoystickSlot);
-		operatorJoystick = new Joystick(operatorJoystickSlot);
-	}
-	
-	/** Sets the internal button mapping to match the type of controller that
-    an operator will be using. 
-	 * 
-	 */
-	public RobotInterfaceMap(joystickType driverType, joystickType operatorType)
-	{
+		operatorJoystick = new Joystick(operatorJoystickSlot);		
 		
-		switch (driverType)
-		{
-		case LOGITECHGAMEPAD:
+		if (driverJoystick.getIsXbox()){
+			// XBOX
+			driverButtonX = 2;
+			driverButtonA = 0;
+			driverButtonB = 1;
+			driverButtonY = 3;
+			driverSelectButton = 6;
+			driverStartButton = 7;
+			driverLeftBumper = 4;
+			driverRightBumper = 5;
+			driverLeftTrigger = 2;
+			driverRightTrigger = 3;
+			driverLeftJoystickButton = 8;
+			driverRightJoystickButton = 9;
+
+			driverLeftY = 1;
+			driverLeftX = 0;
+			driverRightX = 4;
+			driverRightY = 5;
+		}
+		else{
+			//JOYSTICK Values
 			driverButtonX = 0;
 			driverButtonY = 1;
 			driverButtonA = 2;
@@ -103,34 +112,28 @@ public class RobotInterfaceMap
 			driverLeftX = 2;
 			driverRightX = 3;
 			driverRightY = 4;
-			
-			break;
-		case XBOX:
-			driverButtonX = 2;
-			driverButtonA = 0;
-			driverButtonB = 1;
-			driverButtonY = 3;
-			driverSelectButton = 6;
-			driverStartButton = 7;
-			driverLeftBumper = 4;
-			driverRightBumper = 5;
-			driverLeftTrigger = 2;
-			driverRightTrigger = 3;
-			driverLeftJoystickButton = 8;
-			driverRightJoystickButton = 9;
-			driverLeftY = 1;
-			driverLeftX = 0;
-			driverRightX = 4;
-			driverRightY = 5;
-			
-			break;
-		default:
-			break;
 		}
 		
-		switch (operatorType)
-		{
-		case LOGITECHGAMEPAD:
+		if (operatorJoystick.getIsXbox()){
+		//XBOX:
+			operatorButtonX = 2;
+			operatorButtonA = 0;
+			operatorButtonB = 1;
+			operatorButtonY = 3;
+			operatorSelectButton = 6;
+			operatorStartButton = 7;
+			operatorLeftBumper = 4;
+			operatorRightBumper = 5;
+			operatorLeftTrigger = 2;
+			operatorRightTrigger = 3;
+			operatorLeftJoystickButton = 8;
+			operatorRightJoystickButton = 9;
+			operatorLeftY = 1;
+			operatorLeftX = 0;
+			operatorRightX = 4;
+			operatorRightY = 5;}
+		else{
+		// LOGITECHGAMEPAD:
 			operatorButtonX = 0;
 			operatorButtonY = 1;
 			operatorButtonA = 2;
@@ -148,184 +151,51 @@ public class RobotInterfaceMap
 			operatorLeftX = 2;
 			operatorRightX = 3;
 			operatorRightY = 4;
-			
-			break;
-		case XBOX:
-			operatorButtonX = 2;
-			operatorButtonA = 0;
-			operatorButtonB = 1;
-			operatorButtonY = 3;
-			operatorSelectButton = 6;
-			operatorStartButton = 7;
-			operatorLeftBumper = 4;
-			operatorRightBumper = 5;
-			operatorLeftTrigger = 2;
-			operatorRightTrigger = 3;
-			operatorLeftJoystickButton = 8;
-			operatorRightJoystickButton = 9;
-			operatorLeftY = 1;
-			operatorLeftX = 0;
-			operatorRightX = 4;
-			operatorRightY = 5;
-			
-			break;
-		default:
-			break;
 		}
-		driverJoystick = new Joystick(driverJoystickSlot);
-		operatorJoystick = new Joystick(operatorJoystickSlot);
 			
 	}
 
 	
 	//Driver Controller Abstraction Methods
-	public boolean GetDriverButton(int buttonNumber)
-	{
-		return driverJoystick.getRawButton(buttonNumber);
-	}
-	public boolean GetDriverX()
-	{
-		return driverJoystick.getRawButton(driverButtonX);
-	}
-	public boolean GetDriverY()
-	{
-		return driverJoystick.getRawButton(driverButtonY);
-	}
-	public boolean GetDriverA()
-	{
-		return driverJoystick.getRawButton(driverButtonA);
-	}
-	public boolean GetDriverB()
-	{
-		return driverJoystick.getRawButton(driverButtonB);
-	}
-	public boolean GetDriverSelect()
-	{
-		return driverJoystick.getRawButton(driverSelectButton);
-	}
-	public boolean GetDriverStart()
-	{
-		return driverJoystick.getRawButton(driverStartButton);
-	}
-	public boolean GetDriverLeftBumper()
-	{
-		return driverJoystick.getRawButton(driverLeftBumper);
-	}
-	public boolean GetDriverRightBumper()
-	{
-		return driverJoystick.getRawButton(driverRightBumper);
-	}
-	public boolean GetDriverLeftTrigger()
-	{
-		return driverJoystick.getRawButton(driverLeftTrigger);
-	}
-	public boolean GetDriverRightTrigger()
-	{
-		return driverJoystick.getRawButton(driverRightTrigger);
-	}
-	public boolean GetDriverLeftJoystickButton()
-	{
-		return driverJoystick.getRawButton(driverLeftJoystickButton);
-	}
-	public boolean GetDriverRightJoystickButton()
-	{
-		return driverJoystick.getRawButton(driverRightJoystickButton);
-	}
-	public double GetDriverLeftX()
-	{
-		return driverJoystick.getRawAxis(driverLeftX);
-	}
-	public double GetDriverRightX()
-	{
-		return driverJoystick.getRawAxis(driverRightX);
-	}
-	public double GetDriverLeftY()
-	{
-		return driverJoystick.getRawAxis(driverLeftY);
-	}
-	public double GetDriverRightY()
-	{
-		return driverJoystick.getRawAxis(driverRightY);
-	}
-	public Joystick GetDriverJoystick()
-	{
-		return driverJoystick;
-	}
+	public boolean GetDriverButton(int buttonNumber){return driverJoystick.getRawButton(buttonNumber);}
+	public boolean GetDriverX(){                     return driverJoystick.getRawButton(driverButtonX);}
+	public boolean GetDriverY(){                     return driverJoystick.getRawButton(driverButtonY);}
+	public boolean GetDriverA(){                     return driverJoystick.getRawButton(driverButtonA);}
+	public boolean GetDriverB(){                     return driverJoystick.getRawButton(driverButtonB);}
+	public boolean GetDriverSelect(){                return driverJoystick.getRawButton(driverSelectButton);}
+	public boolean GetDriverStart(){                 return driverJoystick.getRawButton(driverStartButton);}
+	public boolean GetDriverLeftBumper(){            return driverJoystick.getRawButton(driverLeftBumper);}
+	public boolean GetDriverRightBumper(){           return driverJoystick.getRawButton(driverRightBumper);}
+	public boolean GetDriverLeftTrigger(){           return driverJoystick.getRawButton(driverLeftTrigger);}
+	public boolean GetDriverRightTrigger(){          return driverJoystick.getRawButton(driverRightTrigger);}
+	public boolean GetDriverLeftJoystickButton(){    return driverJoystick.getRawButton(driverLeftJoystickButton);}
+	public boolean GetDriverRightJoystickButton(){   return driverJoystick.getRawButton(driverRightJoystickButton);}
+	public double GetDriverLeftX(){                  return driverJoystick.getRawAxis(driverLeftX);}
+	public double GetDriverRightX(){                 return driverJoystick.getRawAxis(driverRightX);}
+	public double GetDriverLeftY(){                  return driverJoystick.getRawAxis(driverLeftY);}
+	public double GetDriverRightY(){                 return driverJoystick.getRawAxis(driverRightY);}
+	public Joystick GetDriverJoystick(){             return driverJoystick;}
 	
 	
 	//Operator Controller Abstraction Methods
 	
-	public boolean GetOperatorButton(int buttonNumber)
-	{
-		return operatorJoystick.getRawButton(buttonNumber);
-	}
-	public boolean GetOperatorX()
-	{
-		return operatorJoystick.getRawButton(operatorButtonX);
-	}
-	public boolean GetOperatorY()
-	{
-		return operatorJoystick.getRawButton(operatorButtonY);
-	}
-	public boolean GetOperatorA()
-	{
-		return operatorJoystick.getRawButton(operatorButtonA);
-	}
-	public boolean GetOperatorB()
-	{
-		return operatorJoystick.getRawButton(operatorButtonB);
-	}
-	public boolean GetOperatorSelect()
-	{
-		return operatorJoystick.getRawButton(operatorSelectButton);
-	}
-	public boolean GetOperatorStart()
-	{
-		return operatorJoystick.getRawButton(operatorStartButton);
-	}
-	public boolean GetOperatorLeftBumper()
-	{
-		return operatorJoystick.getRawButton(operatorLeftBumper);
-	}
-	public boolean GetOperatorRightBumper()
-	{
-		return operatorJoystick.getRawButton(operatorRightBumper);
-	}
-	public boolean GetOperatorLeftTrigger()
-	{
-		return operatorJoystick.getRawButton(operatorLeftTrigger);
-	}
-	public boolean GetOperatorRightTrigger()
-	{
-		return operatorJoystick.getRawButton(operatorRightTrigger);
-	}
-	public boolean GetOperatorLeftJoystickButton()
-	{
-		return operatorJoystick.getRawButton(operatorLeftJoystickButton);
-	}
-	public boolean GetOperatorRightJoystickButton()
-	{
-		return operatorJoystick.getRawButton(operatorRightJoystickButton);
-	}
-	public double GetOperatorLeftX()
-	{
-		return operatorJoystick.getRawAxis(operatorLeftX);
-	}
-	public double GetOperatorRightX()
-	{
-		return operatorJoystick.getRawAxis(operatorRightX);
-	}
-	public double GetOperatorLeftY()
-	{
-		return operatorJoystick.getRawAxis(operatorLeftY);
-	}
-	public double GetOperatorRightY()
-	{
-		return operatorJoystick.getRawAxis(operatorRightY);
-	}
-	public Joystick GetOperatorJoystick()
-	{
-		return operatorJoystick;
-	}
+	public boolean GetOperatorButton(int buttonNumber){return operatorJoystick.getRawButton(buttonNumber);}
+	public boolean GetOperatorX(){                     return operatorJoystick.getRawButton(operatorButtonX);}
+	public boolean GetOperatorY(){                     return operatorJoystick.getRawButton(operatorButtonY);}
+	public boolean GetOperatorA(){                     return operatorJoystick.getRawButton(operatorButtonA);}
+	public boolean GetOperatorB(){                     return operatorJoystick.getRawButton(operatorButtonB);}
+	public boolean GetOperatorSelect(){                return operatorJoystick.getRawButton(operatorSelectButton);}
+	public boolean GetOperatorStart(){                 return operatorJoystick.getRawButton(operatorStartButton);}
+	public boolean GetOperatorLeftBumper(){            return operatorJoystick.getRawButton(operatorLeftBumper);}
+	public boolean GetOperatorRightBumper(){           return operatorJoystick.getRawButton(operatorRightBumper);}
+	public boolean GetOperatorLeftTrigger(){           return operatorJoystick.getRawButton(operatorLeftTrigger);}
+	public boolean GetOperatorRightTrigger(){          return operatorJoystick.getRawButton(operatorRightTrigger);}
+	public boolean GetOperatorLeftJoystickButton(){    return operatorJoystick.getRawButton(operatorLeftJoystickButton);}
+	public boolean GetOperatorRightJoystickButton(){   return operatorJoystick.getRawButton(operatorRightJoystickButton);}
+	public double GetOperatorLeftX(){                  return operatorJoystick.getRawAxis(operatorLeftX);}
+	public double GetOperatorRightX(){                 return operatorJoystick.getRawAxis(operatorRightX);}
+	public double GetOperatorLeftY(){                  return operatorJoystick.getRawAxis(operatorLeftY);}
+	public double GetOperatorRightY(){                 return operatorJoystick.getRawAxis(operatorRightY);}
+	public Joystick GetOperatorJoystick(){             return operatorJoystick;}
 
 }
