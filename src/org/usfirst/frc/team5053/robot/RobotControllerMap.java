@@ -29,6 +29,7 @@ public class RobotControllerMap
 	private final int shooterPWM = 2;
 	private final int intakePWM = 3;
 	private final int armPWM = 4;
+	private final int scalerPWM = 5;
 	
 	
 	private Talon m_LeftDrive;
@@ -38,6 +39,8 @@ public class RobotControllerMap
 	private Talon m_Shooter;
 	
 	private Talon m_Intake;
+	
+	private Talon m_Scaler;
 
 	
 	/**
@@ -55,6 +58,7 @@ public class RobotControllerMap
 		
 		m_Intake = new Talon(intakePWM);
 		
+		m_Scaler = new Talon(scalerPWM);
 	}
 	
 	public Talon GetLeftDrive()
@@ -76,6 +80,9 @@ public class RobotControllerMap
 	public Talon GetIntake()
 	{
 		return m_Intake;
+	}
+	public Talon getScaler() {
+		return m_Scaler;
 	}
 	
 }

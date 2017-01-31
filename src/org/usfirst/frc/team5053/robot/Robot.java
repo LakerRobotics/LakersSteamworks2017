@@ -5,7 +5,18 @@ import org.usfirst.frc.team5053.robot.Subsystems.Arm;
 import org.usfirst.frc.team5053.robot.Subsystems.DriveTrain;
 import org.usfirst.frc.team5053.robot.Subsystems.Intake;
 import org.usfirst.frc.team5053.robot.Subsystems.Shooter;
+import org.usfirst.frc.team5053.robot.Subsystems.Utilities.GRIPVision;
+import org.opencv.core.Rect;
+import org.opencv.imgproc.Imgproc;
 
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.vision.VisionPipeline;
+import edu.wpi.first.wpilibj.vision.VisionRunner;
+import edu.wpi.first.wpilibj.vision.VisionThread;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -37,6 +48,7 @@ public class Robot extends IterativeRobot
 	Arm m_Arm;
 	Intake m_Intake;
 	Shooter m_Shooter;
+	
 	//Arm setpoints
 	final double ARM_NEUTRAL	= 0.209;
 	final double ARM_AUTO		= 0.300;
@@ -57,6 +69,16 @@ public class Robot extends IterativeRobot
 	int selectedAutonomous;
 	int autoLoops;
 
+	private final int IMG_WIDTH		= 320;
+	private final int IMG_HEIGHT 	= 240;
+	private final int CAMERA_ANGLE 	= 52;
+	
+	private VisionThread m_VisionThread;
+	private double m_CenterX = 0.0;
+	
+	private final Object m_ImgLock = new Object();
+	
+	@Override
     public void robotInit()
     {
         /**
@@ -64,8 +86,9 @@ public class Robot extends IterativeRobot
          * used for any initialization code.
          */
     	
-    	m_RobotInterface = new RobotInterfaceMap(joystickType.XBOX, joystickType.JOYSTICK);
-    	//m_RobotInterface = new RobotInterfaceMap();
+    	// the RobotInterfaceMap detects the controller and set the key mapping accordingly
+    	m_RobotInterface = new RobotInterfaceMap();
+    	
     	
     	m_RobotControllers = new RobotControllerMap();
     	m_RobotSensors = new RobotSensorMap();
@@ -79,14 +102,35 @@ public class Robot extends IterativeRobot
     	m_Shooter = new Shooter(m_RobotControllers.GetShooter(), m_RobotSensors.GetShooterEncoder());
     	m_Intake = new Intake(m_RobotControllers.GetIntake());
     	
+<<<<<<< HEAD
     	autonomousStep = 0;
     	selectedAutonomous = 0;
     	autoLoops = 0;
+=======
+    	UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+
+    	camera.setExposureManual(1);
+    	camera.setFPS(30);
+    	camera.setBrightness(1);
+        camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
+        
+        m_VisionThread = new VisionThread(camera, new GRIPVision(), pipeline -> {
+            if (!pipeline.filterContoursOutput().isEmpty()) {
+                Rect r = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
+                synchronized (m_ImgLock) {
+                    m_CenterX = r.x + (r.width / 2);
+                    SmartDashboard.putNumber("Vision CenterX", m_CenterX);
+                }
+            }
+        });
+        m_VisionThread.start();
+    	
+>>>>>>> origin/master
     }
 
     public void autonomousInit() 
     {
-    	   /**
+    	 /**
          * This function is called once when autonomous begins
          */
     	
@@ -95,7 +139,16 @@ public class Robot extends IterativeRobot
 
     public void autonomousPeriodic()
     {
+    	
+    	double centerX;
+    	synchronized (m_ImgLock) {
+    		centerX = this.m_CenterX;
+    	}
+    	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
 
+    	SmartDashboard.putNumber("Vision Turn", turn);
+    	//m_DriveTrain.arcadeDrive(-0.6, turn * 0.005);
+    	
         /**
          * This function is called periodically during autonomous
          */
@@ -111,6 +164,7 @@ public class Robot extends IterativeRobot
 
     public void teleopPeriodic()
     {
+    	SmartDashboard.putNumber("Vision CenterX", m_CenterX);
         /**
          * This function is called periodically during operator control
          */
