@@ -52,6 +52,10 @@ public class Robot extends IterativeRobot
 	final double SHOOTER_FAST	= -380;
 	final double SHOOTER_SLOW	= -360;
 	final double SHOOTER_INTAKE	=  360;
+	
+	int autonomousStep;
+	int selectedAutonomous;
+	int autoLoops;
 
     public void robotInit()
     {
@@ -74,6 +78,10 @@ public class Robot extends IterativeRobot
     	
     	m_Shooter = new Shooter(m_RobotControllers.GetShooter(), m_RobotSensors.GetShooterEncoder());
     	m_Intake = new Intake(m_RobotControllers.GetIntake());
+    	
+    	autonomousStep = 0;
+    	selectedAutonomous = 0;
+    	autoLoops = 0;
     }
 
     public void autonomousInit() 
@@ -81,6 +89,8 @@ public class Robot extends IterativeRobot
     	   /**
          * This function is called once when autonomous begins
          */
+    	
+    	
     }
 
     public void autonomousPeriodic()
@@ -89,6 +99,13 @@ public class Robot extends IterativeRobot
         /**
          * This function is called periodically during autonomous
          */
+    	switch(selectedAutonomous)
+    	{
+    	case 0:
+    		BasicAutonomous();
+    		break;
+    	}
+    	autoLoops++;
     }
 
 
@@ -225,6 +242,26 @@ public class Robot extends IterativeRobot
     	{
     		//STOP
     		m_Shooter.SetTalonOutput(0);
+    	}
+    }
+    public void BasicAutonomous()
+    {
+    	switch(autonomousStep)
+    	{
+    	case 0:
+    		m_DriveTrain.arcadeDrive(.25, 0.0);
+    		autonomousStep++;
+    		break;
+    	case 1:
+    		if(autoLoops >= 150) // 3 Seconds
+    		{
+    			m_DriveTrain.arcadeDrive(0.0, 0.0);
+    			autonomousStep++;
+    		}
+    		break;    
+    	case 2:
+    		//Done
+    		break;
     	}
     }
     public void GetDashboardData()
