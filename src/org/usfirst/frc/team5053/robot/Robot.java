@@ -1,7 +1,7 @@
 package org.usfirst.frc.team5053.robot;
 
 import org.usfirst.frc.team5053.robot.RobotInterfaceMap.joystickType;
-import org.usfirst.frc.team5053.robot.Subsystems.Arm;
+import org.usfirst.frc.team5053.robot.Subsystems.GearManipulator;
 import org.usfirst.frc.team5053.robot.Subsystems.DriveTrain;
 import org.usfirst.frc.team5053.robot.Subsystems.Intake;
 import org.usfirst.frc.team5053.robot.Subsystems.Shooter;
@@ -45,7 +45,7 @@ public class Robot extends IterativeRobot
 	
 	//Robot Subsystem Declaration
 	DriveTrain m_DriveTrain;
-	Arm m_Arm;
+	GearManipulator m_Arm;
 	Intake m_Intake;
 	Shooter m_Shooter;
 	
@@ -64,10 +64,6 @@ public class Robot extends IterativeRobot
 	final double SHOOTER_FAST	= -380;
 	final double SHOOTER_SLOW	= -360;
 	final double SHOOTER_INTAKE	=  360;
-	
-	int autonomousStep;
-	int selectedAutonomous;
-	int autoLoops;
 
 	private final int IMG_WIDTH		= 320;
 	private final int IMG_HEIGHT 	= 240;
@@ -77,6 +73,9 @@ public class Robot extends IterativeRobot
 	private double m_CenterX = 0.0;
 	
 	private final Object m_ImgLock = new Object();
+	
+	private boolean isDriveTrainPIDFinished = false;
+	private int autonomousCase;
 	
 	@Override
     public void robotInit()
@@ -96,17 +95,14 @@ public class Robot extends IterativeRobot
     	
     	
     	//Robot Subsystem Initialization
-    	m_DriveTrain = new DriveTrain(m_RobotControllers.GetLeftDrive(), m_RobotControllers.GetRightDrive());
-    	m_Arm = new Arm(m_RobotControllers.GetArm(), m_RobotSensors.GetArmPot());
+    	m_DriveTrain = new DriveTrain(m_RobotControllers.GetLeftDrive(), m_RobotControllers.GetRightDrive(), m_RobotSensors.GetLeftDriveEncoder(), m_RobotSensors.GetRightDriveEncoder(), m_RobotSensors.GetGyro());
+    	m_Arm = new GearManipulator(m_RobotControllers.GetGearManipulator(), m_RobotSensors.GetGearManipulator());
     	
     	m_Shooter = new Shooter(m_RobotControllers.GetShooter(), m_RobotSensors.GetShooterEncoder());
     	m_Intake = new Intake(m_RobotControllers.GetIntake());
     	
-<<<<<<< HEAD
-    	autonomousStep = 0;
-    	selectedAutonomous = 0;
-    	autoLoops = 0;
-=======
+    	autonomousCase = 0;
+    	
     	UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 
     	camera.setExposureManual(1);
@@ -124,8 +120,11 @@ public class Robot extends IterativeRobot
             }
         });
         m_VisionThread.start();
+        
+        System.out.println(m_DriveTrain.GetAverageDistance());
+        System.out.println(m_DriveTrain.GetPIDSetpoint());
+        
     	
->>>>>>> origin/master
     }
 
     public void autonomousInit() 
@@ -133,8 +132,6 @@ public class Robot extends IterativeRobot
     	 /**
          * This function is called once when autonomous begins
          */
-    	
-    	
     }
 
     public void autonomousPeriodic()
@@ -152,44 +149,35 @@ public class Robot extends IterativeRobot
         /**
          * This function is called periodically during autonomous
          */
-    	switch(selectedAutonomous)
+    	switch(autonomousCase)
     	{
     	case 0:
-    		BasicAutonomous();
+    		m_DriveTrain.SetPIDSetpoint(5000, 0);
+    		m_DriveTrain.EnablePID();
+    		m_DriveTrain.WriteDashboardData();
+    		autonomousCase++;
+    		System.out.println("Incrementing Case");
+    		break;
+    	case 1:
+    		m_DriveTrain.WriteDashboardData();
+    		if(m_DriveTrain.DistanceOnTarget())
+    			m_DriveTrain.DisablePID();
     		break;
     	}
-    	autoLoops++;
     }
 
 
     public void teleopPeriodic()
     {
     	SmartDashboard.putNumber("Vision CenterX", m_CenterX);
+    	GetDashboardData();
+    	m_DriveTrain.WriteDashboardData();
+    	
+    	arcadeDrive();
+    	
         /**
          * This function is called periodically during operator control
          */
-    	arcadeDrive();
-    	
-    	//Arm
-    	if(m_RobotInterface.GetOperatorButton(1))
-    	{
-    		manualArmControl();
-    	}
-    	else
-    	{
-    		armSetpoints();
-    	}
-
-    	//Intake
-    	intake();
-    	
-    	//Shooter
-    	//shoot();
-    	
-    	//Update Dashboard Variables
-    	GetDashboardData();
-    	
-    	
     }
 
     public void testPeriodic()
@@ -202,7 +190,7 @@ public class Robot extends IterativeRobot
     //Drivetrain
     public void arcadeDrive()
     {
-    	m_DriveTrain.arcadeDrive(m_RobotInterface.GetDriverLeftY(), m_RobotInterface.GetDriverRightX());
+    	m_DriveTrain.ArcadeDrive(m_RobotInterface.GetDriverLeftY(), m_RobotInterface.GetDriverRightX());
     }
     
     //We don't have an arm... yet!
@@ -296,26 +284,6 @@ public class Robot extends IterativeRobot
     	{
     		//STOP
     		m_Shooter.SetTalonOutput(0);
-    	}
-    }
-    public void BasicAutonomous()
-    {
-    	switch(autonomousStep)
-    	{
-    	case 0:
-    		m_DriveTrain.arcadeDrive(.25, 0.0);
-    		autonomousStep++;
-    		break;
-    	case 1:
-    		if(autoLoops >= 150) // 3 Seconds
-    		{
-    			m_DriveTrain.arcadeDrive(0.0, 0.0);
-    			autonomousStep++;
-    		}
-    		break;    
-    	case 2:
-    		//Done
-    		break;
     	}
     }
     public void GetDashboardData()

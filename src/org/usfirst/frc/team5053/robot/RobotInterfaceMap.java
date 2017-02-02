@@ -73,8 +73,9 @@ public class RobotInterfaceMap
 		driverJoystick = new Joystick(driverJoystickSlot);
 		operatorJoystick = new Joystick(operatorJoystickSlot);		
 		
-		if (driverJoystick.getIsXbox()){
+		//if (driverJoystick.getIsXbox()){
 			// XBOX
+			System.out.println("Xbox detected");
 			driverButtonX = 2;
 			driverButtonA = 0;
 			driverButtonB = 1;
@@ -92,9 +93,10 @@ public class RobotInterfaceMap
 			driverLeftX = 0;
 			driverRightX = 4;
 			driverRightY = 5;
-		}
+		/*}
 		else{
 			//JOYSTICK Values
+			System.out.println("Joystick");
 			driverButtonX = 0;
 			driverButtonY = 1;
 			driverButtonA = 2;
@@ -112,10 +114,10 @@ public class RobotInterfaceMap
 			driverLeftX = 2;
 			driverRightX = 3;
 			driverRightY = 4;
-		}
+		}*/
 		
-		if (operatorJoystick.getIsXbox()){
-		//XBOX:
+		/*if (operatorJoystick.getIsXbox()){
+		 XBOX:
 			operatorButtonX = 2;
 			operatorButtonA = 0;
 			operatorButtonB = 1;
@@ -132,8 +134,8 @@ public class RobotInterfaceMap
 			operatorLeftX = 0;
 			operatorRightX = 4;
 			operatorRightY = 5;}
-		else{
-		// LOGITECHGAMEPAD:
+		else{*/
+		 LOGITECHGAMEPAD:
 			operatorButtonX = 0;
 			operatorButtonY = 1;
 			operatorButtonA = 2;
@@ -151,7 +153,7 @@ public class RobotInterfaceMap
 			operatorLeftX = 2;
 			operatorRightX = 3;
 			operatorRightY = 4;
-		}
+		//}
 			
 	}
 

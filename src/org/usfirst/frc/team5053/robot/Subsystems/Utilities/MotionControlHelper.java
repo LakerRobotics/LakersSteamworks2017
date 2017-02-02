@@ -86,26 +86,32 @@ public class MotionControlHelper {
        
        // get the motors going in the right direction
        double gapEnd = m_targetDistance-currentMeasuredDistance;
-       if(gapEnd == 0) {
+       if(gapEnd == 0) 
+       {
     	   targetSpeed = 0;
        }
-       else {
-       targetSpeed = (gapEnd/Math.abs(gapEnd)) * m_runningSpeed; // This just applied +1 or -1 to get the sign right
+       else 
+       {
+    	   targetSpeed = (gapEnd/Math.abs(gapEnd)) * m_runningSpeed; // This just applied +1 or -1 to get the sign right
        }
        
        // Calculate the reduction to the speed if at the start
        double percentRampUp;
        double gapStart = currentMeasuredDistance-m_initialMeasuredDistance;
-       if( Math.abs(gapStart) > m_rampUpRampDownDistance){
+       if( Math.abs(gapStart) > m_rampUpRampDownDistance)
+       {
     	   // We are outside of the rampUp zone 
     	   percentRampUp = 1; //100%
        }
-       else{
+       else
+       {
     	   // Are we right on top of the start point, if so, don't set motor to zero but some minimum number to get things to move
-           if( Math.abs(gapStart) < m_rampUpRampDownDistance*(percentDeadZoneOverride)){
+           if( Math.abs(gapStart) < m_rampUpRampDownDistance*(percentDeadZoneOverride))
+           {
     	      percentRampUp = percentDeadZoneOverride ; //just to make sure it does not stay stuck at the start 
            }
-           else{
+           else
+           {
                percentRampUp = Math.abs(gapStart)/m_rampUpRampDownDistance;
            }
        }
@@ -122,7 +128,8 @@ public class MotionControlHelper {
 //       }
 //       else{
        // If we are near the end, then ramp down
-       if(Math.abs(gapEnd) < m_rampUpRampDownDistance){
+       if(Math.abs(gapEnd) < m_rampUpRampDownDistance) 
+       {
     	   targetSpeed = percentRampDown * targetSpeed;
        }
        System.out.println("targetSpeed="+targetSpeed);

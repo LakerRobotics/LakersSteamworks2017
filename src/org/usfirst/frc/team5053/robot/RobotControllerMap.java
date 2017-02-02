@@ -28,14 +28,14 @@ public class RobotControllerMap
 	private final int rightDrivePWM = 1;
 	private final int shooterPWM = 2;
 	private final int intakePWM = 3;
-	private final int armPWM = 4;
+	private final int gearManipulatorPWM = 4;
 	private final int scalerPWM = 5;
 	
 	
 	private Talon m_LeftDrive;
 	private Talon m_RightDrive;
 	
-	private Talon m_Arm;
+	private Talon m_GearManipulator;
 	private Talon m_Shooter;
 	
 	private Talon m_Intake;
@@ -52,7 +52,7 @@ public class RobotControllerMap
 		m_LeftDrive = new Talon(leftDrivePWM);
 		m_RightDrive = new Talon(rightDrivePWM);
 		
-		m_Arm = new Talon(armPWM);
+		m_GearManipulator = new Talon(gearManipulatorPWM);
 		
 		m_Shooter = new Talon(shooterPWM);
 		
@@ -69,9 +69,9 @@ public class RobotControllerMap
 	{
 		return m_RightDrive;
 	}
-	public Talon GetArm()
+	public Talon GetGearManipulator()
 	{
-		return m_Arm;
+		return m_GearManipulator;
 	}
 	public Talon GetShooter()
 	{
