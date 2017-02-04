@@ -3,11 +3,11 @@ package org.usfirst.frc.team5053.robot.Subsystems;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDSourceType;
-import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.SpeedController;
 
 public class Shooter implements Subsystem{
 
-	private Talon m_Shooter;
+	private SpeedController m_Shooter;
 	private Encoder m_Encoder;
 	private PIDController m_PID;
 	
@@ -15,7 +15,7 @@ public class Shooter implements Subsystem{
 	private double KI = 5.0E-4;
 	private double KD = 0.0;
 	
-	public Shooter(Talon shooterTalon, Encoder shooterEncoder) {
+	public Shooter(SpeedController shooterTalon, Encoder shooterEncoder) {
 		m_Shooter = shooterTalon;
 		m_Encoder = shooterEncoder;
 		m_Encoder.setPIDSourceType(PIDSourceType.kRate);

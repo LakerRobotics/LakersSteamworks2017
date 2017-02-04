@@ -36,16 +36,8 @@ public class RobotSensorMap
 	private Encoder m_LeftShooter;
 	private Encoder m_GearManipulator;
 	
-	private AnalogPotentiometer m_Encoder;
 	private ADXRS450_Gyro m_Gyro;
 	
-	/**
-<<<<<<< HEAD
-	 
-=======
-	 
->>>>>>> refs/remotes/origin/master
-	 */
 	public RobotSensorMap()
 	{
 		m_LeftDrive = new Encoder(leftDriveEncoderADIO, leftDriveEncoderBDIO);

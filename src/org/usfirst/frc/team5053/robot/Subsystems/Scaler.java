@@ -3,11 +3,11 @@ package org.usfirst.frc.team5053.robot.Subsystems;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDSourceType;
-import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.SpeedController;
 
 public class Scaler implements Subsystem {
 	
-	private Talon m_Scaler;
+	private SpeedController m_Scaler;
 	private Encoder m_Encoder;
 	private PIDController m_PID;
 	
@@ -15,7 +15,7 @@ public class Scaler implements Subsystem {
 	private double KI;
 	private double KD;
 	
-	public Scaler(Talon scalerTalon, Encoder scalerEncoder) {
+	public Scaler(SpeedController scalerTalon, Encoder scalerEncoder) {
 		m_Scaler = scalerTalon;
 		m_Encoder = scalerEncoder;
 		
