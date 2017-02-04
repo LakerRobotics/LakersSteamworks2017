@@ -95,11 +95,11 @@ public class Robot extends IterativeRobot
     	
     	
     	//Robot Subsystem Initialization
-    	m_DriveTrain = new DriveTrain(m_RobotControllers.GetLeftDrive(), m_RobotControllers.GetRightDrive(), m_RobotSensors.GetLeftDriveEncoder(), m_RobotSensors.GetRightDriveEncoder(), m_RobotSensors.GetGyro());
-    	m_Arm = new GearManipulator(m_RobotControllers.GetGearManipulator(), m_RobotSensors.GetGearManipulator());
+    	m_DriveTrain = new DriveTrain(m_RobotControllers.getLeftDrive(), m_RobotControllers.getRightDrive(), m_RobotSensors.getLeftDriveEncoder(), m_RobotSensors.getRightDriveEncoder(), m_RobotSensors.getGyro());
+    	m_Arm = new GearManipulator(m_RobotControllers.getGearManipulator(), m_RobotSensors.getGearManipulatorEncoder());
     	
-    	m_Shooter = new Shooter(m_RobotControllers.GetShooter(), m_RobotSensors.GetShooterEncoder());
-    	m_Intake = new Intake(m_RobotControllers.GetIntake());
+    	m_Shooter = new Shooter(m_RobotControllers.getShooter(), m_RobotSensors.getShooterEncoder());
+    	m_Intake = new Intake(m_RobotControllers.getIntake());
     	
     	autonomousCase = 0;
     	

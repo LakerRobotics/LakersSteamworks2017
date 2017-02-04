@@ -38,14 +38,7 @@ public class RobotSensorMap
 	
 	private AnalogPotentiometer m_Encoder;
 	private ADXRS450_Gyro m_Gyro;
-	
-	/**
-<<<<<<< HEAD
-	 
-=======
-	 
->>>>>>> refs/remotes/origin/master
-	 */
+
 	public RobotSensorMap()
 	{
 		m_LeftDrive = new Encoder(leftDriveEncoderADIO, leftDriveEncoderBDIO);
@@ -56,19 +49,19 @@ public class RobotSensorMap
 		m_Gyro = new ADXRS450_Gyro();
 	}
 	
-	public Encoder GetLeftDriveEncoder() {
+	public Encoder getLeftDriveEncoder() {
 		return m_LeftDrive;
 	}
-	public Encoder GetRightDriveEncoder() {
+	public Encoder getRightDriveEncoder() {
 		return m_RightDrive;
 	}
-	public Encoder GetShooterEncoder() {
+	public Encoder getShooterEncoder() {
 		return m_LeftShooter;
 	}
-	public Encoder GetGearManipulator() {
+	public Encoder getGearManipulatorEncoder() {
 		return m_GearManipulator;
 	}
-	public ADXRS450_Gyro GetGyro() {
+	public ADXRS450_Gyro getGyro() {
 		return m_Gyro;
 	}
 	/*
