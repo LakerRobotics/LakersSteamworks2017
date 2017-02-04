@@ -1,14 +1,14 @@
 package org.usfirst.frc.team5053.robot.Subsystems.Utilities;
 
-import org.usfirst.frc.team5053.robot.Subsystems.DriveTrain;
+import org.usfirst.frc.team5053.robot.Subsystems.DriveTrainMotionControl;
 
 import edu.wpi.first.wpilibj.PIDOutput;
 
 public class DriveStraightPIDOutput implements PIDOutput {
 	
-	private DriveTrain m_DriveTrain;
+	private DriveTrainMotionControl m_DriveTrain;
 	
-	public DriveStraightPIDOutput(DriveTrain driveTrain) {
+	public DriveStraightPIDOutput(DriveTrainMotionControl driveTrain) {
 		m_DriveTrain = driveTrain;
 	}
 	

@@ -5,6 +5,8 @@ import org.usfirst.frc.team5053.robot.Subsystems.GearManipulator;
 import org.usfirst.frc.team5053.robot.Subsystems.DriveTrain;
 import org.usfirst.frc.team5053.robot.Subsystems.Intake;
 import org.usfirst.frc.team5053.robot.Subsystems.Shooter;
+import org.usfirst.frc.team5053.robot.Subsystems.Utilities.AnglePIDWrapper;
+import org.usfirst.frc.team5053.robot.Subsystems.Utilities.DistancePIDWrapper;
 import org.usfirst.frc.team5053.robot.Subsystems.Utilities.GRIPVision;
 import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
@@ -49,6 +51,9 @@ public class Robot extends IterativeRobot
 	Intake m_Intake;
 	Shooter m_Shooter;
 	
+	AnglePIDWrapper m_AnglePIDWrapper;
+	DistancePIDWrapper m_DistancePIDWrapper;
+	
 	//Arm setpoints
 	final double ARM_NEUTRAL	= 0.209;
 	final double ARM_AUTO		= 0.300;
@@ -71,10 +76,12 @@ public class Robot extends IterativeRobot
 	
 	private VisionThread m_VisionThread;
 	private double m_CenterX = 0.0;
+	private double m_VisionTurn;
 	
 	private final Object m_ImgLock = new Object();
 	
 	private boolean isDriveTrainPIDFinished = false;
+	private boolean m_HasTarget;
 	private int autonomousCase;
 	
 	@Override
@@ -101,6 +108,9 @@ public class Robot extends IterativeRobot
     	m_Shooter = new Shooter(m_RobotControllers.getShooter(), m_RobotSensors.getShooterEncoder());
     	m_Intake = new Intake(m_RobotControllers.getIntake());
     	
+    	m_AnglePIDWrapper = new AnglePIDWrapper(m_DriveTrain);
+    	m_DistancePIDWrapper = new DistancePIDWrapper(m_DriveTrain);
+    	
     	autonomousCase = 0;
     	
     	UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
@@ -124,6 +134,8 @@ public class Robot extends IterativeRobot
         System.out.println(m_DriveTrain.GetAverageDistance());
         System.out.println(m_DriveTrain.GetPIDSetpoint());
         
+        m_HasTarget = false;
+        
     	
     }
 
@@ -136,14 +148,13 @@ public class Robot extends IterativeRobot
 
     public void autonomousPeriodic()
     {
-    	
     	double centerX;
     	synchronized (m_ImgLock) {
     		centerX = this.m_CenterX;
     	}
-    	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
+    	this.m_VisionTurn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
 
-    	SmartDashboard.putNumber("Vision Turn", turn);
+    	SmartDashboard.putNumber("Vision Turn", m_VisionTurn);
     	//m_DriveTrain.arcadeDrive(-0.6, turn * 0.005);
     	
         /**
@@ -152,7 +163,9 @@ public class Robot extends IterativeRobot
     	switch(autonomousCase)
     	{
     	case 0:
-    		m_DriveTrain.SetPIDSetpoint(5000, 0);
+    		m_DriveTrain.ResetEncoders();
+    		m_DriveTrain.ResetAngle();
+    		m_DriveTrain.SetPIDSetpoint(2000, 0);
     		m_DriveTrain.EnablePID();
     		m_DriveTrain.WriteDashboardData();
     		autonomousCase++;
@@ -161,7 +174,9 @@ public class Robot extends IterativeRobot
     	case 1:
     		m_DriveTrain.WriteDashboardData();
     		if(m_DriveTrain.DistanceOnTarget())
+    		{
     			m_DriveTrain.DisablePID();
+    		}
     		break;
     	}
     }
@@ -173,7 +188,28 @@ public class Robot extends IterativeRobot
     	GetDashboardData();
     	m_DriveTrain.WriteDashboardData();
     	
-    	arcadeDrive();
+    	double centerX;
+    	synchronized (m_ImgLock) {
+    		centerX = this.m_CenterX;
+    	}
+    	
+    	
+    	    	
+    	if(m_RobotInterface.GetDriverB() && !m_HasTarget) {
+    		
+    		m_DriveTrain.ResetAngle();
+    		m_DriveTrain.ResetEncoders();
+    		this.m_VisionTurn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
+    		m_DriveTrain.SetPIDSetpoint(0, m_VisionTurn);
+    		m_DriveTrain.EnablePID();
+    		m_HasTarget = true;
+    	}
+    	else if(!m_RobotInterface.GetDriverB())
+    	{
+    		m_DriveTrain.DisablePID();
+    		arcadeDrive();
+    		m_HasTarget = false;
+    	}
     	
         /**
          * This function is called periodically during operator control
@@ -190,7 +226,7 @@ public class Robot extends IterativeRobot
     //Drivetrain
     public void arcadeDrive()
     {
-    	m_DriveTrain.ArcadeDrive(m_RobotInterface.GetDriverLeftY(), m_RobotInterface.GetDriverRightX());
+    	m_DriveTrain.TeleopDrive(-m_RobotInterface.GetDriverLeftY(), m_RobotInterface.GetDriverRightX());
     }
     
     //We don't have an arm... yet!
@@ -199,6 +235,14 @@ public class Robot extends IterativeRobot
     	//Gives the operator manual control over the arm if setpoints aren't working (sensor failure)
     	m_Arm.DisablePID();
         m_Arm.SetTalonOutput(-m_RobotInterface.GetOperatorJoystick().getRawAxis(1));
+    }
+    public void getTargetOffset()
+    {
+    	double centerX;
+    	synchronized (m_ImgLock) {
+    		centerX = this.m_CenterX;
+    	}
+    	this.m_VisionTurn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
     }
     
     

@@ -14,6 +14,7 @@ public class Scaler implements Subsystem {
 	public void SetTalonOutput(double speed) {
 		m_Scaler.set(speed);
 	}
+	
 	public void WriteDashboardData() {
 		SmartDashboard.putNumber("intakeMotorPower", m_Scaler.getSpeed());
 	}

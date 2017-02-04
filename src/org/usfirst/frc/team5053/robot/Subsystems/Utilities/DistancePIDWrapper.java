@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.PIDSourceType;
 public class DistancePIDWrapper implements PIDOutput, PIDSource {
 	
 	private DriveTrain m_drivetrain;
+	private final double OUTPUT_RANGE = .5;
+	
 	public DistancePIDWrapper(DriveTrain drivetrain)
 	{
 		m_drivetrain = drivetrain;
@@ -15,8 +17,7 @@ public class DistancePIDWrapper implements PIDOutput, PIDSource {
 
 	@Override
 	public PIDSourceType getPIDSourceType() {
-		// TODO Auto-generated method stub
-		return null;
+		return PIDSourceType.kDisplacement;
 	}
 
 	@Override
@@ -32,7 +33,7 @@ public class DistancePIDWrapper implements PIDOutput, PIDSource {
 
 	@Override
 	public void pidWrite(double output) {
-		m_drivetrain.SetSpeed(output);
+		m_drivetrain.SetSpeed(output*OUTPUT_RANGE);
 	}
 
 }
