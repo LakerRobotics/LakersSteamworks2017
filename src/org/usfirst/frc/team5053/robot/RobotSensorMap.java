@@ -38,6 +38,10 @@ public class RobotSensorMap
 	
 	private AnalogPotentiometer m_Encoder;
 	private ADXRS450_Gyro m_Gyro;
+<<<<<<< HEAD
+=======
+	
+>>>>>>> origin/master
 
 	public RobotSensorMap()
 	{

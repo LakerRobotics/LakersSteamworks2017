@@ -20,9 +20,6 @@ import edu.wpi.first.wpilibj.SpeedController;
 
 public class DriveTrain extends RobotDrive implements Subsystem
 {
-	/**
-	 * Hello There! : I'm the base constructor.
-	 */
 	
 	private SpeedController m_LeftMotor;
 	private SpeedController m_RightMotor;
@@ -135,8 +132,10 @@ public class DriveTrain extends RobotDrive implements Subsystem
 	}
 	public double GetAverageDistance()
 	{
-		return GetLeftDistance();
+		return (GetLeftDistance() + GetRightDistance())/2;
+		//return GetLeftDistance();
 	}
+	
 	public double GetPIDSetpoint()
 	{
 		return m_DistancePIDWrapper.pidGet();
@@ -156,14 +155,19 @@ public class DriveTrain extends RobotDrive implements Subsystem
 	{
 		return m_Gyro.getAngle();
 	}
+	// Do not want to do this, because now the gyro drift is so low we want to keep field orientaiton
+	//@deprecated 
 	public void ResetAngle()
 	{
 		m_Gyro.reset();
+		System.out.println("Do not reset the gyro, because we want to keep field orientation");
 	}
 	public double GetAngularVelocity()
 	{
 		return m_Gyro.getRate();
 	}
+	
+	
 	public void SetTurn(double turn)
 	{
 		ArcadeDrive(m_speed, turn);
@@ -218,8 +222,7 @@ public class DriveTrain extends RobotDrive implements Subsystem
 	public void SetPIDSetpoint(double distance, double angle)
 	{
 		m_DistancePID.setSetpoint(distance);
-		m_AnglePID.setSetpoint(angle);
-		
+		m_AnglePID.setSetpoint(angle);	
 	}
 	double GetDistancePIDSetpoint() 
 	{
@@ -229,10 +232,10 @@ public class DriveTrain extends RobotDrive implements Subsystem
 	{
 		return m_AnglePID.getSetpoint();
 	}
+	
 	public HashMap<String, Double> GetDashboardData() {
 		return null;
 		// TODO Auto-generated method stub
-		
 	}
 	@Override
 	public void WriteDashboardData() {

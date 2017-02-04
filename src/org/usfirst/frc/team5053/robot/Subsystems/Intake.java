@@ -1,6 +1,7 @@
 package org.usfirst.frc.team5053.robot.Subsystems;
 
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Intake implements Subsystem{
 	
@@ -14,7 +15,6 @@ public class Intake implements Subsystem{
 		m_Intake.set(speed);
 	}
 	public void WriteDashboardData() {
-		// TODO Auto-generated method stub
-		
+		SmartDashboard.putNumber("intakeMotorPower", m_Intake.getSpeed());
 	}
 }
