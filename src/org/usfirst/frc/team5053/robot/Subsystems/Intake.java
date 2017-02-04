@@ -1,12 +1,12 @@
 package org.usfirst.frc.team5053.robot.Subsystems;
 
-import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.Talon;
 
 public class Intake implements Subsystem{
 	
-	private SpeedController m_Intake;
+	private Talon m_Intake;
 	
-	public Intake(SpeedController intakeTalon) {
+	public Intake(Talon intakeTalon) {
 		m_Intake = intakeTalon;
 	}
 	
