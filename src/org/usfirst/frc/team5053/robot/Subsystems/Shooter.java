@@ -26,21 +26,27 @@ public class Shooter implements Subsystem{
 	public void EnablePID() {
 		m_PID.enable();
 	}
+	
 	public void DisablePID() {
 		m_PID.disable();
 	}
+	
 	public boolean isPIDEnabled() {
 		return m_PID.isEnabled();
 	}
+	
 	public boolean ShooterOnTarget() {
 		return m_PID.onTarget();
 	}
+	
 	public void SetShooterSetpoint(double speed) {
 		m_PID.setSetpoint(speed);
 	}
+	
 	public void SetTalonOutput(double speed) {
 		m_Shooter.set(speed);
 	}
+	
 	public void WriteDashboardData() {
 		
 	}

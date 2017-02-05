@@ -12,13 +12,14 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /**
  * Drivetrain subsystem that extends the FRC RobotDrive class.
  * @author Colin Ross
  *
  */
 
-public class DriveTrain extends RobotDrive implements Subsystem
+public class DriveTrain implements Subsystem
 {
 	
 	private SpeedController m_LeftMotor;
@@ -30,7 +31,6 @@ public class DriveTrain extends RobotDrive implements Subsystem
 	private DistancePIDWrapper m_DistancePIDWrapper;
 	private AnglePIDWrapper m_AnglePIDWrapper;
 	
-	
 	private Encoder m_LeftEncoder;
 	private Encoder m_RightEncoder;
 	
@@ -39,9 +39,20 @@ public class DriveTrain extends RobotDrive implements Subsystem
 	private double m_speed = 0.0;
 	private double m_turn = 0.0;
 	
+	private RobotDrive m_RobotDrive;
+	
+	private final double STRAIGHT_KP = 0.1;
+	private final double STRAIGHT_KI = 0.0;
+	private final double STRAIGHT_KD = 0.0;
+	
+	private final double TURN_KP = 0.9;
+	private final double TURN_KI = 0.0;
+	private final double TURN_KD = 0.0;
+	
 	public DriveTrain(SpeedController leftMotor, SpeedController rightMotor) 
 	{
-		super(leftMotor, rightMotor);
+		m_RobotDrive = new RobotDrive(leftMotor, rightMotor);
+		
 		m_LeftMotor = leftMotor;
 		m_RightMotor = rightMotor;
 		
@@ -52,7 +63,7 @@ public class DriveTrain extends RobotDrive implements Subsystem
 	}
 	public DriveTrain(SpeedController leftMotor, SpeedController rightMotor, Encoder leftEncoder, Encoder rightEncoder)
 	{
-		super(leftMotor, rightMotor);
+		m_RobotDrive = new RobotDrive(leftMotor, rightMotor);
 		
 		m_LeftMotor = leftMotor;
 		m_RightMotor = rightMotor;
@@ -66,23 +77,22 @@ public class DriveTrain extends RobotDrive implements Subsystem
 		
 		m_DistancePIDWrapper = new DistancePIDWrapper(this);
 		
-		
-		this.setExpiration(0.1);
-		
-		
 		m_DistancePID = new PIDController(0.1, 0.0, 0.0, m_DistancePIDWrapper, m_DistancePIDWrapper);
 		m_DistancePID.setAbsoluteTolerance(5.2);
 		
 	}
 	public DriveTrain(SpeedController leftMotor, SpeedController rightMotor, Encoder leftEncoder, Encoder rightEncoder, ADXRS450_Gyro Gyro)
 	{
-		super(leftMotor, rightMotor);
+		m_RobotDrive = new RobotDrive(leftMotor, rightMotor);
 		
 		m_LeftMotor = leftMotor;
 		m_RightMotor = rightMotor;
 		
 		m_LeftEncoder = leftEncoder;
 		m_RightEncoder = rightEncoder;
+		
+		m_LeftEncoder.setReverseDirection(true);
+		m_RightEncoder.setReverseDirection(true);
 		
 		m_Gyro = Gyro;
 		
@@ -91,15 +101,11 @@ public class DriveTrain extends RobotDrive implements Subsystem
 		
 		m_DistancePIDWrapper = new DistancePIDWrapper(this);
 		m_AnglePIDWrapper = new AnglePIDWrapper(this);
-		
-		
-		//this.setExpiration(0.1);
-		
-		
-		m_DistancePID = new PIDController(0.1, 0.0, 0.0, m_DistancePIDWrapper, m_DistancePIDWrapper);
+
+		m_DistancePID = new PIDController(STRAIGHT_KP, STRAIGHT_KI, STRAIGHT_KD, m_DistancePIDWrapper, m_DistancePIDWrapper);
 		m_DistancePID.setAbsoluteTolerance(5.2);
 		
-		m_AnglePID = new PIDController(0.1, 0.0, 0.0, m_AnglePIDWrapper, m_AnglePIDWrapper);
+		m_AnglePID = new PIDController(TURN_KP, TURN_KI, TURN_KD, m_AnglePIDWrapper, m_AnglePIDWrapper);
 		m_AnglePID.setAbsoluteTolerance(2.5);
 		
 		System.out.println("Constructor finished");
@@ -145,7 +151,11 @@ public class DriveTrain extends RobotDrive implements Subsystem
 	{
 		m_speed = speed;
 		m_turn = angle;
-		this.ArcadeDrive(speed, angle);
+		m_RobotDrive.arcadeDrive(speed, angle);
+	}
+	public void TeleopDrive(double speed, double angle)
+	{
+		m_RobotDrive.arcadeDrive(speed, angle);
 	}
 	public void SetSpeed(double speed)
 	{
@@ -238,12 +248,11 @@ public class DriveTrain extends RobotDrive implements Subsystem
 	
 	public HashMap<String, Double> GetDashboardData() {
 		return null;
-		// TODO Auto-generated method stub
 	}
 	@Override
 	public void WriteDashboardData() {
-		// TODO Auto-generated method stub
-		
+		SmartDashboard.putNumber("Encoder Distance", GetAverageDistance());
+		SmartDashboard.putNumber("Gyro Angle", GetAngle());
 	}
 
 }

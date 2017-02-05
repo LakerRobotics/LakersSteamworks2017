@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.PIDSourceType;
 public class AnglePIDWrapper implements PIDOutput, PIDSource {
 	
 	private DriveTrain m_drivetrain;
+	private final double OUTPUT_RANGE = .5;
+	
 	public AnglePIDWrapper(DriveTrain drivetrain)
 	{
 		m_drivetrain = drivetrain;
@@ -15,8 +17,7 @@ public class AnglePIDWrapper implements PIDOutput, PIDSource {
 
 	@Override
 	public PIDSourceType getPIDSourceType() {
-		// TODO Auto-generated method stub
-		return null;
+		return PIDSourceType.kDisplacement;
 	}
 
 	@Override
@@ -32,7 +33,7 @@ public class AnglePIDWrapper implements PIDOutput, PIDSource {
 
 	@Override
 	public void pidWrite(double output) {
-		m_drivetrain.SetTurn(output);
+		m_drivetrain.SetTurn(output*OUTPUT_RANGE);
 	}
 
 }

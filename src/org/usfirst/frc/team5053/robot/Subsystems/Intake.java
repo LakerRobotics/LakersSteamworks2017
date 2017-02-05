@@ -14,6 +14,7 @@ public class Intake implements Subsystem{
 	public void SetTalonOutput(double speed) {
 		m_Intake.set(speed);
 	}
+	
 	public void WriteDashboardData() {
 		SmartDashboard.putNumber("intakeMotorPower", m_Intake.getSpeed());
 	}
