@@ -159,8 +159,11 @@ public class DriveTrain extends RobotDrive implements Subsystem
 	//@deprecated 
 	public void ResetAngle()
 	{
-		m_Gyro.reset();
-		System.out.println("Do not reset the gyro, because we want to keep field orientation");
+		System.out.println("Do not reset the gyro, because we want to keep field orientation, instead record the current angle & calculate the change yourself");
+		boolean DestroyFieldOreintation = false;
+		if(DestroyFieldOreintation){
+			m_Gyro.reset();
+		}
 	}
 	public double GetAngularVelocity()
 	{

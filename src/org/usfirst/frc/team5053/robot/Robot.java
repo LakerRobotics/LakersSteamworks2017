@@ -39,12 +39,12 @@ public class Robot extends IterativeRobot
 	//Robot Map Declaration
 	RobotInterfaceMap m_RobotInterface;
 	RobotControllerMap m_RobotControllers;
-	RobotSensorMap m_RobotSensors;
+	public static RobotSensorMap m_RobotSensors;
 	
 	
 	
 	//Robot Subsystem Declaration
-	DriveTrain m_DriveTrain;
+	public static DriveTrain m_DriveTrain;
 	GearManipulator m_Arm;
 	Intake m_Intake;
 	Shooter m_Shooter;
@@ -157,10 +157,11 @@ public class Robot extends IterativeRobot
     		m_DriveTrain.WriteDashboardData();
     		autonomousCase++;
     		System.out.println("Incrementing Case");
+    		// TODO consider removing this break so don't have to wait a cycle to start Driving
     		break;
     	case 1:
     		m_DriveTrain.WriteDashboardData();
-    		if(m_DriveTrain.DistanceOnTarget())
+    		if(m_DriveTrain.DistanceOnTarget()) //TODO how is distance to drive set??
     			m_DriveTrain.DisablePID();
     		break;
     	}
