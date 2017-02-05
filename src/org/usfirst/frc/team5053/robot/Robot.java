@@ -41,12 +41,12 @@ public class Robot extends IterativeRobot
 	//Robot Map Declaration
 	RobotInterfaceMap m_RobotInterface;
 	RobotControllerMap m_RobotControllers;
-	RobotSensorMap m_RobotSensors;
+	public static RobotSensorMap m_RobotSensors;
 	
 	
 	
 	//Robot Subsystem Declaration
-	DriveTrain m_DriveTrain;
+	public static DriveTrain m_DriveTrain;
 	GearManipulator m_Arm;
 	Intake m_Intake;
 	Shooter m_Shooter;

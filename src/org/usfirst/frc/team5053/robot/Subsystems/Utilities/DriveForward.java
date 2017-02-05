@@ -38,7 +38,7 @@ public class DriveForward extends Command {
 	Gyro gyro = Robot.m_RobotSensors.m_Gyro;
 	Encoder driveTrainLeftWheelEncoder = Robot.m_RobotSensors.m_LeftDrive;
 	Encoder driveTrainRightWheelEncoder = Robot.m_RobotSensors.m_RightDrive;
-	RobotDrive robotDrive = Robot.m_DriveTrain;
+	RobotDrive robotDrive = Robot.m_DriveTrain.m_RobotDrive;
 	
 	public static Encoder m_LeftDrive;
 	public static Encoder m_RightDrive;
@@ -110,18 +110,18 @@ double ramp = 0; //inches distance to go from start to maxspeed and maxspeed to 
 
 //fromRudy        SmartDashboard.putNumber("Timeinit",this.timeSinceInitialized());
        	//RobotMap.gyroToUse.reset();//TODO don't reset the gyro.
-    	targetAngle = Robot.m_RobotSensors.GetGyro().getAngle();	
-        Robot.m_RobotSensors.GetLeftDriveEncoder().reset();
-        Robot.m_RobotSensors.GetRightDriveEncoder().reset();
+    	targetAngle = gyro.getAngle();	
+    	driveTrainLeftWheelEncoder.reset();
+    	driveTrainRightWheelEncoder.reset();
         double start = 0; //inches 
         //TODO make it read both and average
-        Robot.m_RobotSensors.GetRightDriveEncoder().setPIDSourceType(PIDSourceType.kRate);
+        driveTrainRightWheelEncoder.setPIDSourceType(PIDSourceType.kRate);
 
         // Setup the motion control (i.e. how fast we are going as we move towards our destination and plus, rampUp/rampDown distances)
         // and use the driveStraight PIDOutput to pass along the speed we want to the PID Controller
         MotionControlHelper speedControl = new MotionControlHelper(distance, ramp, maxspeed, start,
-        		Robot.m_RobotSensors.GetRightDriveEncoder(),//RobotMap.driveTrainRightWheelEncoder,
-        		                                    new DriveStraightPIDOutput(Robot.m_RobotSensors.GetGyro(), targetAngle));
+        		driveTrainRightWheelEncoder,//RobotMap.driveTrainRightWheelEncoder,
+        		                                    new DriveStraightPIDOutput(gyro, targetAngle));
 
         // setup the Pid to control how we follow the Speed
         final double Kp = 0.005;

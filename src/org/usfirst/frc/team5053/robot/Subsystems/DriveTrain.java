@@ -39,7 +39,7 @@ public class DriveTrain implements Subsystem
 	private double m_speed = 0.0;
 	private double m_turn = 0.0;
 	
-	private RobotDrive m_RobotDrive;
+	public static RobotDrive m_RobotDrive;
 	
 	private final double STRAIGHT_KP = 0.1;
 	private final double STRAIGHT_KI = 0.0;

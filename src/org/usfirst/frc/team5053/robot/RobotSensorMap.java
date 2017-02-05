@@ -31,13 +31,13 @@ public class RobotSensorMap
 	private final int gearManipulatorEncoderADIO = 6;
 	private final int gearManipulatorEncoderBDIO = 7;
 	
-	private Encoder m_LeftDrive;
-	private Encoder m_RightDrive;
+	public static Encoder m_LeftDrive;
+	public static Encoder m_RightDrive;
 	private Encoder m_LeftShooter;
 	private Encoder m_GearManipulator;
 	
 	private AnalogPotentiometer m_Encoder;
-	private ADXRS450_Gyro m_Gyro;
+	public static ADXRS450_Gyro m_Gyro;
 
 	public RobotSensorMap()
 	{

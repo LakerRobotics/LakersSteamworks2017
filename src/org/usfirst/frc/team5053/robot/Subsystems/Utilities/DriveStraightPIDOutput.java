@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 	 *
 	 */
 	public class DriveStraightPIDOutput implements PIDOutput {
-		RobotDrive robotDrive = Robot.m_DriveTrain;
+		RobotDrive robotDrive = Robot.m_DriveTrain.m_RobotDrive;
 		Gyro gyro = Robot.m_RobotSensors.m_Gyro;
 		
 		// This is just a simple P control, Proportional control of the line follow
