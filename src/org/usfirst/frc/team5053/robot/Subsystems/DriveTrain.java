@@ -4,8 +4,8 @@ import java.util.HashMap;
 
 import org.usfirst.frc.team5053.robot.Subsystems.Utilities.AnglePIDWrapper;
 import org.usfirst.frc.team5053.robot.Subsystems.Utilities.DistancePIDWrapper;
-import org.usfirst.frc.team5053.robot.Subsystems.Utilities.DriveForward;
-import org.usfirst.frc.team5053.robot.Subsystems.Utilities.DriveSpin;
+import org.usfirst.frc.team5053.robot.Subsystems.Utilities.MotionControllerDistance;
+import org.usfirst.frc.team5053.robot.Subsystems.Utilities.MotionControllerSpin;
 
 import java.lang.*;
 
@@ -42,12 +42,12 @@ public class DriveTrain implements Subsystem
 	// Variables to retain info about Driving Straight
 	private boolean autonDriveForwardWasOn = false;
 	private boolean autonDriveForwardDidFinish = false;
-	private DriveForward driveForward = null; // Note, will be created when a request is made (can only be setup once we know distance to travel and speed  rampup/rampdown)
+	private MotionControllerDistance motionControllerDistance = null; // Note, will be created when a request is made (can only be setup once we know distance to travel and speed  rampup/rampdown)
 
 	// Variables to retain info about Spinning
 	private boolean autonDriveSpinWasOn = false;
 	private boolean autonDriveSpinDidFinish = false;
-	private DriveSpin driveSpin = null; // Note, will be created when a request is made (can only be setup once we know rotation to spin and maxRotationspeed  rampup/rampdown)
+	private MotionControllerSpin motionControllerSpin = null; // Note, will be created when a request is made (can only be setup once we know rotation to spin and maxRotationspeed  rampup/rampdown)
 
 	
 	private double m_speed = 0.0;
@@ -280,26 +280,26 @@ public class DriveTrain implements Subsystem
 			//Check if driveStright was just turned on
 			if(autonDriveForwardWasOn != isOn){
 				//we need to init
-				driveForward = new DriveForward(a_distance, a_maxspeed, a_ramp);
-				driveForward.initialize();
+				motionControllerDistance = new MotionControllerDistance(a_distance, a_maxspeed, a_ramp);
+				motionControllerDistance.initialize();
 				autonDriveForwardDidFinish = false;
 			}
 			//now that we have initizlized or are coming through again execute
-			driveForward.execute();
+			motionControllerDistance.execute();
 		}
 		else{
 			//See if it was just turned off
 			if(autonDriveForwardWasOn != isOn){
 				//see if interupted
 				if(autonDriveForwardDidFinish==false){
-					driveForward.interrupted();
+					motionControllerDistance.interrupted();
 				}
-				driveForward.end();
+				motionControllerDistance.end();
 			}
 		}
 		// record settings for next time through
 		autonDriveForwardWasOn = isOn; 
-		autonDriveForwardDidFinish = driveForward.isFinished();
+		autonDriveForwardDidFinish = motionControllerDistance.isFinished();
 		return autonDriveForwardDidFinish;
 }
 
@@ -308,26 +308,26 @@ public class DriveTrain implements Subsystem
 			//Check if driveStright was just turned on
 			if(autonDriveSpinWasOn != isOn){
 				//we need to init
-				driveSpin = new DriveSpin(a_angle);
-				driveSpin.initialize();
+				motionControllerSpin = new MotionControllerSpin(a_angle);
+				motionControllerSpin.initialize();
 				autonDriveSpinDidFinish = false;
 			}
 			//now that we have initizlized or are coming through again execute
-			driveSpin.execute();
+			motionControllerSpin.execute();
 		}
 		else{
 			//See if it was just turned off
 			if(autonDriveSpinWasOn != isOn){
 				//see if interupted
 				if(autonDriveSpinDidFinish==false){
-					driveSpin.interrupted();
+					motionControllerSpin.interrupted();
 				}
-				driveSpin.end();
+				motionControllerSpin.end();
 			}
 		}
 		// record settings for next time through
 		autonDriveSpinWasOn = isOn; 
-		autonDriveSpinDidFinish = driveSpin.isFinished();
+		autonDriveSpinDidFinish = motionControllerSpin.isFinished();
 		return autonDriveSpinDidFinish;
 }
 

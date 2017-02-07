@@ -34,7 +34,7 @@ import org.usfirst.frc.team5053.robot.RobotSensorMap;
 /**
  *
  */
-public class DriveForward extends Command {
+public class MotionControllerDistance extends Command {
 	// Tie this motion control into the robot by tieing int the Encoders and Gyro & DriveTrain
 	
 //	Gyro gyro = Robot.getRobotSensors().getGyro();
@@ -75,21 +75,21 @@ double ramp = 0; //inches distance to go from start to maxspeed and maxspeed to 
 	//Auto generated parameter code will reappear each time we export from robot builder
 	//comment out the excess code when you regenerate the code
 
-	public DriveForward(double a_distance)
+	public MotionControllerDistance(double a_distance)
 	{
 		distance = -a_distance; //TODO we really should not have to negate the value
 		maxspeed = 6 * 12;
 		ramp = 7;
 	}
 	
-	public DriveForward(double a_distance, double a_maxspeed)
+	public MotionControllerDistance(double a_distance, double a_maxspeed)
 	{
 		distance = -a_distance; //TODO we really should not have to negate the value
     	maxspeed = a_maxspeed * 12;
     	ramp = 7;
 	}
 
-	public DriveForward(double a_distance, double a_maxspeed, double a_ramp)
+	public MotionControllerDistance(double a_distance, double a_maxspeed, double a_ramp)
 	{
 		distance = -a_distance;
 		maxspeed = a_maxspeed * 12;
@@ -142,11 +142,11 @@ double ramp = 0; //inches distance to go from start to maxspeed and maxspeed to 
 //SmartDashboard.putData((NamedSendable) RobotMap.IMU);
     	
 	   double angle = m_Gyro.getAngle(); // get current heading
-       SmartDashboard.putNumber("DriveForward angle", angle);
+       SmartDashboard.putNumber("MotionControllerDistance angle", angle);
        
-       SmartDashboard.putNumber("DriveForward Left",m_LeftDrive.getDistance());
-       SmartDashboard.putNumber("DriveForward Right",m_RightDrive.getDistance());
-       SmartDashboard.putNumber("DriveForward Left Rate",m_LeftDrive.getRate());
+       SmartDashboard.putNumber("MotionControllerDistance Left",m_LeftDrive.getDistance());
+       SmartDashboard.putNumber("MotionControllerDistance Right",m_RightDrive.getDistance());
+       SmartDashboard.putNumber("MotionControllerDistance Left Rate",m_LeftDrive.getRate());
 //       SmartDashboard.putNumber("Left Target Rate",targetSpeed);
        System.out.println(//fromRudy "Time="+this.timeSinceInitialized()+
                          " encoderDist="+m_LeftDrive.getDistance()
@@ -159,7 +159,7 @@ double ramp = 0; //inches distance to go from start to maxspeed and maxspeed to 
 
     // Make this return true when this Command no longer needs to run execute()
     public boolean isFinished() {
-    	SmartDashboard.putString("DriveForward", "isFinished()");
+    	SmartDashboard.putString("MotionControllerDistance", "isFinished()");
   /*   if(speedFollowerPID.onTarget());
      {
     	 speedFollowerPID.disable();
@@ -170,7 +170,7 @@ double ramp = 0; //inches distance to go from start to maxspeed and maxspeed to 
     	if(Math.abs(m_RightDrive.getDistance()-distance)<targetTolerance) { 
        		speedFollowerPID.disable();
 //       		mcPID.getError() 
-       		System.out.println("DriveForward Finished true");  
+       		System.out.println("MotionControllerDistance Finished true");  
        	  	robotDrive.tankDrive(0,0);
        		return  true;
        	}
