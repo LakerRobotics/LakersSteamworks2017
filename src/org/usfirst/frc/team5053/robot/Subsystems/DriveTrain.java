@@ -4,6 +4,8 @@ import java.util.HashMap;
 
 import org.usfirst.frc.team5053.robot.Subsystems.Utilities.AnglePIDWrapper;
 import org.usfirst.frc.team5053.robot.Subsystems.Utilities.DistancePIDWrapper;
+import org.usfirst.frc.team5053.robot.Subsystems.Utilities.DriveForward;
+import org.usfirst.frc.team5053.robot.Subsystems.Utilities.DriveSpin;
 
 import java.lang.*;
 
@@ -36,10 +38,22 @@ public class DriveTrain implements Subsystem
 	
 	private ADXRS450_Gyro m_Gyro;
 	
+	
+	// Variables to retain info about Driving Straight
+	private boolean autonDriveForwardWasOn = false;
+	private boolean autonDriveForwardDidFinish = false;
+	private DriveForward driveForward = null; // Note, will be created when a request is made (can only be setup once we know distance to travel and speed  rampup/rampdown)
+
+	// Variables to retain info about Spinning
+	private boolean autonDriveSpinWasOn = false;
+	private boolean autonDriveSpinDidFinish = false;
+	private DriveSpin driveSpin = null; // Note, will be created when a request is made (can only be setup once we know rotation to spin and maxRotationspeed  rampup/rampdown)
+
+	
 	private double m_speed = 0.0;
 	private double m_turn = 0.0;
 	
-	public static RobotDrive m_RobotDrive;
+	private static RobotDrive m_RobotDrive;
 	
 	private final double STRAIGHT_KP = 0.1;
 	private final double STRAIGHT_KI = 0.0;
@@ -51,7 +65,7 @@ public class DriveTrain implements Subsystem
 	
 	public DriveTrain(SpeedController leftMotor, SpeedController rightMotor) 
 	{
-		m_RobotDrive = new RobotDrive(leftMotor, rightMotor);
+		setRobotDrive(new RobotDrive(leftMotor, rightMotor));
 		
 		m_LeftMotor = leftMotor;
 		m_RightMotor = rightMotor;
@@ -63,7 +77,7 @@ public class DriveTrain implements Subsystem
 	}
 	public DriveTrain(SpeedController leftMotor, SpeedController rightMotor, Encoder leftEncoder, Encoder rightEncoder)
 	{
-		m_RobotDrive = new RobotDrive(leftMotor, rightMotor);
+		setRobotDrive(new RobotDrive(leftMotor, rightMotor));
 		
 		m_LeftMotor = leftMotor;
 		m_RightMotor = rightMotor;
@@ -83,7 +97,7 @@ public class DriveTrain implements Subsystem
 	}
 	public DriveTrain(SpeedController leftMotor, SpeedController rightMotor, Encoder leftEncoder, Encoder rightEncoder, ADXRS450_Gyro Gyro)
 	{
-		m_RobotDrive = new RobotDrive(leftMotor, rightMotor);
+		setRobotDrive(new RobotDrive(leftMotor, rightMotor));
 		
 		m_LeftMotor = leftMotor;
 		m_RightMotor = rightMotor;
@@ -151,11 +165,11 @@ public class DriveTrain implements Subsystem
 	{
 		m_speed = speed;
 		m_turn = angle;
-		m_RobotDrive.arcadeDrive(speed, angle);
+		getRobotDrive().arcadeDrive(speed, angle);
 	}
 	public void TeleopDrive(double speed, double angle)
 	{
-		m_RobotDrive.arcadeDrive(speed, angle);
+		getRobotDrive().arcadeDrive(speed, angle);
 	}
 	public void SetSpeed(double speed)
 	{
@@ -254,5 +268,67 @@ public class DriveTrain implements Subsystem
 		SmartDashboard.putNumber("Encoder Distance", GetAverageDistance());
 		SmartDashboard.putNumber("Gyro Angle", GetAngle());
 	}
+	public RobotDrive getRobotDrive() {
+		return m_RobotDrive;
+	}
+	public static void setRobotDrive(RobotDrive m_RobotDrive) {
+		DriveTrain.m_RobotDrive = m_RobotDrive;
+	}
+	
+	public boolean driveStraightDistance(boolean isOn, double a_distance, double a_maxspeed, double a_ramp ){
+		if(isOn=true){
+			//Check if driveStright was just turned on
+			if(autonDriveForwardWasOn != isOn){
+				//we need to init
+				driveForward = new DriveForward(a_distance, a_maxspeed, a_ramp);
+				driveForward.initialize();
+				autonDriveForwardDidFinish = false;
+			}
+			//now that we have initizlized or are coming through again execute
+			driveForward.execute();
+		}
+		else{
+			//See if it was just turned off
+			if(autonDriveForwardWasOn != isOn){
+				//see if interupted
+				if(autonDriveForwardDidFinish==false){
+					driveForward.interrupted();
+				}
+				driveForward.end();
+			}
+		}
+		// record settings for next time through
+		autonDriveForwardWasOn = isOn; 
+		autonDriveForwardDidFinish = driveForward.isFinished();
+		return autonDriveForwardDidFinish;
+}
+
+	public boolean driveSpin(boolean isOn, double a_angle  ){
+		if(isOn=true){
+			//Check if driveStright was just turned on
+			if(autonDriveSpinWasOn != isOn){
+				//we need to init
+				driveSpin = new DriveSpin(a_angle);
+				driveSpin.initialize();
+				autonDriveSpinDidFinish = false;
+			}
+			//now that we have initizlized or are coming through again execute
+			driveSpin.execute();
+		}
+		else{
+			//See if it was just turned off
+			if(autonDriveSpinWasOn != isOn){
+				//see if interupted
+				if(autonDriveSpinDidFinish==false){
+					driveSpin.interrupted();
+				}
+				driveSpin.end();
+			}
+		}
+		// record settings for next time through
+		autonDriveSpinWasOn = isOn; 
+		autonDriveSpinDidFinish = driveSpin.isFinished();
+		return autonDriveSpinDidFinish;
+}
 
 }

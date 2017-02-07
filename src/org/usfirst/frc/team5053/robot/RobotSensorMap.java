@@ -31,13 +31,13 @@ public class RobotSensorMap
 	private final int gearManipulatorEncoderADIO = 6;
 	private final int gearManipulatorEncoderBDIO = 7;
 	
-	public static Encoder m_LeftDrive;
-	public static Encoder m_RightDrive;
+	private static Encoder m_LeftDrive;
+	private static Encoder m_RightDrive;
 	private Encoder m_LeftShooter;
 	private Encoder m_GearManipulator;
 	
-	private AnalogPotentiometer m_Encoder;
-	public static ADXRS450_Gyro m_Gyro;
+//	private AnalogPotentiometer m_Encoder;
+	private ADXRS450_Gyro m_Gyro;
 
 	public RobotSensorMap()
 	{
@@ -46,14 +46,14 @@ public class RobotSensorMap
 		m_LeftShooter = new Encoder(shooterEncoderADIO, shooterEncoderBDIO);
 		m_GearManipulator = new Encoder(gearManipulatorEncoderADIO, gearManipulatorEncoderBDIO);
 		
-		m_Gyro = new ADXRS450_Gyro();
+		setGyro(new ADXRS450_Gyro());
 	}
 	
 	public Encoder getLeftDriveEncoder() {
-		return m_LeftDrive;
+		return getLeftDrive();
 	}
 	public Encoder getRightDriveEncoder() {
-		return m_RightDrive;
+		return getRightDrive();
 	}
 	public Encoder getShooterEncoder() {
 		return m_LeftShooter;
@@ -111,5 +111,17 @@ public class RobotSensorMap
 		}
 	}
 */
+
+	public void setGyro(ADXRS450_Gyro m_Gyro) {
+		this.m_Gyro = m_Gyro;
+	}
+
+	public Encoder getLeftDrive() {
+		return m_LeftDrive;
+	}
+
+	public Encoder getRightDrive() {
+		return m_RightDrive;
+	}
 
 }

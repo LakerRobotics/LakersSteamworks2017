@@ -26,8 +26,8 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 	 *
 	 */
 	public class DriveStraightPIDOutput implements PIDOutput {
-		RobotDrive robotDrive = Robot.m_DriveTrain.m_RobotDrive;
-		Gyro gyro = Robot.m_RobotSensors.m_Gyro;
+		RobotDrive robotDrive = Robot.getDriveTrain().getRobotDrive();
+		Gyro gyro = Robot.getRobotSensors().getGyro();
 		
 		// This is just a simple P control, Proportional control of the line follow
 		// if we assume angle is in degrees and if we were off by 20 Degrees then we would want how much correction
@@ -38,7 +38,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 		double rotationPower = 0.0d;
 
 		public DriveStraightPIDOutput(Gyro theGyro, double targetAngle) {
-//		    SmartDashboard.putString("RobotDriveSpinPIDOutput", "constructor called");
+//		    SmartDashboard.putString("DriveSpinPIDOutput", "constructor called");
 			m_gyro = theGyro;
 			m_targetAngle = targetAngle;
 			double slowRotation = m_targetAngle + 90;

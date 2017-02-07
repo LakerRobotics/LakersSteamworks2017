@@ -31,8 +31,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * 
  */
 
+
 public class Robot extends IterativeRobot
 {
+	public static boolean ON = true;
+	public static boolean OFF = false;
 
 	/* Declare any and all variables here
 	 *  Do not initialize until robotInit()
@@ -41,12 +44,12 @@ public class Robot extends IterativeRobot
 	//Robot Map Declaration
 	RobotInterfaceMap m_RobotInterface;
 	RobotControllerMap m_RobotControllers;
-	public static RobotSensorMap m_RobotSensors;
+	private static RobotSensorMap m_RobotSensors;
 	
 	
 	
 	//Robot Subsystem Declaration
-	public static DriveTrain m_DriveTrain;
+	private static DriveTrain m_DriveTrain;
 	GearManipulator m_Arm;
 	Intake m_Intake;
 	Shooter m_Shooter;
@@ -95,21 +98,18 @@ public class Robot extends IterativeRobot
     	// the RobotInterfaceMap detects the controller and set the key mapping accordingly
     	m_RobotInterface = new RobotInterfaceMap();
     	
-    	
     	m_RobotControllers = new RobotControllerMap();
     	m_RobotSensors = new RobotSensorMap();
     	
-    	
-    	
     	//Robot Subsystem Initialization
-    	m_DriveTrain = new DriveTrain(m_RobotControllers.getLeftDrive(), m_RobotControllers.getRightDrive(), m_RobotSensors.getLeftDriveEncoder(), m_RobotSensors.getRightDriveEncoder(), m_RobotSensors.getGyro());
-    	m_Arm = new GearManipulator(m_RobotControllers.getGearManipulator(), m_RobotSensors.getGearManipulatorEncoder());
+    	m_DriveTrain = new DriveTrain(m_RobotControllers.getLeftDrive(), m_RobotControllers.getRightDrive(), getRobotSensors().getLeftDriveEncoder(), getRobotSensors().getRightDriveEncoder(), getRobotSensors().getGyro());
+    	m_Arm = new GearManipulator(m_RobotControllers.getGearManipulator(), getRobotSensors().getGearManipulatorEncoder());
     	
-    	m_Shooter = new Shooter(m_RobotControllers.getShooter(), m_RobotSensors.getShooterEncoder());
+    	m_Shooter = new Shooter(m_RobotControllers.getShooter(), getRobotSensors().getShooterEncoder());
     	m_Intake = new Intake(m_RobotControllers.getIntake());
     	
-    	m_AnglePIDWrapper = new AnglePIDWrapper(m_DriveTrain);
-    	m_DistancePIDWrapper = new DistancePIDWrapper(m_DriveTrain);
+    	m_AnglePIDWrapper = new AnglePIDWrapper(getDriveTrain());
+    	m_DistancePIDWrapper = new DistancePIDWrapper(getDriveTrain());
     	
     	autonomousCase = 0;
     	
@@ -131,8 +131,8 @@ public class Robot extends IterativeRobot
         });
         m_VisionThread.start();
         
-        System.out.println(m_DriveTrain.GetAverageDistance());
-        System.out.println(m_DriveTrain.GetPIDSetpoint());
+        System.out.println(getDriveTrain().GetAverageDistance());
+        System.out.println(getDriveTrain().GetPIDSetpoint());
         
         m_HasTarget = false;
         
@@ -163,19 +163,19 @@ public class Robot extends IterativeRobot
     	switch(autonomousCase)
     	{
     	case 0:
-    		m_DriveTrain.ResetEncoders();
-    		m_DriveTrain.ResetAngle();
-    		m_DriveTrain.SetPIDSetpoint(2000, 0);
-    		m_DriveTrain.EnablePID();
-    		m_DriveTrain.WriteDashboardData();
+    		getDriveTrain().ResetEncoders();
+    		getDriveTrain().ResetAngle();
+    		getDriveTrain().SetPIDSetpoint(2000, 0);
+    		getDriveTrain().EnablePID();
+    		getDriveTrain().WriteDashboardData();
     		autonomousCase++;
     		System.out.println("Incrementing Case");
     		break;
     	case 1:
-    		m_DriveTrain.WriteDashboardData();
-    		if(m_DriveTrain.DistanceOnTarget())
+    		getDriveTrain().WriteDashboardData();
+    		if(getDriveTrain().DistanceOnTarget())
     		{
-    			m_DriveTrain.DisablePID();
+    			getDriveTrain().DisablePID();
     		}
     		break;
     	}
@@ -186,7 +186,7 @@ public class Robot extends IterativeRobot
     {
     	SmartDashboard.putNumber("Vision CenterX", m_CenterX);
     	GetDashboardData();
-    	m_DriveTrain.WriteDashboardData();
+    	getDriveTrain().WriteDashboardData();
     	
     	double centerX;
     	synchronized (m_ImgLock) {
@@ -197,16 +197,18 @@ public class Robot extends IterativeRobot
     	    	
     	if(m_RobotInterface.GetDriverB() && !m_HasTarget) {
     		
-    		m_DriveTrain.ResetAngle();
-    		m_DriveTrain.ResetEncoders();
+    		getDriveTrain().ResetAngle();
+    		getDriveTrain().ResetEncoders();
     		this.m_VisionTurn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
-    		m_DriveTrain.SetPIDSetpoint(0, m_VisionTurn);
-    		m_DriveTrain.EnablePID();
+//    		getDriveTrain().SetPIDSetpoint(0, m_VisionTurn);
+//    		getDriveTrain().EnablePID();
+    		getDriveTrain().driveSpin(ON, m_VisionTurn);
     		m_HasTarget = true;
     	}
     	else if(!m_RobotInterface.GetDriverB())
     	{
-    		m_DriveTrain.DisablePID();
+    		getDriveTrain().driveSpin(OFF, m_VisionTurn);
+    		getDriveTrain().DisablePID();
     		arcadeDrive();
     		m_HasTarget = false;
     	}
@@ -226,7 +228,7 @@ public class Robot extends IterativeRobot
     //Drivetrain
     public void arcadeDrive()
     {
-    	m_DriveTrain.TeleopDrive(-m_RobotInterface.GetDriverLeftY(), m_RobotInterface.GetDriverRightX());
+    	getDriveTrain().TeleopDrive(-m_RobotInterface.GetDriverLeftY(), m_RobotInterface.GetDriverRightX());
     }
     
     //We don't have an arm... yet!
@@ -335,4 +337,14 @@ public class Robot extends IterativeRobot
     	//Use this to retrieve values from the Driver Station
     	//e.g Which autonomous to use or processed image information.
     }
+
+	public static RobotSensorMap getRobotSensors() {
+		return m_RobotSensors;
+	}
+
+	public static DriveTrain getDriveTrain() {
+		return m_DriveTrain;
+	}
+
+
 }
