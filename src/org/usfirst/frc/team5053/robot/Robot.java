@@ -3,6 +3,7 @@ package org.usfirst.frc.team5053.robot;
 import org.usfirst.frc.team5053.robot.RobotInterfaceMap.joystickType;
 import org.usfirst.frc.team5053.robot.Subsystems.GearManipulator;
 import org.usfirst.frc.team5053.robot.Subsystems.DriveTrain;
+import org.usfirst.frc.team5053.robot.Subsystems.DriveTrainMotionControl;
 import org.usfirst.frc.team5053.robot.Subsystems.Intake;
 import org.usfirst.frc.team5053.robot.Subsystems.Shooter;
 import org.usfirst.frc.team5053.robot.Subsystems.Utilities.GRIPVision;
@@ -44,7 +45,8 @@ public class Robot extends IterativeRobot
 	
 	
 	//Robot Subsystem Declaration
-	DriveTrain m_DriveTrain;
+	//DriveTrain m_DriveTrain;
+	DriveTrainMotionControl m_DriveTrain;
 	GearManipulator m_Arm;
 	Intake m_Intake;
 	Shooter m_Shooter;
@@ -95,7 +97,7 @@ public class Robot extends IterativeRobot
     	
     	
     	//Robot Subsystem Initialization
-    	m_DriveTrain = new DriveTrain(m_RobotControllers.GetLeftDrive(), m_RobotControllers.GetRightDrive(), m_RobotSensors.GetLeftDriveEncoder(), m_RobotSensors.GetRightDriveEncoder(), m_RobotSensors.GetGyro());
+    	m_DriveTrain = new DriveTrainMotionControl(m_RobotControllers.GetLeftDrive(), m_RobotControllers.GetRightDrive(), m_RobotSensors.GetLeftDriveEncoder(), m_RobotSensors.GetRightDriveEncoder(), m_RobotSensors.GetGyro());
     	m_Arm = new GearManipulator(m_RobotControllers.GetGearManipulator(), m_RobotSensors.GetGearManipulator());
     	
     	m_Shooter = new Shooter(m_RobotControllers.GetShooter(), m_RobotSensors.GetShooterEncoder());
@@ -122,7 +124,6 @@ public class Robot extends IterativeRobot
         m_VisionThread.start();
         
         System.out.println(m_DriveTrain.GetAverageDistance());
-        System.out.println(m_DriveTrain.GetPIDSetpoint());
         
     	
     }
@@ -152,16 +153,18 @@ public class Robot extends IterativeRobot
     	switch(autonomousCase)
     	{
     	case 0:
-    		m_DriveTrain.SetPIDSetpoint(5000, 0);
-    		m_DriveTrain.EnablePID();
+    		//Magic Numbers
+    		m_DriveTrain.DriveDistance(100,  10,  7);
     		m_DriveTrain.WriteDashboardData();
     		autonomousCase++;
     		System.out.println("Incrementing Case");
     		break;
     	case 1:
     		m_DriveTrain.WriteDashboardData();
-    		if(m_DriveTrain.DistanceOnTarget())
-    			m_DriveTrain.DisablePID();
+    		if(m_DriveTrain.isPIDFinished())
+    		{
+    			autonomousCase++;
+    		}
     		break;
     	}
     }
