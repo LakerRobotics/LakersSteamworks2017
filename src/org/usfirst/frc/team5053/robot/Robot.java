@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-
 /**
  * 
  * STEAMWORKS 2017
@@ -114,7 +113,7 @@ public class Robot extends IterativeRobot
     	autonomousCase = 0;
     	
     	UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-
+    	
     	camera.setExposureManual(1);
     	camera.setFPS(30);
     	camera.setBrightness(1);
@@ -160,25 +159,7 @@ public class Robot extends IterativeRobot
         /**
          * This function is called periodically during autonomous
          */
-    	switch(autonomousCase)
-    	{
-    	case 0:
-    		m_DriveTrain.ResetEncoders();
-    		m_DriveTrain.ResetAngle();
-    		m_DriveTrain.SetPIDSetpoint(2000, 0);
-    		m_DriveTrain.EnablePID();
-    		m_DriveTrain.WriteDashboardData();
-    		autonomousCase++;
-    		System.out.println("Incrementing Case");
-    		break;
-    	case 1:
-    		m_DriveTrain.WriteDashboardData();
-    		if(m_DriveTrain.DistanceOnTarget())
-    		{
-    			m_DriveTrain.DisablePID();
-    		}
-    		break;
-    	}
+    	testAuton();
     }
 
 
@@ -330,6 +311,42 @@ public class Robot extends IterativeRobot
     		m_Shooter.SetTalonOutput(0);
     	}
     }
+    
+    public void testAuton() {
+    	switch(autonomousCase)
+    	{
+    	case 0:
+    		m_DriveTrain.ResetEncoders();
+    		m_DriveTrain.ResetAngle();
+    		m_DriveTrain.SetPIDSetpoint(500, 0);
+        	m_DriveTrain.EnablePID();
+        	autonomousCase++;
+    		break;
+    	case 1:
+    		if(m_DriveTrain.DistanceOnTarget())
+    		{
+    			m_DriveTrain.SetPIDSetpoint(0, 90);
+            	autonomousCase++;
+    		}
+    		break;
+    	case 2:
+    		if(m_DriveTrain.AngleOnTarget())
+    		{
+    			m_DriveTrain.DisablePID();
+    			m_Shooter.SetShooterSetpoint(10/*Random value replace later*/);
+    			m_Shooter.EnablePID();
+    			autonomousCase++;
+    		}
+    		break;
+    	case 3:
+    		if(m_Shooter.ShooterOnTarget())
+    		{
+    			//Feed balls
+    		}
+    		break;
+    	}
+    }
+    
     public void GetDashboardData()
     {
     	//Use this to retrieve values from the Driver Station

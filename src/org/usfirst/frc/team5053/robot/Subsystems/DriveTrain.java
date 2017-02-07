@@ -3,6 +3,7 @@ package org.usfirst.frc.team5053.robot.Subsystems;
 import java.util.HashMap;
 
 import org.usfirst.frc.team5053.robot.Subsystems.Utilities.AnglePIDWrapper;
+import org.usfirst.frc.team5053.robot.Subsystems.Utilities.CurvePIDWrapper;
 import org.usfirst.frc.team5053.robot.Subsystems.Utilities.DistancePIDWrapper;
 
 import java.lang.*;
@@ -27,9 +28,11 @@ public class DriveTrain implements Subsystem
 	
 	private PIDController m_DistancePID;
 	private PIDController m_AnglePID;
+	private PIDController m_CurvePID;
 	
 	private DistancePIDWrapper m_DistancePIDWrapper;
 	private AnglePIDWrapper m_AnglePIDWrapper;
+	private CurvePIDWrapper m_CurvePIDWrapper;
 	
 	private Encoder m_LeftEncoder;
 	private Encoder m_RightEncoder;
@@ -38,6 +41,7 @@ public class DriveTrain implements Subsystem
 	
 	private double m_speed = 0.0;
 	private double m_turn = 0.0;
+	private boolean m_isLeftTurn = false;
 	
 	private RobotDrive m_RobotDrive;
 	
@@ -48,6 +52,10 @@ public class DriveTrain implements Subsystem
 	private final double TURN_KP = 0.9;
 	private final double TURN_KI = 0.0;
 	private final double TURN_KD = 0.0;
+	
+	private final double CURVE_KP = 0.0;
+	private final double CURVE_KI = 0.0;
+	private final double CURVE_KD = 0.0;
 	
 	public DriveTrain(SpeedController leftMotor, SpeedController rightMotor) 
 	{
@@ -101,12 +109,16 @@ public class DriveTrain implements Subsystem
 		
 		m_DistancePIDWrapper = new DistancePIDWrapper(this);
 		m_AnglePIDWrapper = new AnglePIDWrapper(this);
+		m_CurvePIDWrapper = new CurvePIDWrapper(this);
 
 		m_DistancePID = new PIDController(STRAIGHT_KP, STRAIGHT_KI, STRAIGHT_KD, m_DistancePIDWrapper, m_DistancePIDWrapper);
 		m_DistancePID.setAbsoluteTolerance(5.2);
 		
 		m_AnglePID = new PIDController(TURN_KP, TURN_KI, TURN_KD, m_AnglePIDWrapper, m_AnglePIDWrapper);
 		m_AnglePID.setAbsoluteTolerance(2.5);
+		
+		m_CurvePID = new PIDController(CURVE_KP, CURVE_KI, CURVE_KD, m_CurvePIDWrapper, m_CurvePIDWrapper);
+		
 		
 		System.out.println("Constructor finished");
 	}
@@ -146,12 +158,27 @@ public class DriveTrain implements Subsystem
 	{
 		return m_DistancePIDWrapper.pidGet();
 	}
-	
+	public double GetCurveSetpoint()
+	{
+		return m_CurvePIDWrapper.pidGet();
+	}
 	public void ArcadeDrive(double speed, double angle)
 	{
 		m_speed = speed;
 		m_turn = angle;
 		m_RobotDrive.arcadeDrive(speed, angle);
+	}
+	public void TankDrive(double speed, boolean isLeftTurn)
+	{
+		if(isLeftTurn)
+		{
+			m_RobotDrive.tankDrive(0, speed);
+		}
+		else
+		{
+			m_RobotDrive.tankDrive(speed, 0);
+		}
+		m_isLeftTurn = isLeftTurn;
 	}
 	public void TeleopDrive(double speed, double angle)
 	{
@@ -165,12 +192,9 @@ public class DriveTrain implements Subsystem
 	{
 		return m_Gyro.getAngle();
 	}
-	// Do not want to do this, because now the gyro drift is so low we want to keep field orientaiton
-	//@deprecated 
 	public void ResetAngle()
 	{
 		m_Gyro.reset();
-		System.out.println("Do not reset the gyro, because we want to keep field orientation");
 	}
 	public double GetAngularVelocity()
 	{
@@ -201,19 +225,46 @@ public class DriveTrain implements Subsystem
 	
 	public void EnablePID() 
 	{
+		if(m_CurvePID.isEnabled())
+		{
+			m_CurvePID.disable();
+		}
 		if (!m_DistancePID.isEnabled())
+		{
 			m_DistancePID.enable();
-		
-		if (!m_AnglePID.isEnabled()) {
+		}
+		if (!m_AnglePID.isEnabled()) 
+		{
 			m_AnglePID.enable();
+		}
+	}
+	public void EnableCurvePID() {
+		if(m_DistancePID.isEnabled())
+		{
+			m_DistancePID.disable();
+		}
+		if(m_AnglePID.isEnabled())
+		{
+			m_AnglePID.disable();
+		}
+		if(!m_CurvePID.isEnabled())
+		{
+			m_CurvePID.enable();
 		}
 	}
 	public void DisablePID()
 	{
 		if (m_DistancePID.isEnabled())
+		{
 			m_DistancePID.disable();
-		if (m_AnglePID.isEnabled()) {
+		}
+		if (m_AnglePID.isEnabled()) 
+		{
 			m_AnglePID.disable();
+		}
+		if(m_CurvePID.isEnabled())
+		{
+			m_CurvePID.disable();
 		}
 	}
 	public boolean DistanceOnTarget()
@@ -229,10 +280,23 @@ public class DriveTrain implements Subsystem
 			return true;
 		} else return false;
 	}
+	public boolean CurveOnTarget()
+	{
+		if(Math.abs(getCurvePIDSetpoint() - GetAngle()) < 2.5)
+		{
+			return true;
+		}
+		else
+			return false;
+	}
 	public void SetPIDSetpoint(double distance, double angle)
 	{
 		m_DistancePID.setSetpoint(distance);
 		m_AnglePID.setSetpoint(angle);	
+	}
+	public void SetCurveSetpoint(double angle)
+	{
+		m_CurvePID.setSetpoint(angle);
 	}
 	double GetDistancePIDSetpoint() 
 	{
@@ -242,7 +306,10 @@ public class DriveTrain implements Subsystem
 	{
 		return m_AnglePID.getSetpoint();
 	}
-	
+	double getCurvePIDSetpoint()
+	{
+		return m_CurvePID.getSetpoint();
+	}
 	public HashMap<String, Double> GetDashboardData() {
 		return null;
 	}
@@ -250,6 +317,10 @@ public class DriveTrain implements Subsystem
 	public void WriteDashboardData() {
 		SmartDashboard.putNumber("Encoder Distance", GetAverageDistance());
 		SmartDashboard.putNumber("Gyro Angle", GetAngle());
+		SmartDashboard.putNumber("Curve output", GetCurveSetpoint());
+	}
+	public void SetCurve(double speed) {
+		TankDrive(speed, m_isLeftTurn);
 	}
 
 }

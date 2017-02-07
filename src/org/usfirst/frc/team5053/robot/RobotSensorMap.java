@@ -47,6 +47,9 @@ public class RobotSensorMap
 		m_GearManipulator = new Encoder(gearManipulatorEncoderADIO, gearManipulatorEncoderBDIO);
 		
 		m_Gyro = new ADXRS450_Gyro();
+		
+		m_LeftDrive.setDistancePerPulse(6*Math.PI/360);
+		m_RightDrive.setDistancePerPulse(6*Math.PI/360);
 	}
 	
 	public Encoder getLeftDriveEncoder() {
