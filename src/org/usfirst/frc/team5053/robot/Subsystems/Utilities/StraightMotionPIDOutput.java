@@ -1,7 +1,5 @@
 package org.usfirst.frc.team5053.robot.Subsystems.Utilities;
 
-import org.usfirst.frc.team5053.robot.Robot;
-import org.usfirst.frc.team5053.robot.Subsystems.DriveTrain;
 //FromRudy import org.usfirst.frc5053.FRC2016Stronghold.MotionControlHelper;
 //FromRudy import org.usfirst.frc5053.FRC2016Stronghold.MotionControlPIDController;
 //FromRudy import org.usfirst.frc5053.FRC2016Stronghold.RobotMap;
@@ -10,12 +8,7 @@ import org.usfirst.frc.team5053.robot.Subsystems.DriveTrainMotionControl;
 import edu.wpi.first.wpilibj.PIDOutput;
 
 	
-	import edu.wpi.first.wpilibj.PIDOutput;
 	import edu.wpi.first.wpilibj.PIDSource;
-	import edu.wpi.first.wpilibj.PIDSourceType;
-	import edu.wpi.first.wpilibj.RobotDrive;
-	import edu.wpi.first.wpilibj.interfaces.Gyro;
-
 	import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 	/**
@@ -45,9 +38,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 			double slowRotation = m_targetAngle + 90;
 			WrapRotationPIDOutput wrappedRotationPIDOutput =  new WrapRotationPIDOutput(this);
 			
-			
-			//This method enables a PIDController thread and abandons control of it, why?
-			MotionControlPIDController rotationPID = createRotationPIDController(m_targetAngle, slowRotation, wrappedRotationPIDOutput);
+			createRotationPIDController(m_targetAngle, slowRotation, wrappedRotationPIDOutput);
 			
 			//WrapRotationPIDInput  wrapRotationPIDInput = new WrapRotationPIDOutput(rotationPID, (PIDSource) m_gyro);
 		}

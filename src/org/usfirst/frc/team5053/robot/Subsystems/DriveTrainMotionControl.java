@@ -67,14 +67,27 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 		}
 		
 	}
+	public void TurnToAngle(double turnAngle)
+	{
+		if(!isPIDRunning)
+		{
+			m_MotionController.ExecuteTurnMotion(turnAngle);
+			isPIDRunning = true;
+		}
+		
+	}
 	public boolean isPIDFinished()
 	{
-		if (m_MotionController.isStraightMotionFinished())
+		if(!m_MotionController.isPIDEnabled())
 		{
 			isPIDRunning = false;
 			return true;
 		}
 		return false;
+	}
+	public void DisablePIDControl()
+	{
+		m_MotionController.DisablePIDControls();
 	}
 	public double GetRightDistance()
 	{
