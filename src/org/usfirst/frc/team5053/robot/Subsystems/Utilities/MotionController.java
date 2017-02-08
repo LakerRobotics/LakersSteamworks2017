@@ -53,7 +53,6 @@ public class MotionController {
 	{
 		if (!m_PIDEnabled)
 		{
-			System.out.println("Target distance" + Double.toString(distance));
 			m_targetAngle = m_DriveTrain.GetAngle();
 			m_targetDistance = -distance;
 			m_DriveTrain.ResetEncoders();

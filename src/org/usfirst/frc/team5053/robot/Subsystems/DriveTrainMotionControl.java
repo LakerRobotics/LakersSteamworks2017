@@ -2,16 +2,11 @@ package org.usfirst.frc.team5053.robot.Subsystems;
 
 import java.util.HashMap;
 
-import org.usfirst.frc.team5053.robot.Subsystems.Utilities.DriveStraightPIDOutput;
-import org.usfirst.frc.team5053.robot.Subsystems.Utilities.MotionControlHelper;
-import org.usfirst.frc.team5053.robot.Subsystems.Utilities.MotionControlPIDController;
 import org.usfirst.frc.team5053.robot.Subsystems.Utilities.MotionController;
-import org.usfirst.frc.team5053.robot.Subsystems.Utilities.TurnPIDOutput;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PIDSource;
-import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -119,7 +114,8 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 		m_LeftEncoder.reset();
 		m_RightEncoder.reset();
 	}
-	public void ResetGyro() {
+	public void ResetGyro() 
+	{
 		m_Gyro.reset();
 	}
 	public double GetAverageSpeed()
@@ -145,7 +141,6 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 		
 	}
 	public void WriteDashboardData() {
-		// TODO Auto-generated method stub
 		SmartDashboard.putNumber("Left Encoder", m_LeftEncoder.getDistance());
 		SmartDashboard.putNumber("Right Encoder", m_RightEncoder.getDistance());
 		SmartDashboard.putBoolean("Is DriveTrain PID Running", isPIDRunning);
