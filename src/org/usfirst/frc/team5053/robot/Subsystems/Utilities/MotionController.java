@@ -4,6 +4,7 @@ import org.usfirst.frc.team5053.robot.Subsystems.DriveTrainMotionControl;
 import org.usfirst.frc.team5053.robot.Subsystems.Utilities.MotionControlHelper;
 import org.usfirst.frc.team5053.robot.Subsystems.Utilities.MotionControlPIDController;
 import edu.wpi.first.wpilibj.PIDSource;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class MotionController {
 	DriveTrainMotionControl m_DriveTrain;
@@ -52,7 +53,9 @@ public class MotionController {
 	{
 		if (!m_PIDEnabled)
 		{
+			System.out.println("Target distance" + Double.toString(distance));
 			m_targetAngle = m_DriveTrain.GetAngle();
+			m_targetDistance = -distance;
 			m_DriveTrain.ResetEncoders();
 			
 			double start = 0;
@@ -107,7 +110,8 @@ public class MotionController {
 		 * Called while waiting for the MotionControlPID to finish. The PID will be disabled when the end condition is met, and
 		 * the return value indicates you can proceed to the next step.
 		 * */
-		if (Math.abs(m_DriveTrain.GetRightDistance()-m_targetDistance) < m_straightTolerance)
+		//TODO Tolerance
+		if (Math.abs(m_DriveTrain.GetLeftDistance()) > Math.abs(m_targetDistance))
 		{
 			m_StraightPIDController.disable();
 			m_DriveTrain.ArcadeDrive(0, 0);

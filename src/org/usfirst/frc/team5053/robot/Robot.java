@@ -98,7 +98,7 @@ public class Robot extends IterativeRobot
     	
     	//Robot Subsystem Initialization
     	m_DriveTrain = new DriveTrainMotionControl(m_RobotControllers.GetLeftDrive(), m_RobotControllers.GetRightDrive(), m_RobotSensors.GetLeftDriveEncoder(), m_RobotSensors.GetRightDriveEncoder(), m_RobotSensors.GetGyro());
-    	m_Arm = new GearManipulator(m_RobotControllers.GetGearManipulator(), m_RobotSensors.GetGearManipulator());
+    	//m_Arm = new GearManipulator(m_RobotControllers.GetGearManipulator(), m_RobotSensors.GetGearManipulator());
     	
     	m_Shooter = new Shooter(m_RobotControllers.GetShooter(), m_RobotSensors.GetShooterEncoder());
     	m_Intake = new Intake(m_RobotControllers.GetIntake());
@@ -123,7 +123,7 @@ public class Robot extends IterativeRobot
         });
         m_VisionThread.start();
         
-        System.out.println(m_DriveTrain.GetAverageDistance());
+        //System.out.println(m_DriveTrain.GetAverageDistance());
         
     	
     }
@@ -153,15 +153,17 @@ public class Robot extends IterativeRobot
     	switch(autonomousCase)
     	{
     	case 0:
+    		m_DriveTrain.ResetEncoders();
+    		m_DriveTrain.ResetGyro();
     		//Magic Numbers
-    		m_DriveTrain.DriveDistance(100,  10,  7);
+    		m_DriveTrain.TurnToAngle(90);
     		m_DriveTrain.WriteDashboardData();
     		autonomousCase++;
     		System.out.println("Incrementing Case");
     		break;
     	case 1:
     		m_DriveTrain.WriteDashboardData();
-    		if(m_DriveTrain.isPIDFinished())
+    		if(m_DriveTrain.isTurnPIDFinished())
     		{
     			autonomousCase++;
     		}

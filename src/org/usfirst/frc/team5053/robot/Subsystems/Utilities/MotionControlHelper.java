@@ -132,7 +132,7 @@ public class MotionControlHelper {
        {
     	   targetSpeed = percentRampDown * targetSpeed;
        }
-       System.out.println("targetSpeed="+targetSpeed);
+      // System.out.println("targetSpeed="+targetSpeed);
        SmartDashboard.putNumber("targetSpeed",targetSpeed);
        
        return targetSpeed;
@@ -158,13 +158,13 @@ public class MotionControlHelper {
     	double currentSpeed = m_source.pidGet();
     	
     	double targetSpeed = getTargetSpeed(this.getMeasurment());
-    	SmartDashboard.putDouble("MotionControlHelper.adjustTargetSpeed Measurement", this.getMeasurment());
-    	System.out.println("MotionControlHelper.adjustTargetSpeed targetSpeed="+targetSpeed + "  ActualSpeed="+currentSpeed  + "targetPosition="+ this.m_targetDistance+"    Current Postion="+this.getMeasurment());
+    	SmartDashboard.putNumber("MotionControlHelper.adjustTargetSpeed Measurement", this.getMeasurment());
+    	//System.out.println("MotionControlHelper.adjustTargetSpeed targetSpeed="+targetSpeed + "  ActualSpeed="+currentSpeed  + "targetPosition="+ this.m_targetDistance+"    Current Postion="+this.getMeasurment());
     	this.getRegularPIDControl().setSetpoint(targetSpeed);
-    	SmartDashboard.putDouble("MotionControlHelper.adjustTargetSpeed targetSpeed", targetSpeed);
+    	SmartDashboard.putNumber("MotionControlHelper.adjustTargetSpeed targetSpeed", targetSpeed);
     	
     	ensureSourceProvidesRate();
-    	SmartDashboard.putDouble("MotionControlHelper.adjustTargetSpeed Gyro Rate", m_source.pidGet());
+    	SmartDashboard.putNumber("MotionControlHelper.adjustTargetSpeed Gyro Rate", m_source.pidGet());
     	// now that we have the speed set properly lets call the PID control and have it adjust the PIDInput (e.g. the motor power) to get closer to the desired speed.
     	//TODO need to access the inner class PIDTask and override to call calculatesSetup then then calculate()
        	//super.calculate();
@@ -210,7 +210,6 @@ public class MotionControlHelper {
         	//TODO have WPI redo the PIDController so the calculate() method is protected so we wouldn't have to do this hack 
 			//  if it were protected then we could override calculate() method and allow the target speed to be set ahead of calculation the new PID output
 			try{
-				System.out.println("MotionControlHelper.pidGet()");
 				m_MCHelper.adjustTargetSpeed();
 			}
 			catch (Exception e){

@@ -76,9 +76,18 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 		}
 		
 	}
-	public boolean isPIDFinished()
+	public boolean isStraightPIDFinished()
 	{
-		if(!m_MotionController.isPIDEnabled())
+		if(m_MotionController.isStraightMotionFinished())
+		{
+			isPIDRunning = false;
+			return true;
+		}
+		return false;
+	}
+	public boolean isTurnPIDFinished() 
+	{
+		if(m_MotionController.isTurnMotionFinished())
 		{
 			isPIDRunning = false;
 			return true;
@@ -110,6 +119,9 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 		m_LeftEncoder.reset();
 		m_RightEncoder.reset();
 	}
+	public void ResetGyro() {
+		m_Gyro.reset();
+	}
 	public double GetAverageSpeed()
 	{
 		return ((GetLeftSpeed() + GetRightSpeed())/2);
@@ -120,7 +132,7 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 	}
 	public void ArcadeDrive(double speed, double angle)
 	{
-		this.ArcadeDrive(speed, angle);
+		this.arcadeDrive(speed, angle);
 	}
 	public double GetAngle()
 	{

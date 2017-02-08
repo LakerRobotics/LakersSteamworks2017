@@ -32,7 +32,7 @@ public class DistancePIDWrapper implements PIDOutput, PIDSource {
 
 	@Override
 	public void pidWrite(double output) {
-		m_drivetrain.SetSpeed(output);
+		m_drivetrain.SetSpeed(output*.5);
 	}
 
 }
