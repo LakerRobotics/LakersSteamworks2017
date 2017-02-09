@@ -70,6 +70,7 @@ public class Robot extends IterativeRobot
 	private final Object m_ImgLock = new Object();
 	
 	private int autonomousCase;
+	private boolean isVisionTurnRunning = false;
 	
 	@Override
     public void robotInit()
@@ -95,14 +96,17 @@ public class Robot extends IterativeRobot
     	
     	autonomousCase = 0;
     	
-    	UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-
+    	UsbCamera camera = CameraServer.getInstance().startAutomaticCapture("Shooter Cam", 0);
+    	UsbCamera backCamera = CameraServer.getInstance().startAutomaticCapture("Peg Camera", 1);
+    	SmartDashboard.putBoolean("Is second cam null?", backCamera == null);
+    	
     	camera.setExposureManual(1);
     	camera.setFPS(30);
     	camera.setBrightness(1);
         camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
         
         m_VisionThread = new VisionThread(camera, new GRIPVision(), pipeline -> {
+        	SmartDashboard.putBoolean("Is empty", pipeline.filterContoursOutput().isEmpty());
             if (!pipeline.filterContoursOutput().isEmpty()) {
                 Rect r = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
                 synchronized (m_ImgLock) {
@@ -142,14 +146,14 @@ public class Robot extends IterativeRobot
     		m_DriveTrain.ResetEncoders();
     		m_DriveTrain.ResetGyro();
     		//Magic Numbers
-    		m_DriveTrain.TurnToAngle(90);
+    		m_DriveTrain.DriveDistance(50, 10, 7);
     		m_DriveTrain.WriteDashboardData();
     		autonomousCase++;
     		System.out.println("Incrementing Case");
     		break;
     	case 1:
     		m_DriveTrain.WriteDashboardData();
-    		if(m_DriveTrain.isTurnPIDFinished())
+    		if(m_DriveTrain.isStraightPIDFinished())
     		{
     			autonomousCase++;
     		}
@@ -165,12 +169,19 @@ public class Robot extends IterativeRobot
     	
     	GetDashboardData();
     	
-    	//Drivetrain
-    	if(m_RobotInterface.GetDriverB())
-    	{
-    		visionAlign();
+    	double centerX;
+    	synchronized (m_ImgLock) {
+    		centerX = this.m_CenterX;
     	}
-    	else
+    	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
+    	SmartDashboard.putNumber("Teleop CenterX", m_CenterX);
+    	SmartDashboard.putNumber("Teleop Turn", turn);
+    	//Drivetrain
+    	if(m_RobotInterface.GetDriverB() || isVisionTurnRunning)
+    	{
+    		visionAlign(turn);
+    	}
+    	else if(!isVisionTurnRunning)
     	{
         	arcadeDrive();
     	}
@@ -194,24 +205,22 @@ public class Robot extends IterativeRobot
     //Drivetrain methods
     public void arcadeDrive()
     {
-    	m_DriveTrain.ArcadeDrive(m_RobotInterface.GetDriverLeftY(), m_RobotInterface.GetDriverRightX());
+    	m_DriveTrain.ArcadeDrive(-m_RobotInterface.GetDriverLeftY(), -m_RobotInterface.GetDriverRightX());
     }
     
-    public void visionAlign() {
-    	if(!m_DriveTrain.isPIDRunning)
+    public void visionAlign(double turn) 
+    {
+    	if(!m_DriveTrain.isPIDRunning && !isVisionTurnRunning)
     	{
-        	double centerX;
-        	synchronized (m_ImgLock) {
-        		centerX = this.m_CenterX;
-        	}
-        	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
-
-        	SmartDashboard.putNumber("Vision CenterX", m_CenterX);
+        	SmartDashboard.putNumber("Vision Turn", turn);
         	
         	m_DriveTrain.TurnToAngle(turn);
+
+    		isVisionTurnRunning = true;
     	}    	
     	else if(m_DriveTrain.isTurnPIDFinished())
     	{
+    		isVisionTurnRunning = false;
     		m_DriveTrain.DisablePIDControl();
     	}
     }

@@ -45,7 +45,7 @@ public class MotionController {
 		m_targetDistance = 0;
 		m_targetAngle = 0;
 		m_straightTolerance = 5;
-		m_turnTolerance = 0.5;
+		m_turnTolerance = 2;
 		m_PIDEnabled = false;
 		
 	}
@@ -54,12 +54,12 @@ public class MotionController {
 		if (!m_PIDEnabled)
 		{
 			m_targetAngle = m_DriveTrain.GetAngle();
-			m_targetDistance = -distance;
+			m_targetDistance = distance;
 			m_DriveTrain.ResetEncoders();
 			
 			double start = 0;
 			
-			double convertedDistance = -distance;
+			double convertedDistance = distance;
 			double convertedSpeed = maxspeed * 12; // Inches
 			double convertedRamp = ramp;
 			
@@ -81,6 +81,8 @@ public class MotionController {
 	{
 		if (!m_PIDEnabled)
 		{
+			m_DriveTrain.ResetGyro();
+			
 			//Magic numbers need fixing
 			double maxRPM = 30;
 			double ramp = 3.5 * maxRPM;
@@ -140,7 +142,13 @@ public class MotionController {
 	}
 	public void DisablePIDControls()
 	{
-		m_TurnPIDController.disable();
-		m_StraightPIDController.disable();
+		if(m_TurnPIDController != null)
+		{
+			m_TurnPIDController.disable();
+		}
+		if(m_StraightPIDController != null)
+		{
+			m_StraightPIDController.disable();
+		}
 	}
 }
