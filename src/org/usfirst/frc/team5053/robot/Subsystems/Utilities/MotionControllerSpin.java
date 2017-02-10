@@ -142,7 +142,7 @@ public class MotionControllerSpin extends Command {
        		rotationSpeedPID.disable();
 //       		mcPID.getError() 
        		System.out.println("MotionControllerSpin Finished true");  
-       	  	robotDrive.tankDrive(0,0);
+//20170208 because when on the motors were humming & may want to leave at some speed beside zero robotDrive.tankDrive(0,0);
        		return  true;
        	}
        	else{

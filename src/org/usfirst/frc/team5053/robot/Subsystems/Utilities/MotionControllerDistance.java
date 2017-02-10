@@ -171,7 +171,7 @@ double ramp = 0; //inches distance to go from start to maxspeed and maxspeed to 
        		speedFollowerPID.disable();
 //       		mcPID.getError() 
        		System.out.println("MotionControllerDistance Finished true");  
-       	  	robotDrive.tankDrive(0,0);
+//20170208 because may not end at zero speed.       	  	robotDrive.tankDrive(0,0);
        		return  true;
        	}
        	else

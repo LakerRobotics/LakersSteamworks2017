@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.PIDSourceType;
 public class DistancePIDWrapper implements PIDOutput, PIDSource {
 	
 	private DriveTrain m_drivetrain;
-	private final double OUTPUT_RANGE = .5;
+	private final double OUTPUT_RANGE = .5; // So what is this limiting to 1/2 the power??
 	
 	public DistancePIDWrapper(DriveTrain drivetrain)
 	{

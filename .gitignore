@@ -46,3 +46,7 @@ Network Trash Folder
 Temporary Items
 .apdisk
 *.class
+
+bin/org/usfirst/frc/team5053/robot/Robot.class
+*.class
+bin/org/usfirst/frc/team5053/robot/RobotSensorMap.class
