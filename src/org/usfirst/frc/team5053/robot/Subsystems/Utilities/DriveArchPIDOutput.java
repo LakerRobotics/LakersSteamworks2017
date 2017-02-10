@@ -76,8 +76,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 			//if not at the desired total rotation angle, then adjust the rotation power
 			//abs(m_archRotationPID.getMotionControlHelper().m_targetDistance - gyro.getAngle()) >
 			if (m_archRotationSpeedPID.onTarget()){
-				//we have turned to the correct angle so no rotation power 
-				m_archRotationSpeedPID.setSetpoint(0);
+				//we have turned to the correct angle so no rotation power except as needed based on the regular motion controlled angular adjustment				
 			}else{
 				//set the rotation based on the current speed of the robot.
 				//arched-turn for a robot in a big circle of radius R and it seems the the rate of angler change just needs to be proportional to the speed:
@@ -96,7 +95,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 	    	double leftPower; 
 	    	double rightPower;
 	    	
-	    	// Reduce forward power so can get full even turning effect
+	    	// Reduce forward power so can get full and even turning effect
 	    	// also may help if quickly reduce from full throttle, to avoid a jerk in the rotation as the PID would convert from 1/2 to all all rotation power
 	    	// .
 	    	if (a_forwardPower + rotationPower > 1.0){
