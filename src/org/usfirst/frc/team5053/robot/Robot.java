@@ -1,9 +1,11 @@
 package org.usfirst.frc.team5053.robot;
 
+import org.usfirst.frc.team5053.robot.RobotInterfaceMap.JoystickType;
 import org.usfirst.frc.team5053.robot.Subsystems.DriveTrain;
 import org.usfirst.frc.team5053.robot.Subsystems.DriveTrainMotionControl;
 import org.usfirst.frc.team5053.robot.Subsystems.Indexer;
 import org.usfirst.frc.team5053.robot.Subsystems.Intake;
+import org.usfirst.frc.team5053.robot.Subsystems.LightSystem;
 import org.usfirst.frc.team5053.robot.Subsystems.Mixer;
 import org.usfirst.frc.team5053.robot.Subsystems.Scaler;
 import org.usfirst.frc.team5053.robot.Subsystems.Shooter;
@@ -13,6 +15,8 @@ import org.opencv.imgproc.Imgproc;
 
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Sendable;
@@ -49,28 +53,32 @@ public class Robot extends IterativeRobot
 	private Indexer m_Indexer;
 	private Scaler m_Scaler;
 	private Mixer m_Mixer;
+	private LightSystem m_LightSystem;
+	
+	//Vision declaration
+	private UsbCamera m_Camera;
+	private VisionThread m_VisionThread;
+	private double centerX;
+	private double previousVisionTurn;
+	private boolean isVisionTurnRunning;
+	private final Object m_ImgLock = new Object();
 	
 	//Shooter speeds
-	private final double SHOOTER_FAST	= -380;
-	private final double SHOOTER_SLOW	= -360;
+	private final double SHOOTER_SPEED	= .5;
 	
 	//Misc speeds
-	private final double INTAKE_SPEED = 360;
-	private final double MIXER_SPEED = 360;
-	private final double INDEXER_SPEED = 360;
-	private final double SCALER_SPEED = 360;
+	private final double INTAKE_SPEED = .7;
+	private final double MIXER_SPEED = .7;
+	private final double INDEXER_SPEED = .7;
+	private final double SCALER_SPEED = .7;
 
 	private final int IMG_WIDTH		= 320;
 	private final int IMG_HEIGHT 	= 240;
 	private final int CAMERA_ANGLE 	= 52;
 	
-	private VisionThread m_VisionThread;
-	private double m_CenterX = 0.0;
-	
-	private final Object m_ImgLock = new Object();
-	
+	//Misc Variables
 	private int autonomousCase;
-	private boolean isVisionTurnRunning = false;
+	private int teleopLightLoops;
 	
 	@Override
     public void robotInit()
@@ -81,7 +89,7 @@ public class Robot extends IterativeRobot
          */
     	
     	// the RobotInterfaceMap detects the controller and set the key mapping accordingly
-    	m_RobotInterface = new RobotInterfaceMap();
+    	m_RobotInterface = new RobotInterfaceMap(JoystickType.XBOX, JoystickType.JOYSTICK);
 
     	m_RobotControllers = new RobotControllerMap();
     	m_RobotSensors = new RobotSensorMap();    	
@@ -94,24 +102,29 @@ public class Robot extends IterativeRobot
     	m_Mixer = new Mixer(m_RobotControllers.getMixer());
     	m_Scaler = new Scaler(m_RobotControllers.getScaler());
     	
+    	m_LightSystem = new LightSystem(m_RobotSensors.getRed(), m_RobotSensors.getBlue(), m_RobotSensors.getGreen(), DriverStation.getInstance().getAlliance());
+    	m_LightSystem.setDefault();
+    	
+    	m_Camera = CameraServer.getInstance().startAutomaticCapture();
+		
+    	m_Camera.setExposureManual(1);
+    	m_Camera.setFPS(30);
+    	m_Camera.setBrightness(1);
+        m_Camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
+    	
+        centerX = 0.0;
     	autonomousCase = 0;
-    	
-    	UsbCamera camera = CameraServer.getInstance().startAutomaticCapture("Shooter Cam", 0);
-    	UsbCamera backCamera = CameraServer.getInstance().startAutomaticCapture("Peg Camera", 1);
-    	SmartDashboard.putBoolean("Is second cam null?", backCamera == null);
-    	
-    	camera.setExposureManual(1);
-    	camera.setFPS(30);
-    	camera.setBrightness(1);
-        camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
-        
-        m_VisionThread = new VisionThread(camera, new GRIPVision(), pipeline -> {
+    	previousVisionTurn = 0;
+    	teleopLightLoops = 0;
+    	isVisionTurnRunning = false;
+       
+        m_VisionThread = new VisionThread(m_Camera, new GRIPVision(), pipeline -> {
         	SmartDashboard.putBoolean("Is empty", pipeline.filterContoursOutput().isEmpty());
             if (!pipeline.filterContoursOutput().isEmpty()) {
                 Rect r = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
                 synchronized (m_ImgLock) {
-                    m_CenterX = r.x + (r.width / 2);
-                    SmartDashboard.putNumber("Vision CenterX", m_CenterX);
+                	centerX = r.x + (r.width / 2);
+                    SmartDashboard.putNumber("Vision CenterX", centerX);
                 }
             }
         });
@@ -133,7 +146,7 @@ public class Robot extends IterativeRobot
     	
     	double centerX;
     	synchronized (m_ImgLock) {
-    		centerX = this.m_CenterX;
+    		centerX = this.centerX;
     	}
     	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
 
@@ -171,15 +184,28 @@ public class Robot extends IterativeRobot
     	
     	double centerX;
     	synchronized (m_ImgLock) {
-    		centerX = this.m_CenterX;
+    		centerX = this.centerX;
     	}
     	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
-    	SmartDashboard.putNumber("Teleop CenterX", m_CenterX);
-    	SmartDashboard.putNumber("Teleop Turn", turn);
+    	
+        SmartDashboard.putString("Alliance", DriverStation.getInstance().getAlliance().toString());
+    	
     	//Drivetrain
-    	if(m_RobotInterface.GetDriverB() || isVisionTurnRunning)
+    	if(m_RobotInterface.GetDriverLeftBumper())
     	{
-    		visionAlign(turn);
+    		if(!(Math.abs(previousVisionTurn) == turn))
+    		{
+    			previousVisionTurn = turn;
+        		visionAlign(turn);
+    		}
+    	}
+    	else if(isVisionTurnRunning)
+    	{
+    		if(m_DriveTrain.isTurnPIDFinished())
+        	{
+        		isVisionTurnRunning = false;
+        		m_DriveTrain.DisablePIDControl();
+        	}
     	}
     	else if(!isVisionTurnRunning)
     	{
@@ -187,12 +213,16 @@ public class Robot extends IterativeRobot
     	}
     	m_DriveTrain.WriteDashboardData();
     	
+    	//Shooter methods
+    	shoot();
+    	
     	//Other
     	//Indexer is not run here because AFAIK it should only be run when the shooter is ready to go
-    	//Is the mixer part of the intake system?
     	runIntake();
-    	runMixer();
+    	runIndexer();
     	runScaler();
+    	
+    	teleopLightLoops++;
     }
 
     public void testPeriodic()
@@ -205,20 +235,17 @@ public class Robot extends IterativeRobot
     //Drivetrain methods
     public void arcadeDrive()
     {
-    	m_DriveTrain.ArcadeDrive(-m_RobotInterface.GetDriverLeftY(), -m_RobotInterface.GetDriverRightX());
+    	m_DriveTrain.ArcadeDrive(m_RobotInterface.GetDriverLeftY(), m_RobotInterface.GetDriverRightX());
     }
     
     public void visionAlign(double turn) 
     {
-    	if(!m_DriveTrain.isPIDRunning && !isVisionTurnRunning)
-    	{
-        	SmartDashboard.putNumber("Vision Turn", turn);
-        	
-        	m_DriveTrain.TurnToAngle(turn);
+    	SmartDashboard.putNumber("Vision Turn", turn);
+    	
+    	m_DriveTrain.TurnToAngle(turn);
 
-    		isVisionTurnRunning = true;
-    	}    	
-    	else if(m_DriveTrain.isTurnPIDFinished())
+		isVisionTurnRunning = true;	
+    	if(m_DriveTrain.isTurnPIDFinished())
     	{
     		isVisionTurnRunning = false;
     		m_DriveTrain.DisablePIDControl();
@@ -229,46 +256,44 @@ public class Robot extends IterativeRobot
     public void shoot()
     {
     	//TODO Determine buttons
-    	if(m_RobotInterface.GetOperatorButton(3))
+    	if(m_RobotInterface.GetDriverRightBumper())
     	{
-    		//Fast Shot
+    		//TODO Add an encoder to the robot's shooter
+    		m_Shooter.SetTalonOutput(SHOOTER_SPEED);
+    		runIndexer();
+    		
+    		//Shoot
     		//Enable the PID Controller for the Shooter
-    		m_Shooter.SetShooterSetpoint(SHOOTER_FAST);
+    		/*m_Shooter.SetShooterSetpoint(SHOOTER_SPEED);
     	   	m_Shooter.EnablePID();
-        	
-        	
-        	if(m_Shooter.ShooterOnTarget() && m_Shooter.ShooterOnTarget())
+    		
+        	if(m_Shooter.ShooterOnTarget())
         	{
         		//Shooter is ready to fire.
         		runIndexer();
+        		
+        		m_LightSystem.setRedState(false);
+        		m_LightSystem.setBlueState(false);
+        		m_LightSystem.setGreenState(true);
         	}
-    	}
-    	else if(m_RobotInterface.GetOperatorButton(4))
-    	{
-    		//Slow Shot
-    		//Enable the PID Controller for the Shooter
-    		m_Shooter.SetShooterSetpoint(SHOOTER_SLOW);
-    	   	m_Shooter.EnablePID();
-        	
-        	
-        	if(m_Shooter.ShooterOnTarget() && m_Shooter.ShooterOnTarget())
+        	else
         	{
-        		//Shooter is ready to fire.
-        		runIndexer();
-        	}
+        		m_LightSystem.setDefault();
+        	}*/
     	}
     	else
     	{
     		//STOP
+    		//m_Shooter.DisablePID();
     		m_Shooter.SetTalonOutput(0);
+    		//m_LightSystem.setDefault();
     	}
     }
 
     //Intake methods
     public void runIntake()
     {
-    	//TODO Determine button
-	    if(m_RobotInterface.GetOperatorButton(8))
+	    if(m_RobotInterface.GetDriverA())
 		{
 			m_Intake.SetTalonOutput(INTAKE_SPEED);
 		}
@@ -281,8 +306,7 @@ public class Robot extends IterativeRobot
     //Indexer methods
     public void runIndexer() 
     {
-    	//TODO Determine button
-    	if(m_RobotInterface.GetOperatorButton(8))
+    	if(m_RobotInterface.GetDriverB())
  		{
     		m_Indexer.SetTalonOutput(INDEXER_SPEED);
  		}
@@ -295,8 +319,7 @@ public class Robot extends IterativeRobot
     //Mixer methods
     public void runMixer() 
     {
-    	//TODO Determine button
-    	if(m_RobotInterface.GetOperatorButton(8))
+    	if(m_RobotInterface.GetDriverY())
  		{
     	    m_Mixer.SetTalonOutput(MIXER_SPEED);
  		}
@@ -310,13 +333,38 @@ public class Robot extends IterativeRobot
     public void runScaler() 
     {
     	//TODO Determine button
-    	if(m_RobotInterface.GetOperatorButton(8))
+    	if(m_RobotInterface.GetDriverX())
  		{
         	m_Scaler.SetTalonOutput(SCALER_SPEED);
+        	
+        	if(teleopLightLoops <= 50)
+        	{
+        		m_LightSystem.setGreenState(true);
+        		
+        		m_LightSystem.setRedState(false);
+        		m_LightSystem.setBlueState(false);
+        	}
+        	else if(teleopLightLoops > 50 && teleopLightLoops <= 100)
+        	{
+        		m_LightSystem.setRedState(true);
+        		
+        		m_LightSystem.setBlueState(false);
+        		m_LightSystem.setGreenState(false);
+        	}
+        	else if(teleopLightLoops > 100)
+        	{
+        		m_LightSystem.setRedState(true);
+        		
+        		m_LightSystem.setBlueState(false);
+        		m_LightSystem.setGreenState(false);
+        		if(teleopLightLoops == 150)
+        			teleopLightLoops = 0;
+        	}
  		}
  	    else
  	    {
  	    	m_Scaler.SetTalonOutput(0);
+ 	    	m_LightSystem.setDefault();
  	    }
     }
     

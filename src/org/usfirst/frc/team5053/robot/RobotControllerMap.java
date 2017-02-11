@@ -1,5 +1,6 @@
 package org.usfirst.frc.team5053.robot;
 
+import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.Talon;
 
 /**
@@ -16,8 +17,6 @@ import edu.wpi.first.wpilibj.Talon;
 
 public class RobotControllerMap
 {
-
-
 	private final int leftDrivePWM = 0;
 	private final int rightDrivePWM = 1;
 	private final int intakePWM = 2;
@@ -25,7 +24,6 @@ public class RobotControllerMap
 	private final int shooterPWM = 4;
 	private final int scalerPWM = 5;
 	private final int mixerPWM = 6;
-	
 	
 	private Talon m_LeftDrive;
 	private Talon m_RightDrive;
@@ -49,6 +47,11 @@ public class RobotControllerMap
 		m_Shooter = new Talon(shooterPWM);
 		m_Scaler = new Talon(scalerPWM);
 		m_Mixer = new Talon(mixerPWM);
+		
+		m_LeftDrive.setInverted(true);
+		m_RightDrive.setInverted(true);
+		m_Intake.setInverted(true);
+		m_Shooter.setInverted(true);
 	}
 	
 	public Talon getLeftDrive()

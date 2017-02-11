@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.Joystick;
 
 public class RobotInterfaceMap 
 {
-	public enum joystickType
+	public enum JoystickType
 	{
 		LOGITECHGAMEPAD,
 		XBOX,
@@ -61,42 +61,40 @@ public class RobotInterfaceMap
 	private int operatorRightX = 0;
 	private int operatorRightY = 0;
 	
-	
 	private Joystick driverJoystick;
 	private Joystick operatorJoystick;
 	
 	/** Default constructor. Will detect if the plugged in controller is xbox  and adjust setting accordingly.
 	 * 
 	 */
-	public RobotInterfaceMap()
+	public RobotInterfaceMap(JoystickType driver, JoystickType operator)
 	{
 		driverJoystick = new Joystick(driverJoystickSlot);
 		operatorJoystick = new Joystick(operatorJoystickSlot);		
 		
-		//if (driverJoystick.getIsXbox()){
-			// XBOX
-			System.out.println("Xbox detected");
-			driverButtonX = 2;
-			driverButtonA = 0;
-			driverButtonB = 1;
-			driverButtonY = 3;
-			driverSelectButton = 6;
-			driverStartButton = 7;
-			driverLeftBumper = 4;
-			driverRightBumper = 5;
+		if (driver.equals(JoystickType.XBOX)){
+			//XBOX driver
+			driverButtonA = 1;
+			driverButtonB = 2;
+			driverButtonX = 3;
+			driverButtonY = 4;
+			driverLeftBumper = 5;
+			driverRightBumper = 6;
+			driverSelectButton = 7;
+			driverStartButton = 8;
+			driverLeftJoystickButton = 9;
+			driverRightJoystickButton = 10;
+
+			driverLeftX = 0;
+			driverLeftY = 1;
 			driverLeftTrigger = 2;
 			driverRightTrigger = 3;
-			driverLeftJoystickButton = 8;
-			driverRightJoystickButton = 9;
-
-			driverLeftY = 1;
-			driverLeftX = 0;
 			driverRightX = 4;
 			driverRightY = 5;
-		/*}
-		else{
-			//JOYSTICK Values
-			System.out.println("Joystick");
+		}
+		else
+		{
+			//JOYSTICK driver
 			driverButtonX = 0;
 			driverButtonY = 1;
 			driverButtonA = 2;
@@ -114,28 +112,33 @@ public class RobotInterfaceMap
 			driverLeftX = 2;
 			driverRightX = 3;
 			driverRightY = 4;
-		}*/
+		}
 		
-		/*if (operatorJoystick.getIsXbox()){
-		 XBOX:
-			operatorButtonX = 2;
-			operatorButtonA = 0;
-			operatorButtonB = 1;
-			operatorButtonY = 3;
-			operatorSelectButton = 6;
-			operatorStartButton = 7;
-			operatorLeftBumper = 4;
-			operatorRightBumper = 5;
+		if (operator.equals(JoystickType.XBOX))
+		{
+			//XBOX operator
+			operatorButtonA = 1;
+			operatorButtonB = 2;
+			operatorButtonX = 3;
+			operatorButtonY = 4;
+			operatorLeftBumper = 5;
+			operatorRightBumper = 6;
+			operatorSelectButton = 7;
+			operatorStartButton = 8;
+			operatorLeftJoystickButton = 9;
+			operatorRightJoystickButton = 10;
+
+			operatorLeftX = 0;
+			operatorLeftY = 1;
 			operatorLeftTrigger = 2;
 			operatorRightTrigger = 3;
-			operatorLeftJoystickButton = 8;
-			operatorRightJoystickButton = 9;
-			operatorLeftY = 1;
-			operatorLeftX = 0;
 			operatorRightX = 4;
-			operatorRightY = 5;}
-		else{*/
-		 LOGITECHGAMEPAD:
+			operatorRightY = 5;
+			
+		}
+		else
+		{
+			//JOYSTICK operator
 			operatorButtonX = 0;
 			operatorButtonY = 1;
 			operatorButtonA = 2;
@@ -153,8 +156,7 @@ public class RobotInterfaceMap
 			operatorLeftX = 2;
 			operatorRightX = 3;
 			operatorRightY = 4;
-		//}
-			
+		}	
 	}
 
 	

@@ -20,7 +20,7 @@ public class MotionController {
 	private double m_turnTolerance;
 	private boolean m_PIDEnabled;
 	
-	private final double TurnKp = 0.001;
+	private final double TurnKp = 0.9;
 	private final double TurnKi = 0.0;
 	private final double TurnKd = 0.0;
 	private final double StraightKp = 0.005;
@@ -49,7 +49,7 @@ public class MotionController {
 		m_PIDEnabled = false;
 		
 	}
-	public void ExecuteStraightMotion(double distance, double maxspeed, double ramp)
+	public boolean ExecuteStraightMotion(double distance, double maxspeed, double ramp)
 	{
 		if (!m_PIDEnabled)
 		{
@@ -63,47 +63,58 @@ public class MotionController {
 			double convertedSpeed = maxspeed * 12; // Inches
 			double convertedRamp = ramp;
 			
-			//Instantiates a new MotionControlHelper() object for the new drive segment
-			m_StraightControl = new MotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_StraightSource, new StraightMotionPIDOutput(m_DriveTrain, m_TurnSource, m_targetAngle));
-			
-			//Instantiates a new MotionControlPIDController() object for the new drive segment using the previous MotionControlHelper()
-			m_StraightPIDController = new MotionControlPIDController(StraightKp, StraightKi, StraightKd, m_StraightControl);
-			m_StraightPIDController.setAbsoluteTolerance(m_straightTolerance);
-			m_StraightPIDController.setOutputRange(-1, 1);
-			
-			//Turns the MotionControlPID ON and it will continue to execute by itself until told otherwise.
-			m_StraightPIDController.enable();
-			m_PIDEnabled = true;
+			if (!(Math.abs(m_DriveTrain.GetLeftDistance()) > Math.abs(m_targetDistance)))
+			{
+				//Instantiates a new MotionControlHelper() object for the new drive segment
+				m_StraightControl = new MotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_StraightSource, new StraightMotionPIDOutput(m_DriveTrain, m_TurnSource, m_targetAngle));
+				
+				//Instantiates a new MotionControlPIDController() object for the new drive segment using the previous MotionControlHelper()
+				m_StraightPIDController = new MotionControlPIDController(StraightKp, StraightKi, StraightKd, m_StraightControl);
+				m_StraightPIDController.setAbsoluteTolerance(m_straightTolerance);
+				m_StraightPIDController.setOutputRange(-1, 1);
+				
+				//Turns the MotionControlPID ON and it will continue to execute by itself until told otherwise.
+				m_StraightPIDController.enable();
+				m_PIDEnabled = true;
+				return true;
+			}
+			return false;
 		}
-		
+		return true;
 	}
-	public void ExecuteTurnMotion(double turnAngle)
+	public boolean ExecuteTurnMotion(double turnAngle)
 	{
 		if (!m_PIDEnabled)
 		{
 			m_DriveTrain.ResetGyro();
 			
 			//Magic numbers need fixing
-			double maxRPM = 30;
-			double ramp = 3.5 * maxRPM;
+			double maxRPM = 60/*30*/;
+			double ramp = 30/* 3.5 * maxRPM*/;
 			
-			double maxSpeed = maxRPM * 6;
+			double maxSpeed = maxRPM * 6; //360 Degrees/60 seconds to convert RPM to speed or degrees per second
 			double start = m_DriveTrain.GetAngle();
 			m_targetAngle = turnAngle + start;
 			
-			//Instantiates a new MotionControlHelper() object for the new turn segment
-			m_TurnControl = new MotionControlHelper(m_targetAngle, ramp, maxSpeed, start, m_TurnSource, new DriveTurnPIDOutput(m_DriveTrain));
-			m_TurnControl.setTargetDistance(m_targetAngle);
-			
-			//Instantiates a new MotionControlPIDController() object for the new turn segment using the previous MotionControlHelper()
-			m_TurnPIDController = new MotionControlPIDController(TurnKp, TurnKi, TurnKd, m_TurnControl);
-			m_TurnPIDController.setOutputRange(-1.0, 1.0);
-			
-			//Turns the MotionControlPID ON and it will continue to execute by itself until told otherwise.
-			m_TurnPIDController.enable();	
-			m_PIDEnabled = true;
+			if (!(Math.abs(m_DriveTrain.GetAngle()-m_targetAngle) < m_turnTolerance))
+			{
+				//Instantiates a new MotionControlHelper() object for the new turn segment
+				m_TurnControl = new MotionControlHelper(m_targetAngle, ramp, maxSpeed, start, m_TurnSource, new DriveTurnPIDOutput(m_DriveTrain));
+				m_TurnControl.setTargetDistance(m_targetAngle);
+				
+				//Instantiates a new MotionControlPIDController() object for the new turn segment using the previous MotionControlHelper()
+				m_TurnPIDController = new MotionControlPIDController(TurnKp, TurnKi, TurnKd, m_TurnControl);
+				m_TurnPIDController.setOutputRange(-1.0, 1.0);
+				
+				//Turns the MotionControlPID ON and it will continue to execute by itself until told otherwise.
+				m_TurnPIDController.enable();	
+				m_PIDEnabled = true;
+				
+				return true;
+			}
+			return false;
 		}
-		
+		return true;
 	}
 	public boolean isStraightMotionFinished()
 	{

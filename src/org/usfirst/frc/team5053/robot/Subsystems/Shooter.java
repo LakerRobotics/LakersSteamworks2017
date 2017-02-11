@@ -15,12 +15,15 @@ public class Shooter implements Subsystem{
 	private double KI = 5.0E-4;
 	private double KD = 0.0;
 	
+	private double PERCENT_TOLERANCE = 0.5;
+	
 	public Shooter(Talon shooterTalon, Encoder shooterEncoder) {
 		m_Shooter = shooterTalon;
 		m_Encoder = shooterEncoder;
 		m_Encoder.setPIDSourceType(PIDSourceType.kRate);
 		
 		m_PID = new PIDController(KP, KI, KD, m_Encoder, m_Shooter);
+		m_PID.setAbsoluteTolerance(PERCENT_TOLERANCE);
 	}
 	
 	public void EnablePID() {

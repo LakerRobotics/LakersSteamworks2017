@@ -47,9 +47,6 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 		
 		m_Gyro = Gyro;
 		
-		m_LeftMotor.setInverted(true);
-		m_RightMotor.setInverted(true);
-		
 		m_MotionController = new MotionController(this, (PIDSource) m_RightEncoder, (PIDSource) m_Gyro);
 		
 	}
@@ -57,8 +54,7 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 	{
 		if(!isPIDRunning)
 		{
-			m_MotionController.ExecuteStraightMotion(distance, maxspeed, ramp);
-			isPIDRunning = true;
+			isPIDRunning = 	m_MotionController.ExecuteStraightMotion(distance, maxspeed, ramp);
 		}
 		
 	}
@@ -66,8 +62,7 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 	{
 		if(!isPIDRunning)
 		{
-			m_MotionController.ExecuteTurnMotion(turnAngle);
-			isPIDRunning = true;
+			isPIDRunning = m_MotionController.ExecuteTurnMotion(turnAngle);
 		}
 		
 	}
