@@ -58,7 +58,9 @@ public class Robot extends IterativeRobot
 	//Vision declaration
 	private UsbCamera m_Camera;
 	private VisionThread m_VisionThread;
+	private boolean haveTarget = false;
 	private double centerX;
+	private double distanceToBoilerTarget;  // in Feet
 	private double previousVisionTurn;
 	private boolean isVisionTurnRunning;
 	private final Object m_ImgLock = new Object();
@@ -74,7 +76,14 @@ public class Robot extends IterativeRobot
 
 	private final int IMG_WIDTH		= 320;
 	private final int IMG_HEIGHT 	= 240;
-	private final int CAMERA_ANGLE 	= 52;
+	private final int CAMERA_ANGLE 	= 52; //?62 see comments in notes 2lines down
+	private final int CAMERA_VERTICAL_VIEW_ANGLE = 37;
+	// Chief Delphi 2/20/2016 says Horizontal 61 Degrees Vertical 34.3 Degrees
+	// https://www.chiefdelphi.com/forums/showthread.php?p=1543606 
+	// But the references used by the post were updated 4/23/2016
+	// https://dl2jx7zfbtwvr.cloudfront.net/specsheets/WEBC1010.pdf says diagonal Field of view is 68.5
+	// Using the following reference interpolate between 60 and 70 and get 61.39 Horizontal and 36.955
+	// http://vrguy.blogspot.com/2013/04/converting-diagonal-field-of-view-and.html
 	
 	//Misc Variables
 	private int autonomousCase;
@@ -117,15 +126,43 @@ public class Robot extends IterativeRobot
     	previousVisionTurn = 0;
     	teleopLightLoops = 0;
     	isVisionTurnRunning = false;
+    	distanceToBoilerTarget  = 4.0; //in Feet
        
         m_VisionThread = new VisionThread(m_Camera, new GRIPVision(), pipeline -> {
         	SmartDashboard.putBoolean("Is empty", pipeline.filterContoursOutput().isEmpty());
             if (!pipeline.filterContoursOutput().isEmpty()) {
                 Rect r = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
                 synchronized (m_ImgLock) {
+                	haveTarget= true;
+                    SmartDashboard.putBoolean("VisionHaveTarget", false);
+                    
                 	centerX = r.x + (r.width / 2);
                     SmartDashboard.putNumber("Vision CenterX", centerX);
+                    
+                    // Calcualte distance from target
+                    // 2016 Game:
+                    // http://wpilib.screenstepslive.com/s/4485/m/24194/l/288985-identifying-and-processing-the-targets
+                    
+                    // tanget(angle) = x/y or in this case x is width and y is direct distance to the target
+                    // tangent(target_height_angle) = target_height_in/direct_distance --> solve for 
+                    // Note as we get closer the apparent height of the target will 
+                    // SKIP THIS found they already figured it out, although they warn about inaccuracies, we should switch to lidar
+                    // 2017 Game:
+                    // http://wpilib.screenstepslive.com/s/4485/m/24194/l/683625-processing-images-from-the-2017-frc-game
+                    //   distance = Target height in ft. (10/12) * YRes / (2 * PixelHeight * tan(viewAngle of camera))
+                    double target_height_pixles = r.height;
+                    double target_height_in = 4; //10 inches if we have both
+                    this.distanceToBoilerTarget = 8.04*(target_height_in/12) /* converted to feet -- vision height of the rectangle assumes only have the top one*/
+                    		                  * IMG_HEIGHT
+                    		                  / (2*target_height_pixles*Math.tan(CAMERA_VERTICAL_VIEW_ANGLE));
+                    SmartDashboard.putNumber("VisionDistanceToBoilerTarget", distanceToBoilerTarget);
                 }
+            }
+            else{
+            	haveTarget= false;
+//                SmartDashboard.putNumber("Vision CenterX", centerX); // Leave this because maybe we just got to close to still see the target, so use last angle
+//                SmartDashboard.putNumber("VisionDistanceToBoilerTarget", 0); // Zero out? 
+                SmartDashboard.putBoolean("VisionHaveTarget", false);
             }
         });
         m_VisionThread.start();
@@ -136,6 +173,9 @@ public class Robot extends IterativeRobot
     	 /**
          * This function is called once when autonomous begins
          */
+    	GetDashboardData();
+    	
+    	
     }
 
     public void autonomousPeriodic()
@@ -145,8 +185,10 @@ public class Robot extends IterativeRobot
          */
     	
     	double centerX;
+    	double distanceToBoilerTarget;
     	synchronized (m_ImgLock) {
     		centerX = this.centerX;
+        	distanceToBoilerTarget = this.distanceToBoilerTarget;
     	}
     	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
 
@@ -180,11 +222,13 @@ public class Robot extends IterativeRobot
          * This function is called periodically during operator control
          */
     	
-    	GetDashboardData();
+
     	
     	double centerX;
     	synchronized (m_ImgLock) {
     		centerX = this.centerX;
+        	double distanceToBoilerTarget;
+        	distanceToBoilerTarget = this.distanceToBoilerTarget;
     	}
     	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
     	
@@ -253,13 +297,29 @@ public class Robot extends IterativeRobot
     }
     
     //Shooter methods
+    private double calcShooterSpeed(double distanceFromTarget){
+    	// From trajectory spreadsheet
+    	//y = 11.815x2 + 140.58x + 1348.4 
+    	return 11.815*(distanceFromTarget*distanceFromTarget) + 140.58*distanceFromTarget+1348.4;
+    }
+    
     public void shoot()
     {
     	//TODO Determine buttons
     	if(m_RobotInterface.GetDriverRightBumper())
     	{
     		//TODO Add an encoder to the robot's shooter
-    		m_Shooter.SetTalonOutput(SHOOTER_SPEED);
+    		if(this.haveTarget){
+        		m_Shooter.SetShooterSetpoint(calcShooterSpeed(distanceToBoilerTarget));
+    		    // TODO remove this Hack
+        		// approximate motor speed as a percent of the speed at 8ft, which is assumed to be the max RPM
+    		    double approximateMotorPower = calcShooterSpeed(distanceToBoilerTarget)/calcShooterSpeed(8);
+        		m_Shooter.SetTalonOutput(approximateMotorPower);
+    		}else
+    		{
+        		m_Shooter.SetTalonOutput(SHOOTER_SPEED);
+    		}
+
     		runIndexer();
     		
     		//Shoot
