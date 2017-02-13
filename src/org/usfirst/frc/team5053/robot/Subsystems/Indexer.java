@@ -3,19 +3,19 @@ package org.usfirst.frc.team5053.robot.Subsystems;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Intake implements Subsystem{
+public class Indexer implements Subsystem{
 	
-	private Talon m_Intake;
+	private Talon m_Indexer;
 	private double m_Speed;
 	
-	public Intake(Talon intakeTalon) {
-		m_Intake = intakeTalon;
+	public Indexer(Talon intakeTalon) {
+		m_Indexer = intakeTalon;
 	}
 	
 	public void SetTalonOutput(double speed) {
-		m_Intake.set(speed);
+		m_Indexer.set(speed);
 	}
 	public void WriteDashboardData() {
-		SmartDashboard.putNumber("Intake Speed", m_Speed);
+		SmartDashboard.putNumber("Indexer Speed", m_Speed);
 	}
 }

@@ -44,7 +44,7 @@ public class GRIPVision implements VisionPipeline {
 		// Step HSV_Threshold0:
 		Mat hsvThresholdInput = source0;
 		double[] hsvThresholdHue = {60.0, 120.0};
-		double[] hsvThresholdSaturation = {97.96762589928056, 255.0};
+		double[] hsvThresholdSaturation = {0.0, 255.0};
 		double[] hsvThresholdValue = {25.86330935251798, 156.26262626262627};
 		hsvThreshold(hsvThresholdInput, hsvThresholdHue, hsvThresholdSaturation, hsvThresholdValue, hsvThresholdOutput);
 
@@ -59,7 +59,7 @@ public class GRIPVision implements VisionPipeline {
 
 		// Step Filter_Contours0:
 		ArrayList<MatOfPoint> filterContoursContours = convexHullsOutput;
-		double filterContoursMinArea = 2500.0;
+		double filterContoursMinArea = 0.0;
 		double filterContoursMinPerimeter = 0.0;
 		double filterContoursMinWidth = 0.0;
 		double filterContoursMaxWidth = 1000.0;

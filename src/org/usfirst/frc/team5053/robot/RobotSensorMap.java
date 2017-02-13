@@ -1,10 +1,9 @@
 package org.usfirst.frc.team5053.robot;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
-import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.DigitalOutput;
 
 /**
  * Maps all of the sensors on the robot.
@@ -18,7 +17,6 @@ import edu.wpi.first.wpilibj.Solenoid;
 
 //Controllers are mapped and handled by the RobotControllerMap class
 
-
 public class RobotSensorMap
 {
 	
@@ -28,95 +26,62 @@ public class RobotSensorMap
 	private final int rightDriveEncoderBDIO = 3;
 	private final int shooterEncoderADIO = 4;
 	private final int shooterEncoderBDIO = 5;
-	private final int gearManipulatorEncoderADIO = 6;
-	private final int gearManipulatorEncoderBDIO = 7;
+	private final int redDIO = 6;
+	private final int blueDIO = 7;
+	private final int greenDIO = 8;
 	
 	private Encoder m_LeftDrive;
 	private Encoder m_RightDrive;
-	private Encoder m_LeftShooter;
-	private Encoder m_GearManipulator;
-	
-	private AnalogPotentiometer m_Encoder;
+	private Encoder m_Shooter;
 	private ADXRS450_Gyro m_Gyro;
 	
-	/**
-<<<<<<< HEAD
-	 
-=======
-	 
->>>>>>> refs/remotes/origin/master
-	 */
+	private DigitalOutput m_Red;
+	private DigitalOutput m_Blue;
+	private DigitalOutput m_Green;
+
 	public RobotSensorMap()
 	{
 		m_LeftDrive = new Encoder(leftDriveEncoderADIO, leftDriveEncoderBDIO);
 		m_RightDrive = new Encoder(rightDriveEncoderADIO, rightDriveEncoderBDIO);
-		m_LeftShooter = new Encoder(shooterEncoderADIO, shooterEncoderBDIO);
-		m_GearManipulator = new Encoder(gearManipulatorEncoderADIO, gearManipulatorEncoderBDIO);
+		m_Shooter = new Encoder(shooterEncoderADIO, shooterEncoderBDIO);
+		
+		m_LeftDrive.setDistancePerPulse(6*Math.PI/1024);
+		m_RightDrive.setDistancePerPulse(6*Math.PI/1024);
+		m_Shooter.setDistancePerPulse(1/1024);
 		
 		m_Gyro = new ADXRS450_Gyro();
+		
+		m_Red = new DigitalOutput(redDIO);
+		m_Blue = new DigitalOutput(blueDIO);
+		m_Green = new DigitalOutput(greenDIO);
 	}
 	
-	public Encoder GetLeftDriveEncoder() {
+	public Encoder getLeftDriveEncoder() 
+	{
 		return m_LeftDrive;
 	}
-	public Encoder GetRightDriveEncoder() {
+	public Encoder getRightDriveEncoder() 
+	{
 		return m_RightDrive;
 	}
-	public Encoder GetShooterEncoder() {
-		return m_LeftShooter;
+	public Encoder getShooterEncoder() 
+	{
+		return m_Shooter;
 	}
-	public Encoder GetGearManipulator() {
-		return m_GearManipulator;
-	}
-	public ADXRS450_Gyro GetGyro() {
+	public ADXRS450_Gyro getGyro() 
+	{
 		return m_Gyro;
 	}
-	/*
-	public double getLeftEncoderRate()
+	public DigitalOutput getRed()
 	{
-		if (m_LeftEncoder != null)
-		{
-			return m_LeftEncoder.getRate();
-		}
-		else 
-		{
-			return 0.0;
-		}
+		return m_Red;
 	}
-	public double getRightEncoderRate()
+	public DigitalOutput getBlue()
 	{
-		if (m_RightEncoder != null)
-		{
-			return m_RightEncoder.getRate();
-		}
-		else
-		{
-			return 0.0;
-		}
+		return m_Blue;
 	}
-	
-	public double getLeftEncoderDistance()
+	public DigitalOutput getGreen()
 	{
-		if (m_LeftEncoder != null)
-		{
-			return m_LeftEncoder.getDistance();
-		}
-		else 
-		{
-			return 0.0;
-		}
+		return m_Green;
 	}
-	public double getRightEncoderDistance()
-	{
-		if (m_RightEncoder != null)
-		{
-			return m_RightEncoder.getDistance();
-		}
-		else 
-		{
-			return 0.0;
-		}
-	}
-*/
-
 }

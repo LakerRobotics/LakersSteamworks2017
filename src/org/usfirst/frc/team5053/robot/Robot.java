@@ -1,9 +1,13 @@
 package org.usfirst.frc.team5053.robot;
 
-import org.usfirst.frc.team5053.robot.RobotInterfaceMap.joystickType;
-import org.usfirst.frc.team5053.robot.Subsystems.GearManipulator;
+import org.usfirst.frc.team5053.robot.RobotInterfaceMap.JoystickType;
 import org.usfirst.frc.team5053.robot.Subsystems.DriveTrain;
+import org.usfirst.frc.team5053.robot.Subsystems.DriveTrainMotionControl;
+import org.usfirst.frc.team5053.robot.Subsystems.Indexer;
 import org.usfirst.frc.team5053.robot.Subsystems.Intake;
+import org.usfirst.frc.team5053.robot.Subsystems.LightSystem;
+import org.usfirst.frc.team5053.robot.Subsystems.Mixer;
+import org.usfirst.frc.team5053.robot.Subsystems.Scaler;
 import org.usfirst.frc.team5053.robot.Subsystems.Shooter;
 import org.usfirst.frc.team5053.robot.Subsystems.Utilities.GRIPVision;
 import org.opencv.core.Rect;
@@ -11,14 +15,14 @@ import org.opencv.imgproc.Imgproc;
 
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.vision.VisionPipeline;
 import edu.wpi.first.wpilibj.vision.VisionRunner;
 import edu.wpi.first.wpilibj.vision.VisionThread;
-import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
@@ -37,45 +41,44 @@ public class Robot extends IterativeRobot
 	 */
 	
 	//Robot Map Declaration
-	RobotInterfaceMap m_RobotInterface;
-	RobotControllerMap m_RobotControllers;
-	RobotSensorMap m_RobotSensors;
-	
-	
+	private RobotInterfaceMap m_RobotInterface;
+	private RobotControllerMap m_RobotControllers;
+	private RobotSensorMap m_RobotSensors;
 	
 	//Robot Subsystem Declaration
-	DriveTrain m_DriveTrain;
-	GearManipulator m_Arm;
-	Intake m_Intake;
-	Shooter m_Shooter;
+	//DriveTrain m_DriveTrain;
+	private DriveTrainMotionControl m_DriveTrain;
+	private Intake m_Intake;
+	private Shooter m_Shooter;
+	private Indexer m_Indexer;
+	private Scaler m_Scaler;
+	private Mixer m_Mixer;
+	private LightSystem m_LightSystem;
 	
-	//Arm setpoints
-	final double ARM_NEUTRAL	= 0.209;
-	final double ARM_AUTO		= 0.300;
-	final double ARM_BALL		= 0.327;
-	final double ARM_LOW		= 0.352;
-	
-	//Intake speeds
-	final double INTAKE_FAST	= -2000;
-	final double INTAKE_SLOW	= -1500;
-	final double INTAKE_REVERSE =  2000;
+	//Vision declaration
+	private UsbCamera m_Camera;
+	private VisionThread m_VisionThread;
+	private double centerX;
+	private double previousVisionTurn;
+	private boolean isVisionTurnRunning;
+	private final Object m_ImgLock = new Object();
 	
 	//Shooter speeds
-	final double SHOOTER_FAST	= -380;
-	final double SHOOTER_SLOW	= -360;
-	final double SHOOTER_INTAKE	=  360;
+	private final double SHOOTER_SPEED	= .5;
+	
+	//Misc speeds
+	private final double INTAKE_SPEED = .7;
+	private final double MIXER_SPEED = .7;
+	private final double INDEXER_SPEED = .7;
+	private final double SCALER_SPEED = .7;
 
 	private final int IMG_WIDTH		= 320;
 	private final int IMG_HEIGHT 	= 240;
 	private final int CAMERA_ANGLE 	= 52;
 	
-	private VisionThread m_VisionThread;
-	private double m_CenterX = 0.0;
-	
-	private final Object m_ImgLock = new Object();
-	
-	private boolean isDriveTrainPIDFinished = false;
+	//Misc Variables
 	private int autonomousCase;
+	private int teleopLightLoops;
 	
 	@Override
     public void robotInit()
@@ -86,45 +89,46 @@ public class Robot extends IterativeRobot
          */
     	
     	// the RobotInterfaceMap detects the controller and set the key mapping accordingly
-    	m_RobotInterface = new RobotInterfaceMap();
-    	
-    	
+    	m_RobotInterface = new RobotInterfaceMap(JoystickType.XBOX, JoystickType.JOYSTICK);
+
     	m_RobotControllers = new RobotControllerMap();
-    	m_RobotSensors = new RobotSensorMap();
-    	
-    	
+    	m_RobotSensors = new RobotSensorMap();    	
     	
     	//Robot Subsystem Initialization
-    	m_DriveTrain = new DriveTrain(m_RobotControllers.GetLeftDrive(), m_RobotControllers.GetRightDrive(), m_RobotSensors.GetLeftDriveEncoder(), m_RobotSensors.GetRightDriveEncoder(), m_RobotSensors.GetGyro());
-    	m_Arm = new GearManipulator(m_RobotControllers.GetGearManipulator(), m_RobotSensors.GetGearManipulator());
+    	m_DriveTrain = new DriveTrainMotionControl(m_RobotControllers.getLeftDrive(), m_RobotControllers.getRightDrive(), m_RobotSensors.getLeftDriveEncoder(), m_RobotSensors.getRightDriveEncoder(), m_RobotSensors.getGyro());
+    	m_Shooter = new Shooter(m_RobotControllers.getShooter(), m_RobotSensors.getShooterEncoder());
+    	m_Intake = new Intake(m_RobotControllers.getIntake());
+    	m_Indexer = new Indexer(m_RobotControllers.getIndexer());
+    	m_Mixer = new Mixer(m_RobotControllers.getMixer());
+    	m_Scaler = new Scaler(m_RobotControllers.getScaler());
     	
-    	m_Shooter = new Shooter(m_RobotControllers.GetShooter(), m_RobotSensors.GetShooterEncoder());
-    	m_Intake = new Intake(m_RobotControllers.GetIntake());
+    	m_LightSystem = new LightSystem(m_RobotSensors.getRed(), m_RobotSensors.getBlue(), m_RobotSensors.getGreen(), DriverStation.getInstance().getAlliance());
+    	m_LightSystem.setDefault();
     	
+    	m_Camera = CameraServer.getInstance().startAutomaticCapture();
+		
+    	m_Camera.setExposureManual(1);
+    	m_Camera.setFPS(30);
+    	m_Camera.setBrightness(1);
+        m_Camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
+    	
+        centerX = 0.0;
     	autonomousCase = 0;
-    	
-    	UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-
-    	camera.setExposureManual(1);
-    	camera.setFPS(30);
-    	camera.setBrightness(1);
-        camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
-        
-        m_VisionThread = new VisionThread(camera, new GRIPVision(), pipeline -> {
+    	previousVisionTurn = 0;
+    	teleopLightLoops = 0;
+    	isVisionTurnRunning = false;
+       
+        m_VisionThread = new VisionThread(m_Camera, new GRIPVision(), pipeline -> {
+        	SmartDashboard.putBoolean("Is empty", pipeline.filterContoursOutput().isEmpty());
             if (!pipeline.filterContoursOutput().isEmpty()) {
                 Rect r = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
                 synchronized (m_ImgLock) {
-                    m_CenterX = r.x + (r.width / 2);
-                    SmartDashboard.putNumber("Vision CenterX", m_CenterX);
+                	centerX = r.x + (r.width / 2);
+                    SmartDashboard.putNumber("Vision CenterX", centerX);
                 }
             }
         });
         m_VisionThread.start();
-        
-        System.out.println(m_DriveTrain.GetAverageDistance());
-        System.out.println(m_DriveTrain.GetPIDSetpoint());
-        
-    	
     }
 
     public void autonomousInit() 
@@ -136,156 +140,234 @@ public class Robot extends IterativeRobot
 
     public void autonomousPeriodic()
     {
+    	/**
+         * This function is called periodically during autonomous
+         */
     	
     	double centerX;
     	synchronized (m_ImgLock) {
-    		centerX = this.m_CenterX;
+    		centerX = this.centerX;
     	}
     	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
 
     	SmartDashboard.putNumber("Vision Turn", turn);
     	//m_DriveTrain.arcadeDrive(-0.6, turn * 0.005);
-    	
-        /**
-         * This function is called periodically during autonomous
-         */
+        
     	switch(autonomousCase)
     	{
     	case 0:
-    		m_DriveTrain.SetPIDSetpoint(5000, 0);
-    		m_DriveTrain.EnablePID();
+    		m_DriveTrain.ResetEncoders();
+    		m_DriveTrain.ResetGyro();
+    		//Magic Numbers
+    		m_DriveTrain.DriveDistance(50, 10, 7);
     		m_DriveTrain.WriteDashboardData();
     		autonomousCase++;
     		System.out.println("Incrementing Case");
     		break;
     	case 1:
     		m_DriveTrain.WriteDashboardData();
-    		if(m_DriveTrain.DistanceOnTarget())
-    			m_DriveTrain.DisablePID();
+    		if(m_DriveTrain.isStraightPIDFinished())
+    		{
+    			autonomousCase++;
+    		}
     		break;
     	}
     }
 
-
     public void teleopPeriodic()
     {
-    	SmartDashboard.putNumber("Vision CenterX", m_CenterX);
-    	GetDashboardData();
-    	m_DriveTrain.WriteDashboardData();
-    	
-    	arcadeDrive();
-    	
-        /**
+    	/**
          * This function is called periodically during operator control
          */
+    	
+    	GetDashboardData();
+    	
+    	double centerX;
+    	synchronized (m_ImgLock) {
+    		centerX = this.centerX;
+    	}
+    	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
+    	
+        SmartDashboard.putString("Alliance", DriverStation.getInstance().getAlliance().toString());
+    	
+    	//Drivetrain
+    	if(m_RobotInterface.GetDriverLeftBumper())
+    	{
+    		if(!(Math.abs(previousVisionTurn) == turn))
+    		{
+    			previousVisionTurn = turn;
+        		visionAlign(turn);
+    		}
+    	}
+    	else if(isVisionTurnRunning)
+    	{
+    		if(m_DriveTrain.isTurnPIDFinished())
+        	{
+        		isVisionTurnRunning = false;
+        		m_DriveTrain.DisablePIDControl();
+        	}
+    	}
+    	else if(!isVisionTurnRunning)
+    	{
+        	arcadeDrive();
+    	}
+    	m_DriveTrain.WriteDashboardData();
+    	
+    	//Shooter methods
+    	shoot();
+    	
+    	//Other
+    	//Indexer is not run here because AFAIK it should only be run when the shooter is ready to go
+    	runIntake();
+    	runIndexer();
+    	runScaler();
+    	
+    	teleopLightLoops++;
     }
 
     public void testPeriodic()
-    {
-        
+    {  
         /**
          * This function is called periodically during test mode
          */
     }
-    //Drivetrain
+    
+    //Drivetrain methods
     public void arcadeDrive()
     {
     	m_DriveTrain.ArcadeDrive(m_RobotInterface.GetDriverLeftY(), m_RobotInterface.GetDriverRightX());
     }
     
-    //We don't have an arm... yet!
-    public void manualArmControl() 
+    public void visionAlign(double turn) 
     {
-    	//Gives the operator manual control over the arm if setpoints aren't working (sensor failure)
-    	m_Arm.DisablePID();
-        m_Arm.SetTalonOutput(-m_RobotInterface.GetOperatorJoystick().getRawAxis(1));
-    }
-    
-    
-    public void armSetpoints() 
-    {	
-    	//Gives the operator several different preset positions for an arm.
-    	if(!m_Arm.isPIDEnabled())
-    	{
-    		m_Arm.SetTalonOutput(0);
-    	}
+    	SmartDashboard.putNumber("Vision Turn", turn);
     	
-    	if(m_RobotInterface.GetOperatorButton(7))
-    	{
-        	m_Arm.EnablePID();
-    		m_Arm.SetTargetPosition(ARM_NEUTRAL);
-    	}
-    	else if(m_RobotInterface.GetOperatorButton(9))
-    	{
-    		m_Arm.EnablePID();
-    		m_Arm.SetTargetPosition(ARM_BALL);
-    	}
-    	else if(m_RobotInterface.GetOperatorButton(11))
-    	{
-    		m_Arm.EnablePID();
-    		m_Arm.SetTargetPosition(ARM_LOW);
-    	}
-    }
-    
-    //Intake
-    public void intake()
-    {
-	    if(m_RobotInterface.GetOperatorButton(8))
-		{
-			m_Intake.SetTalonOutput(INTAKE_FAST);
-		}
-		else if(m_RobotInterface.GetOperatorButton(10))
-		{
-			m_Intake.SetTalonOutput(INTAKE_SLOW);
-			
-		}
-		else if(m_RobotInterface.GetOperatorButton(12))
-		{
-			m_Intake.SetTalonOutput(INTAKE_REVERSE);
+    	m_DriveTrain.TurnToAngle(turn);
 
-		}
-		else
-		{
-			m_Intake.SetTalonOutput(0);
-		}
+		isVisionTurnRunning = true;	
+    	if(m_DriveTrain.isTurnPIDFinished())
+    	{
+    		isVisionTurnRunning = false;
+    		m_DriveTrain.DisablePIDControl();
+    	}
     }
     
-    //Shooter
+    //Shooter methods
     public void shoot()
     {
-    	
-    	if(m_RobotInterface.GetOperatorButton(3))
+    	//TODO Determine buttons
+    	if(m_RobotInterface.GetDriverRightBumper())
     	{
-    		//Fast Shot
+    		//TODO Add an encoder to the robot's shooter
+    		m_Shooter.SetTalonOutput(SHOOTER_SPEED);
+    		runIndexer();
+    		
+    		//Shoot
     		//Enable the PID Controller for the Shooter
-    		m_Shooter.SetShooterSetpoint(SHOOTER_FAST);
+    		/*m_Shooter.SetShooterSetpoint(SHOOTER_SPEED);
     	   	m_Shooter.EnablePID();
-        	
-        	
-        	if(m_Shooter.ShooterOnTarget() && m_Shooter.ShooterOnTarget())
+    		
+        	if(m_Shooter.ShooterOnTarget())
         	{
         		//Shooter is ready to fire.
+        		runIndexer();
+        		
+        		m_LightSystem.setRedState(false);
+        		m_LightSystem.setBlueState(false);
+        		m_LightSystem.setGreenState(true);
         	}
-    	}
-    	else if(m_RobotInterface.GetOperatorButton(4))
-    	{
-    		//Slow Shot
-    		//Enable the PID Controller for the Shooter
-    		m_Shooter.SetShooterSetpoint(SHOOTER_SLOW);
-    	   	m_Shooter.EnablePID();
-        	
-        	
-        	if(m_Shooter.ShooterOnTarget() && m_Shooter.ShooterOnTarget())
+        	else
         	{
-        		//Shooter is ready to fire.
-        	}
+        		m_LightSystem.setDefault();
+        	}*/
     	}
     	else
     	{
     		//STOP
+    		//m_Shooter.DisablePID();
     		m_Shooter.SetTalonOutput(0);
+    		//m_LightSystem.setDefault();
     	}
     }
+
+    //Intake methods
+    public void runIntake()
+    {
+	    if(m_RobotInterface.GetDriverA())
+		{
+			m_Intake.SetTalonOutput(INTAKE_SPEED);
+		}
+	    else
+	    {
+	    	m_Intake.SetTalonOutput(0);
+	    }
+    }
+    
+    //Indexer methods
+    public void runIndexer() 
+    {
+    	if(m_RobotInterface.GetDriverB())
+ 		{
+    		m_Indexer.SetTalonOutput(INDEXER_SPEED);
+ 		}
+ 	    else
+ 	    {
+ 	    	m_Indexer.SetTalonOutput(0);
+ 	    }
+    }
+    
+    //Mixer methods
+    public void runMixer() 
+    {
+    	if(m_RobotInterface.GetDriverY())
+ 		{
+    	    m_Mixer.SetTalonOutput(MIXER_SPEED);
+ 		}
+ 	    else
+ 	    {
+ 	    	m_Mixer.SetTalonOutput(0);
+ 	    }
+    }
+    
+    //Scaler methods
+    public void runScaler() 
+    {
+    	//TODO Determine button
+    	if(m_RobotInterface.GetDriverX())
+ 		{
+        	m_Scaler.SetTalonOutput(SCALER_SPEED);
+        	
+        	if(teleopLightLoops <= 50)
+        	{
+        		m_LightSystem.setGreenState(true);
+        		
+        		m_LightSystem.setRedState(false);
+        		m_LightSystem.setBlueState(false);
+        	}
+        	else if(teleopLightLoops > 50 && teleopLightLoops <= 100)
+        	{
+        		m_LightSystem.setRedState(true);
+        		
+        		m_LightSystem.setBlueState(false);
+        		m_LightSystem.setGreenState(false);
+        	}
+        	else if(teleopLightLoops > 100)
+        	{
+        		m_LightSystem.setRedState(true);
+        		
+        		m_LightSystem.setBlueState(false);
+        		m_LightSystem.setGreenState(false);
+        		if(teleopLightLoops == 150)
+        			teleopLightLoops = 0;
+        	}
+ 		}
+ 	    else
+ 	    {
+ 	    	m_Scaler.SetTalonOutput(0);
+ 	    	m_LightSystem.setDefault();
+ 	    }
+    }
+    
     public void GetDashboardData()
     {
     	//Use this to retrieve values from the Driver Station

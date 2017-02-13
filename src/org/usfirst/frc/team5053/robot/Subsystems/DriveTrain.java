@@ -5,8 +5,6 @@ import java.util.HashMap;
 import org.usfirst.frc.team5053.robot.Subsystems.Utilities.AnglePIDWrapper;
 import org.usfirst.frc.team5053.robot.Subsystems.Utilities.DistancePIDWrapper;
 
-import java.lang.*;
-
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PIDController;

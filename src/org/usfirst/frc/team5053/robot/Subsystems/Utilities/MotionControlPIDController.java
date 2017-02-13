@@ -23,7 +23,7 @@ public class MotionControlPIDController extends PIDController {
 		// Set the PIDSource to return Rate and then get the Rate.
 		
 		m_motionControlHelper.getM_source().setPIDSourceType(PIDSourceType.kRate);
-		System.out.println("MotionControlPIDController.getRate() return"+m_motionControlHelper.getM_source().pidGet());
+		SmartDashboard.putNumber("Motion Control Rate", this.getRate());
 		return m_motionControlHelper.getM_source().pidGet();
 	}
 	
@@ -60,10 +60,4 @@ public class MotionControlPIDController extends PIDController {
 		m_motionControlHelper = motionControl; 
 		motionControl.setRegularPIDControl(this);// to let the motionControl adjust the Rate, ie do the motion control
 	}
-
-	
-
-
-
-
 }
