@@ -151,12 +151,25 @@ public class Robot extends IterativeRobot
                     // 2017 Game:
                     // http://wpilib.screenstepslive.com/s/4485/m/24194/l/683625-processing-images-from-the-2017-frc-game
                     //   distance = Target height in ft. (10/12) * YRes / (2 * PixelHeight * tan(viewAngle of camera))
-                    double target_height_pixles = r.height;
-                    double target_height_in = 4; //10 inches if we have both
-                    this.distanceToBoilerTarget = 8.04*(target_height_in/12) /* converted to feet -- vision height of the rectangle assumes only have the top one*/
+                    boolean GET_DISTANCE_FROM_VERTICALLY=false;
+                    if(GET_DISTANCE_FROM_VERTICALLY){
+                       double target_height_pixles = r.height;
+                       double target_height_in = 4; //10 inches if we have both
+                       this.distanceToBoilerTarget = (target_height_in/12)  /* converted to feet -- vision height of the rectangle assumes only have the top one*/
                     		                  * IMG_HEIGHT
                     		                  / (2*target_height_pixles*Math.tan((2*Math.PI/360)*CAMERA_VERTICAL_VIEW_ANGLE));
+                    }
+                    else{
+                        double target_width_pixles = r.width;
+                        double target_width_in = 15; //10 inches if we have both
+                        this.distanceToBoilerTarget = (target_width_in/12)  /* converted to feet -- vision height of the rectangle assumes only have the top one*/
+                     		                  * IMG_WIDTH
+                     		                  / (2*target_width_pixles*Math.tan((2*Math.PI/360)*CAMERA_ANGLE));
+                    	
+                    }
                     SmartDashboard.putNumber("VisionDistanceToBoilerTarget", distanceToBoilerTarget);
+                    SmartDashboard.putNumber("VisionTargetVerticalHeightInt", r.height);
+                    SmartDashboard.putNumber("VisionTargetWidthInt", r.width);
                 }
             }
             else{
