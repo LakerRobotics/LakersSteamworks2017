@@ -102,6 +102,8 @@ public class Robot extends IterativeRobot
 
     	m_RobotControllers = new RobotControllerMap();
     	m_RobotSensors = new RobotSensorMap();    	
+    	m_RobotSensors.getLidar().start(); // start taking distance reading
+
     	
     	//Robot Subsystem Initialization
     	m_DriveTrain = new DriveTrainMotionControl(m_RobotControllers.getLeftDrive(), m_RobotControllers.getRightDrive(), m_RobotSensors.getLeftDriveEncoder(), m_RobotSensors.getRightDriveEncoder(), m_RobotSensors.getGyro());
@@ -134,7 +136,6 @@ public class Robot extends IterativeRobot
                 Rect r = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
                 synchronized (m_ImgLock) {
                 	haveTarget= true;
-                    SmartDashboard.putBoolean("VisionHaveTarget", false);
                     
                 	centerX = r.x + (r.width / 2);
                     SmartDashboard.putNumber("Vision CenterX", centerX);
@@ -154,7 +155,7 @@ public class Robot extends IterativeRobot
                     double target_height_in = 4; //10 inches if we have both
                     this.distanceToBoilerTarget = 8.04*(target_height_in/12) /* converted to feet -- vision height of the rectangle assumes only have the top one*/
                     		                  * IMG_HEIGHT
-                    		                  / (2*target_height_pixles*Math.tan(CAMERA_VERTICAL_VIEW_ANGLE));
+                    		                  / (2*target_height_pixles*Math.tan((2*Math.PI/360)*CAMERA_VERTICAL_VIEW_ANGLE));
                     SmartDashboard.putNumber("VisionDistanceToBoilerTarget", distanceToBoilerTarget);
                 }
             }
@@ -162,8 +163,8 @@ public class Robot extends IterativeRobot
             	haveTarget= false;
 //                SmartDashboard.putNumber("Vision CenterX", centerX); // Leave this because maybe we just got to close to still see the target, so use last angle
 //                SmartDashboard.putNumber("VisionDistanceToBoilerTarget", 0); // Zero out? 
-                SmartDashboard.putBoolean("VisionHaveTarget", false);
             }
+            SmartDashboard.putBoolean("VisionHaveTarget", haveTarget);
         });
         m_VisionThread.start();
     }
@@ -174,8 +175,6 @@ public class Robot extends IterativeRobot
          * This function is called once when autonomous begins
          */
     	GetDashboardData();
-    	
-    	
     }
 
     public void autonomousPeriodic()
@@ -221,9 +220,6 @@ public class Robot extends IterativeRobot
     	/**
          * This function is called periodically during operator control
          */
-    	
-
-    	
     	double centerX;
     	synchronized (m_ImgLock) {
     		centerX = this.centerX;
@@ -231,7 +227,9 @@ public class Robot extends IterativeRobot
         	distanceToBoilerTarget = this.distanceToBoilerTarget;
     	}
     	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
-    	
+    	double lidarDistanceFt = m_RobotSensors.getLidar().getDistance();
+        SmartDashboard.putNumber("LidarDistanceFt", lidarDistanceFt);
+        
         SmartDashboard.putString("Alliance", DriverStation.getInstance().getAlliance().toString());
     	
     	//Drivetrain

@@ -20,15 +20,15 @@ public class LidarLiteSensor {
     private final static int LIDAR_CONFIG_REGISTER = 0x00;
     private final static int LIDAR_DISTANCE_REGISTER = 0x8f;
 
-    public LidarLiteSensor(Port port) {
-        mI2C = new I2C(port, LIDAR_ADDR);
+    public LidarLiteSensor() {
+        mI2C = new I2C(I2C.Port.kOnboard, LIDAR_ADDR);
         mDistance = new byte[2];
         mUpdater = new java.util.Timer();
         mHasSignal = false;
     }
 
     /**
-     * @return Distance in meters
+     * @return Distance in feet
      */
     public double getDistance() {
         int distCm = (int) Integer.toUnsignedLong(mDistance[0] << 8) + Byte.toUnsignedInt(mDistance[1]);
