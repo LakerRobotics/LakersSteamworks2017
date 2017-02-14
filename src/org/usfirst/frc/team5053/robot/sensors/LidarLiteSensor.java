@@ -36,6 +36,14 @@ public class LidarLiteSensor {
         mUpdater = new java.util.Timer();
         mHasSignal = false;
     }
+    
+    public boolean isWorking(){
+    	byte[] expected = new byte[1];
+    	expected[0]= 0x01;
+    	boolean sensorWorks = mI2C.verifySensor(0x41, 1, expected);
+        System.out.println("I2C.verifySensor(0x41,1,0x01)="+sensorWorks);
+    	return sensorWorks;
+    }
 
     /**
      * @return Distance in feet
@@ -62,15 +70,9 @@ public class LidarLiteSensor {
     }
 /*
  * scan all registers see if get something besides all zeros
+ * THis is a Debugging function, to be removed once things are working
  */
     public void scan(){
-    	byte[] expected = new byte[1];
-    	expected[0]= 0x01;
-    	
-    	boolean sensorWorks = mI2C.verifySensor(0x41, 1, expected);
-        System.out.println(".");
-        System.out.println("I2C.verifySensor(0x41,1,0x01)="+sensorWorks);
-        System.out.println(".");
     	
     	boolean writeAborted = mI2C.write(LIDAR_CONFIG_REGISTER, LIDAR_CONFIG_START_TAKING_MESUREMENTS);
         System.out.print("I2C.write("+LIDAR_CONFIG_REGISTER+","+LIDAR_CONFIG_START_TAKING_MESUREMENTS+"):aborted="+writeAborted+ " ");
@@ -89,7 +91,6 @@ public class LidarLiteSensor {
             System.out.println("I2C.read("+i+",1,returnBytes)="+readReturned+" returns returnBytes[0]="+returnBytes[0]+ " ");
             Timer.delay(0.005); // Delay to prevent over polling
         }
-
 
     }
     /**
