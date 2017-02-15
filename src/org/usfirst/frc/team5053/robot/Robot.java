@@ -366,9 +366,9 @@ System.out.print("lidar.start()");
     	else
     	{
     		//STOP
-    		//m_Shooter.DisablePID();
+    		m_Shooter.DisablePID();
     		m_Shooter.SetTalonOutput(0);
-    		//m_LightSystem.setDefault();
+    		m_LightSystem.setDefault();
     	}
     }
 
