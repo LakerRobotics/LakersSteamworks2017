@@ -8,7 +8,7 @@ import org.usfirst.frc.team5053.robot.constants.RobotValuesRudy;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public abstract class RobotConstants extends RobotValues {
-	private static RobotValues robotWeAreRunningOn = new RobotValuesMackinac();
+	private static RobotValues robotWeAreRunningOn;
 	private static String robotName;
 	
 	static{
