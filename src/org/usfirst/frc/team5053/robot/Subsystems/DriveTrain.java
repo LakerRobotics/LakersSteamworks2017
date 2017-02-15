@@ -2,6 +2,7 @@ package org.usfirst.frc.team5053.robot.Subsystems;
 
 import java.util.HashMap;
 
+import org.usfirst.frc.team5053.robot.RobotConstants;
 import org.usfirst.frc.team5053.robot.Subsystems.Utilities.AnglePIDWrapper;
 import org.usfirst.frc.team5053.robot.Subsystems.Utilities.DistancePIDWrapper;
 
@@ -71,9 +72,8 @@ public class DriveTrain extends RobotDrive implements Subsystem
 		this.setExpiration(0.1);
 		
 		
-		m_DistancePID = new PIDController(0.1, 0.0, 0.0, m_DistancePIDWrapper, m_DistancePIDWrapper);
-		m_DistancePID.setAbsoluteTolerance(5.2);
-		
+		m_DistancePID = new PIDController(RobotConstants.getPidDist_P(), RobotConstants.getPidDist_I(), RobotConstants.getPidDist_D(), m_DistancePIDWrapper, m_DistancePIDWrapper);
+		m_DistancePID.setAbsoluteTolerance(RobotConstants.getPidDist_AbsoluteTolerance());
 	}
 	public DriveTrain(SpeedController leftMotor, SpeedController rightMotor, Encoder leftEncoder, Encoder rightEncoder, ADXRS450_Gyro Gyro)
 	{
