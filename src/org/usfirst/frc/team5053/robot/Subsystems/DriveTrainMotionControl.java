@@ -133,7 +133,6 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 	public HashMap<String, Double> GetDashboardData() {
 		return null;
 		// TODO Auto-generated method stub
-		
 	}
 	public void WriteDashboardData() {
 		SmartDashboard.putNumber("Left Encoder", m_LeftEncoder.getDistance());
