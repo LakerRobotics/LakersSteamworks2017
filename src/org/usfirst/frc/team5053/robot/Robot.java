@@ -60,26 +60,24 @@ public class Robot extends IterativeRobot
 	private VisionThread m_VisionThread;
 	private boolean haveTarget = false;
 	private double centerX;
-	private double visionDistanceToBoilerTarget;  // in Feet
+	private double distanceToBoilerTarget;  // in Feet
 	private double previousVisionTurn;
 	private boolean isVisionTurnRunning;
+	private final Object m_ImgLock = new Object();
 	
-	//Auton constants
-	
-	//Subsystem constants
+	//Shooter speeds
 	private final double SHOOTER_SPEED	= .5;
+	
+	//Misc speeds
 	private final double INTAKE_SPEED = .7;
 	private final double MIXER_SPEED = .7;
 	private final double INDEXER_SPEED = .7;
 	private final double SCALER_SPEED = .7;
-	
-	//Vision constants
+
 	private final int IMG_WIDTH		= 320;
 	private final int IMG_HEIGHT 	= 240;
-	private final int CAMERA_ANGLE 	= 52; //?62 see comments in notes 2 lines down
+	private final int CAMERA_ANGLE 	= 52; //?62 see comments in notes 2lines down
 	private final int CAMERA_VERTICAL_VIEW_ANGLE = 37;
-	private final Object m_ImgLock = new Object();
-	
 	// Chief Delphi 2/20/2016 says Horizontal 61 Degrees Vertical 34.3 Degrees
 	// https://www.chiefdelphi.com/forums/showthread.php?p=1543606 
 	// But the references used by the post were updated 4/23/2016
@@ -105,7 +103,7 @@ public class Robot extends IterativeRobot
     	m_RobotControllers = new RobotControllerMap();
     	m_RobotSensors = new RobotSensorMap();    	
     	m_RobotSensors.getLidar().start(); // start taking distance reading
-    	System.out.print("lidar.start()");
+
     	
     	//Robot Subsystem Initialization
     	m_DriveTrain = new DriveTrainMotionControl(m_RobotControllers.getLeftDrive(), m_RobotControllers.getRightDrive(), m_RobotSensors.getLeftDriveEncoder(), m_RobotSensors.getRightDriveEncoder(), m_RobotSensors.getGyro());
@@ -130,61 +128,58 @@ public class Robot extends IterativeRobot
     	previousVisionTurn = 0;
     	teleopLightLoops = 0;
     	isVisionTurnRunning = false;
-    	visionDistanceToBoilerTarget  = 4.0; //in Feet
+    	distanceToBoilerTarget  = 4.0; //in Feet
        
-
-          m_VisionThread = new VisionThread(m_Camera, new GRIPVision(), pipeline -> {
-    	 
-    	        	SmartDashboard.putBoolean("Is empty", pipeline.filterContoursOutput().isEmpty());
-    	            if (!pipeline.filterContoursOutput().isEmpty()) {
-    	                Rect r = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
-    	                synchronized (m_ImgLock) {
-    	                	haveTarget= true;
-    	                    
-    	                	centerX = r.x + (r.width / 2);
-    	                    SmartDashboard.putNumber("Vision CenterX", centerX);
-    	                    
-    	                    // Calcualte distance from target
-    	                    // 2016 Game:
-    	                    // http://wpilib.screenstepslive.com/s/4485/m/24194/l/288985-identifying-and-processing-the-targets
-    	                    
-    	                    // tanget(angle) = x/y or in this case x is width and y is direct distance to the target
-    	                    // tangent(target_height_angle) = target_height_in/direct_distance --> solve for 
-    	                    // Note as we get closer the apparent height of the target will 
-    	                    // SKIP THIS found they already figured it out, although they warn about inaccuracies, we should switch to lidar
-    	                    // 2017 Game:
-    	                    // http://wpilib.screenstepslive.com/s/4485/m/24194/l/683625-processing-images-from-the-2017-frc-game
-    	                    //   distance = Target height in ft. (10/12) * YRes / (2 * PixelHeight * tan(viewAngle of camera))
-    	                    boolean GET_DISTANCE_FROM_VERTICALLY=false;
-    	                    if(GET_DISTANCE_FROM_VERTICALLY)
-    	                    {
-    	                       double target_height_pixles = r.height;
-    	                       double target_height_in = 4; //10 inches if we have both
-    	                       this.visionDistanceToBoilerTarget = (target_height_in/12)  /* converted to feet -- vision height of the rectangle assumes only have the top one*/
-    	                    		                  * IMG_HEIGHT  / (2*target_height_pixles*Math.tan((2*Math.PI/360)*CAMERA_VERTICAL_VIEW_ANGLE));
-    	                    }
-    	                    else
-    	                    {
-    	                        double target_width_pixles = r.width;
-    	                        double target_width_in = 15; //
-    	                        this.visionDistanceToBoilerTarget = (target_width_in/12)  /* converted to feet -- vision width of the rectangle*/
-    	                     		                  * IMG_WIDTH / (2*target_width_pixles*Math.tan((2*Math.PI/360)*CAMERA_ANGLE));
-    	                    }
-    	                    SmartDashboard.putNumber("VisionDistanceToBoilerTarget", visionDistanceToBoilerTarget);
-    	                    SmartDashboard.putNumber("VisionTargetVerticalHeightInt", r.height);
-    	                    SmartDashboard.putNumber("VisionTargetWidthInt", r.width);
-    	                }
-    	            }
-    	           else
-    	           {
-    	            	haveTarget= false;
-    	            	//SmartDashboard.putNumber("Vision CenterX", centerX); // Leave this because maybe we just got to close to still see the target, so use last angle
-    	            	//SmartDashboard.putNumber("VisionDistanceToBoilerTarget", 0); // Zero out? 
-    	            }
-    	            SmartDashboard.putBoolean("VisionHaveTarget", haveTarget);
-    	        });
-    	       
-    	        m_VisionThread.start();
+        m_VisionThread = new VisionThread(m_Camera, new GRIPVision(), pipeline -> {
+        	SmartDashboard.putBoolean("Is empty", pipeline.filterContoursOutput().isEmpty());
+            if (!pipeline.filterContoursOutput().isEmpty()) {
+                Rect r = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
+                synchronized (m_ImgLock) {
+                	haveTarget= true;
+                    
+                	centerX = r.x + (r.width / 2);
+                    SmartDashboard.putNumber("Vision CenterX", centerX);
+                    
+                    // Calcualte distance from target
+                    // 2016 Game:
+                    // http://wpilib.screenstepslive.com/s/4485/m/24194/l/288985-identifying-and-processing-the-targets
+                    
+                    // tanget(angle) = x/y or in this case x is width and y is direct distance to the target
+                    // tangent(target_height_angle) = target_height_in/direct_distance --> solve for 
+                    // Note as we get closer the apparent height of the target will 
+                    // SKIP THIS found they already figured it out, although they warn about inaccuracies, we should switch to lidar
+                    // 2017 Game:
+                    // http://wpilib.screenstepslive.com/s/4485/m/24194/l/683625-processing-images-from-the-2017-frc-game
+                    //   distance = Target height in ft. (10/12) * YRes / (2 * PixelHeight * tan(viewAngle of camera))
+                    boolean GET_DISTANCE_FROM_VERTICALLY=false;
+                    if(GET_DISTANCE_FROM_VERTICALLY){
+                       double target_height_pixles = r.height;
+                       double target_height_in = 4; //10 inches if we have both
+                       this.distanceToBoilerTarget = (target_height_in/12)  /* converted to feet -- vision height of the rectangle assumes only have the top one*/
+                    		                  * IMG_HEIGHT
+                    		                  / (2*target_height_pixles*Math.tan((2*Math.PI/360)*CAMERA_VERTICAL_VIEW_ANGLE));
+                    }
+                    else{
+                        double target_width_pixles = r.width;
+                        double target_width_in = 15; //10 inches if we have both
+                        this.distanceToBoilerTarget = (target_width_in/12)  /* converted to feet -- vision height of the rectangle assumes only have the top one*/
+                     		                  * IMG_WIDTH
+                     		                  / (2*target_width_pixles*Math.tan((2*Math.PI/360)*CAMERA_ANGLE));
+                    	
+                    }
+                    SmartDashboard.putNumber("VisionDistanceToBoilerTarget", distanceToBoilerTarget);
+                    SmartDashboard.putNumber("VisionTargetVerticalHeightInt", r.height);
+                    SmartDashboard.putNumber("VisionTargetWidthInt", r.width);
+                }
+            }
+            else{
+            	haveTarget= false;
+//                SmartDashboard.putNumber("Vision CenterX", centerX); // Leave this because maybe we just got to close to still see the target, so use last angle
+//                SmartDashboard.putNumber("VisionDistanceToBoilerTarget", 0); // Zero out? 
+            }
+            SmartDashboard.putBoolean("VisionHaveTarget", haveTarget);
+        });
+        m_VisionThread.start();
     }
 
     public void autonomousInit() 
@@ -205,11 +200,12 @@ public class Robot extends IterativeRobot
     	double distanceToBoilerTarget;
     	synchronized (m_ImgLock) {
     		centerX = this.centerX;
-        	visionDistanceToBoilerTarget = this.visionDistanceToBoilerTarget;
+        	distanceToBoilerTarget = this.distanceToBoilerTarget;
     	}
     	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
 
     	SmartDashboard.putNumber("Vision Turn", turn);
+    	//m_DriveTrain.arcadeDrive(-0.6, turn * 0.005);
         
     	switch(autonomousCase)
     	{
@@ -240,12 +236,15 @@ public class Robot extends IterativeRobot
     	double centerX;
     	synchronized (m_ImgLock) {
     		centerX = this.centerX;
-        	visionDistanceToBoilerTarget = this.visionDistanceToBoilerTarget;
+        	double distanceToBoilerTarget;
+        	distanceToBoilerTarget = this.distanceToBoilerTarget;
     	}
     	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
-    	double lidarDistanceCm = m_RobotSensors.getLidar().getDistanceCm();
-        SmartDashboard.putNumber("LidarDistanceCm", lidarDistanceCm);
+    	double lidarDistanceFt = m_RobotSensors.getLidar().getDistance();
+        SmartDashboard.putNumber("LidarDistanceFt", lidarDistanceFt);
         
+        SmartDashboard.putString("Alliance", DriverStation.getInstance().getAlliance().toString());
+    	
     	//Drivetrain
     	if(m_RobotInterface.GetDriverLeftBumper())
     	{
@@ -270,10 +269,10 @@ public class Robot extends IterativeRobot
     	m_DriveTrain.WriteDashboardData();
     	
     	//Shooter methods
-    	runShooter();
+    	shoot();
     	
     	//Other
-    	//Indexer should not run here because AFAIK it should only be run when the shooter is ready to go
+    	//Indexer is not run here because AFAIK it should only be run when the shooter is ready to go
     	runIntake();
     	runIndexer();
     	runScaler();
@@ -315,46 +314,28 @@ public class Robot extends IterativeRobot
     	return 11.815*(distanceFromTarget*distanceFromTarget) + 140.58*distanceFromTarget+1348.4;
     }
     
-    public void runShooter()
+    public void shoot()
     {
     	//TODO Determine buttons
-    	if(m_RobotInterface.GetDriverRightBumper())//if(the Driver's Joystick's right bumper button is pressed)
+    	if(m_RobotInterface.GetDriverRightBumper())
     	{
-    		double targetRPM;
     		//TODO Add an encoder to the robot's shooter
-    		if(this.haveTarget)
+    		if(this.haveTarget){
+        		m_Shooter.SetShooterSetpoint(calcShooterSpeed(distanceToBoilerTarget));
+    		    // TODO remove this Hack
+        		// approximate motor speed as a percent of the speed at 8ft, which is assumed to be the max RPM
+    		    double approximateMotorPower = calcShooterSpeed(distanceToBoilerTarget)/calcShooterSpeed(8);
+        		m_Shooter.SetTalonOutput(approximateMotorPower);
+    		}else
     		{
-    	   		double distance = 3;// distance in feet
-    	   	 	if(m_RobotSensors.getLidar().isWorking())
-    	   	 	{
-    				if(m_RobotSensors.getLidar().getDistanceFt()!=0)
-    				{
-        				distance = m_RobotSensors.getLidar().getDistanceFt();
-    				}
-    				else
-    				{
-        				distance = visionDistanceToBoilerTarget;
-    				}
-    			}
-    	   	 	else
-    			{
-    				distance = visionDistanceToBoilerTarget;
-    			}
-        		targetRPM = calcShooterSpeed(distance);
-    		   
-        		// TODO remove this Hack
-        		//Approximate motor speed as a percent of the speed at 8ft, which is assumed to be the max RPM
-        		//double approximateMotorPower = calcShooterSpeed(distanceToBoilerTarget)/calcShooterSpeed(8);
-        		//m_Shooter.SetTalonOutput(approximateMotorPower);
+        		m_Shooter.SetTalonOutput(SHOOTER_SPEED);
     		}
-    		else
-    		{
-    			// vision is not on target so just use the input value from the dashboard (expect this will go away in favor of last used value or somehow providing tuning with Joystick
-    	    	targetRPM = SmartDashboard.getNumber("shooterRPM",1500); //Default to 1500 RPM if don't get a number
-    		}
+
+    		runIndexer();
     		
+    		//Shoot
     		//Enable the PID Controller for the Shooter
-    		m_Shooter.SetShooterSetpoint(targetRPM);
+    		/*m_Shooter.SetShooterSetpoint(SHOOTER_SPEED);
     	   	m_Shooter.EnablePID();
     		
         	if(m_Shooter.ShooterOnTarget())
@@ -368,16 +349,15 @@ public class Robot extends IterativeRobot
         	}
         	else
         	{
-        		//Shooter is not ready to fire
         		m_LightSystem.setDefault();
-        	}
+        	}*/
     	}
     	else
     	{
     		//STOP
-    		m_Shooter.DisablePID();
+    		//m_Shooter.DisablePID();
     		m_Shooter.SetTalonOutput(0);
-    		m_LightSystem.setDefault();
+    		//m_LightSystem.setDefault();
     	}
     }
 
