@@ -8,10 +8,10 @@ import org.usfirst.frc.team5053.robot.constants.RobotValuesRudy;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public abstract class RobotConstants extends RobotValues {
-	private static RobotValues robotWeAreRunningOn ;
+	private static RobotValues robotWeAreRunningOn = new RobotValuesMackinac();
 	private static String robotName;
 	
-	public void RobotSettings(){
+	static{
     	robotName = SmartDashboard.getString("robotName","Mackinaw");//Default to "Mackinaw" if don't get a value
     	if("Mackinaw"==robotName){ robotWeAreRunningOn = new RobotValuesMackinac();};
     	if("LilGeek"==robotName){ robotWeAreRunningOn = new RobotValuesLilGeek();};
