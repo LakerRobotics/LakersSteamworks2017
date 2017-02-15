@@ -238,7 +238,7 @@ public class Robot extends IterativeRobot
         	visionDistanceToBoilerTarget = this.visionDistanceToBoilerTarget;
     	}
     	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
-    	double lidarDistanceFt = m_RobotSensors.getLidar().getDistance();
+    	double lidarDistanceFt = m_RobotSensors.getLidar().getDistanceCm();
         SmartDashboard.putNumber("LidarDistanceFt", lidarDistanceFt);
         
         SmartDashboard.putString("Alliance", DriverStation.getInstance().getAlliance().toString());
@@ -322,8 +322,8 @@ public class Robot extends IterativeRobot
     		if(this.haveTarget){
     	   		double distance = 3;// distance in feet
     	   	 	if(m_RobotSensors.getLidar().isWorking()){
-    				if(m_RobotSensors.getLidar().getDistance()!=0){
-        				distance = m_RobotSensors.getLidar().getDistance();
+    				if(m_RobotSensors.getLidar().getDistanceCm()!=0){
+        				distance = m_RobotSensors.getLidar().getDistanceCm();
     				}
     				else{
         				distance = visionDistanceToBoilerTarget;
