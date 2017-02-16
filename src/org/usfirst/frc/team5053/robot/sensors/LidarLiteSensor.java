@@ -11,16 +11,17 @@ import edu.wpi.first.wpilibj.Timer;
 import java.util.TimerTask;
 
 public class LidarLiteSensor {
+	
     private I2C m_I2C;
     private byte[] m_Distance;
     private java.util.Timer m_Updater;
     private boolean m_HasSignal;
 
-    private final static int LIDAR_ADDR = 0x62;
-    private final static int LIDAR_CONFIG_REGISTER = 0x00;
-    private final static int LIDAR_CONFIG_START_TAKING_MESUREMENTS = 0x04; // Value to initiate ranging.
-    private final static int LIDAR_REGISTER_HARDWARE_VER = 0x41;
-    private final static int LIDAR_DISTANCE_REGISTER = 0x8f;
+    private final int LIDAR_ADDR = 0x62;
+    private final int LIDAR_CONFIG_REGISTER = 0x00;
+    private final int LIDAR_CONFIG_START_TAKING_MESUREMENTS = 0x04; // Value to initiate ranging.
+    private final int LIDAR_REGISTER_HARDWARE_VER = 0x41;
+    private final int LIDAR_DISTANCE_REGISTER = 0x8f;
     
     //from v1 User manual:
     // The"Sensor"module"has"a"7bit" slave "address" with a default value of "0x62" in hexadecimal notation.
