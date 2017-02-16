@@ -350,7 +350,7 @@ public class Robot extends IterativeRobot
     //Intake methods
     public void runIntake()
     {
-	    if(m_RobotInterface.GetDriverA())
+	    if(m_RobotInterface.GetOperatorButton(1))
 		{
 			m_Intake.SetTalonOutput(INTAKE_SPEED);
 		}
@@ -389,8 +389,7 @@ public class Robot extends IterativeRobot
     //Scaler methods
     public void runScaler() 
     {
-    	//TODO Determine button
-    	if(m_RobotInterface.GetDriverX())
+    	if(m_RobotInterface.GetOperatorButton(2))
  		{
         	m_Scaler.SetTalonOutput(SCALER_SPEED);
         	
