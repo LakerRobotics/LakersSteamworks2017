@@ -267,7 +267,7 @@ public class Robot extends IterativeRobot
     	m_DriveTrain.WriteDashboardData();
     	
     	//Shooter methods
-    	runShooter();
+    	shoot();
     	
     	//Other
     	//Indexer is not run here because AFAIK it should only be run when the shooter is ready to go
@@ -325,8 +325,8 @@ public class Robot extends IterativeRobot
     		//TODO Add an encoder to the robot's shooter
 //    		if(this.haveTarget){
     	   		double distance = 3;// distance in feet
-    				if(m_RobotSensors.getLidar().getDistance()!=0){
-        				distance = m_RobotSensors.getLidar().getDistance();
+    				if(m_RobotSensors.getLidar().getDistanceFt()!=0){
+        				distance = m_RobotSensors.getLidar().getDistanceFt();
     				}
     				else{
     					if(visionDistanceToBoilerTarget==0){
@@ -369,7 +369,7 @@ public class Robot extends IterativeRobot
     //Intake methods
     public void runIntake()
     {
-	    if(m_RobotInterface.GetOpperatorButtonA())
+	    if(m_RobotInterface.GetOperatorA())
 		{
 			m_Intake.SetTalonOutput(INTAKE_SPEED);
 		}
@@ -409,7 +409,7 @@ public class Robot extends IterativeRobot
     public void runScaler() 
     {
     	//TODO Determine button
-    	if(m_RobotInterface.GetOperatorButtonB())
+    	if(m_RobotInterface.GetOperatorB())
  		{
         	m_Scaler.SetTalonOutput(SCALER_SPEED);
         	
