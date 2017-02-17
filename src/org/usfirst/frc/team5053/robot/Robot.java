@@ -98,8 +98,7 @@ public class Robot extends IterativeRobot
          */
     	
     	// the RobotInterfaceMap detects the controller and set the key mapping accordingly
-//temp    	m_RobotInterface = new RobotInterfaceMap(JoystickType.XBOX, JoystickType.JOYSTICK);
-    	m_RobotInterface = new RobotInterfaceMap(JoystickType.JOYSTICK, JoystickType.JOYSTICK);
+    	m_RobotInterface = new RobotInterfaceMap(JoystickType.XBOX, JoystickType.JOYSTICK);
 
     	m_RobotControllers = new RobotControllerMap();
     	m_RobotSensors = new RobotSensorMap();    	
@@ -239,7 +238,7 @@ public class Robot extends IterativeRobot
         	visionDistanceToBoilerTarget = this.visionDistanceToBoilerTarget;
     	}
     	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
-    	double lidarDistanceFt = m_RobotSensors.getLidar().getDistance();
+    	double lidarDistanceFt = m_RobotSensors.getLidar().getDistanceFt();
         SmartDashboard.putNumber("LidarDistanceFt", lidarDistanceFt);
         
         SmartDashboard.putString("Alliance", DriverStation.getInstance().getAlliance().toString());
@@ -268,7 +267,7 @@ public class Robot extends IterativeRobot
     	m_DriveTrain.WriteDashboardData();
     	
     	//Shooter methods
-    	shoot();
+    	runShooter();
     	
     	//Other
     	//Indexer is not run here because AFAIK it should only be run when the shooter is ready to go
@@ -320,7 +319,6 @@ public class Robot extends IterativeRobot
     
     public void shoot()
     {
-    	//TODO Determine buttons
     	if(m_RobotInterface.GetDriverRightBumper())//if(the Driver's Joystick's right bumper button is pressed)
     	{
     		double targetRPM;
@@ -338,13 +336,7 @@ public class Robot extends IterativeRobot
     					}
     				}
         		targetRPM=calcShooterSpeed(distance);
-    		    // TODO remove this Hack
-        		// approximate motor speed as a percent of the speed at 8ft, which is assumed to be the max RPM
-//    		    double approximateMotorPower = calcShooterSpeed(distanceToBoilerTarget)/calcShooterSpeed(8);
-//        		m_Shooter.SetTalonOutput(approximateMotorPower);
-//    	    	targetRPM = SmartDashboard.getDouble("shooterRPM",1500);//Default to 1500 RPM if don't get a number
- 
-//    		runIndexer();
+
     		
     		//Shoot
     		//Enable the PID Controller for the Shooter
@@ -377,7 +369,7 @@ public class Robot extends IterativeRobot
     //Intake methods
     public void runIntake()
     {
-	    if(m_RobotInterface.GetDriverA())
+	    if(m_RobotInterface.GetOpperatorButtonA())
 		{
 			m_Intake.SetTalonOutput(INTAKE_SPEED);
 		}
@@ -417,7 +409,7 @@ public class Robot extends IterativeRobot
     public void runScaler() 
     {
     	//TODO Determine button
-    	if(m_RobotInterface.GetDriverX())
+    	if(m_RobotInterface.GetOperatorButtonB())
  		{
         	m_Scaler.SetTalonOutput(SCALER_SPEED);
         	
