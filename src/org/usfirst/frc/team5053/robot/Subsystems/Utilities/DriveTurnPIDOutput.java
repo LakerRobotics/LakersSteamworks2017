@@ -9,7 +9,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class DriveTurnPIDOutput implements PIDOutput {
 
 	DriveTrainMotionControl m_DriveTrain;
-	private final double POWER_MODIFIER = .5;
+	private final double POWER_MODIFIER = .5;// Why is there a power modifier, 
+	                                         // seems should be eliminated to allow full power, can do same thing in PID control if really necciary but should 
 	
 	public DriveTurnPIDOutput(DriveTrainMotionControl driveTrain) {
 	    SmartDashboard.putString("DriveSpinPIDOutput", "constructor called");

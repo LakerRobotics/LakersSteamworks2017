@@ -71,9 +71,9 @@ public class DriveTrain extends RobotDrive implements Subsystem
 		
 		this.setExpiration(0.1);
 		
-		
-		m_DistancePID = new PIDController(RobotConstants.getPidDist_P(), RobotConstants.getPidDist_I(), RobotConstants.getPidDist_D(), m_DistancePIDWrapper, m_DistancePIDWrapper);
-		m_DistancePID.setAbsoluteTolerance(RobotConstants.getPidDist_AbsoluteTolerance());
+		RobotConstants robotConstants = new RobotConstants();
+		m_DistancePID = new PIDController(robotConstants.getPidDist_P(), robotConstants.getPidDist_I(), robotConstants.getPidDist_D(), m_DistancePIDWrapper, m_DistancePIDWrapper);
+		m_DistancePID.setAbsoluteTolerance(robotConstants.getPidDist_AbsoluteTolerance());
 	}
 	public DriveTrain(SpeedController leftMotor, SpeedController rightMotor, Encoder leftEncoder, Encoder rightEncoder, ADXRS450_Gyro Gyro)
 	{

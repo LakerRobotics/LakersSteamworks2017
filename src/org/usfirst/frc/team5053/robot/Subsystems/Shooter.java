@@ -12,8 +12,8 @@ public class Shooter implements Subsystem{
 	private Encoder m_Encoder;
 	private PIDController m_PID;
 	
-	private double KP = 0.002;
-	private double KI = 0.001;
+	private double KP = 0.0001;
+	private double KI = 0.000;
 	private double KD = 0.0;
 	
 	private double ABSOLUTE_TOLERANCE = 100;
@@ -40,6 +40,9 @@ public class Shooter implements Subsystem{
 		return m_PID.onTarget();
 	}
 	public void SetShooterSetpoint(double speed) {
+		System.out.print("ShooterSet set to "+speed+" ");
+		System.out.println("Shooter running at"+this.m_Encoder.getRate()+" ");
+		
 		m_PID.setSetpoint(speed);
 	}
 	public void SetTalonOutput(double speed) {

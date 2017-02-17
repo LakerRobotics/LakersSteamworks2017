@@ -43,6 +43,9 @@ public class RobotInterfaceMap
 	private int driverLeftX = 0;
 	private int driverRightX = 0;
 	private int driverRightY = 0;
+	private int driverForwardPowerAxis = 0; 
+	private int driverRotationPowerAxis = 0; 
+	
 	
 	private int operatorButtonX = 0;
 	private int operatorButtonA = 0;
@@ -63,7 +66,7 @@ public class RobotInterfaceMap
 	
 	private Joystick driverJoystick;
 	private Joystick operatorJoystick;
-	
+
 	/** Default constructor. Will detect if the plugged in controller is xbox  and adjust setting accordingly.
 	 * 
 	 */
@@ -71,7 +74,6 @@ public class RobotInterfaceMap
 	{
 		driverJoystick = new Joystick(driverJoystickSlot);
 		operatorJoystick = new Joystick(operatorJoystickSlot);		
-		
 		if (driver.equals(JoystickType.XBOX)){
 			//XBOX driver
 			driverButtonA = 1;
@@ -91,6 +93,8 @@ public class RobotInterfaceMap
 			driverRightTrigger = 3;
 			driverRightX = 4;
 			driverRightY = 5;
+			driverForwardPowerAxis = driverLeftY;//1 RobotConstants.getDriverForwardPowerAxis(); 
+			driverRotationPowerAxis =driverRightY;// RobotConstants.getDriverRotationPowerAxis(); 
 		}
 		else
 		{
@@ -112,6 +116,8 @@ public class RobotInterfaceMap
 			driverLeftX = 2;
 			driverRightX = 3;
 			driverRightY = 4;
+			driverForwardPowerAxis = driverLeftY;//1 RobotConstants.getDriverForwardPowerAxis(); 
+			driverRotationPowerAxis =driverLeftX;// RobotConstants.getDriverRotationPowerAxis(); 
 		}
 		
 		if (operator.equals(JoystickType.XBOX))
@@ -179,6 +185,8 @@ public class RobotInterfaceMap
 	public double GetDriverLeftY(){                  return driverJoystick.getRawAxis(driverLeftY);}
 	public double GetDriverRightY(){                 return driverJoystick.getRawAxis(driverRightY);}
 	public Joystick GetDriverJoystick(){             return driverJoystick;}
+	public int GetDriverForwardPowerAxis(){          return driverForwardPowerAxis;};
+	public int GetDriverRotationPowerAxis(){         return driverRotationPowerAxis;};
 	
 	
 	//Operator Controller Abstraction Methods

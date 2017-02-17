@@ -98,7 +98,8 @@ public class Robot extends IterativeRobot
          */
     	
     	// the RobotInterfaceMap detects the controller and set the key mapping accordingly
-    	m_RobotInterface = new RobotInterfaceMap(JoystickType.XBOX, JoystickType.JOYSTICK);
+//temp    	m_RobotInterface = new RobotInterfaceMap(JoystickType.XBOX, JoystickType.JOYSTICK);
+    	m_RobotInterface = new RobotInterfaceMap(JoystickType.JOYSTICK, JoystickType.JOYSTICK);
 
     	m_RobotControllers = new RobotControllerMap();
     	m_RobotSensors = new RobotSensorMap();    	
@@ -290,7 +291,12 @@ public class Robot extends IterativeRobot
     {
     	m_DriveTrain.ArcadeDrive(m_RobotInterface.GetDriverLeftY(), m_RobotInterface.GetDriverRightX());
     }
-    
+
+    public void arcadeDriveGyroAssist()
+    {
+    	m_DriveTrain.ArcadeDriveGyroAssist(m_RobotInterface.GetDriverJoystick(),m_RobotInterface.GetDriverForwardPowerAxis(),m_RobotInterface.GetDriverRotationPowerAxis());
+    }
+
     public void visionAlign(double turn) 
     {
     	SmartDashboard.putNumber("Vision Turn", turn);
@@ -319,33 +325,30 @@ public class Robot extends IterativeRobot
     	{
     		double targetRPM;
     		//TODO Add an encoder to the robot's shooter
-    		if(this.haveTarget){
+//    		if(this.haveTarget){
     	   		double distance = 3;// distance in feet
-    	   	 	if(m_RobotSensors.getLidar().isWorking()){
     				if(m_RobotSensors.getLidar().getDistance()!=0){
         				distance = m_RobotSensors.getLidar().getDistance();
     				}
     				else{
-        				distance = visionDistanceToBoilerTarget;
+    					if(visionDistanceToBoilerTarget==0){
+    						distance = distance;
+    					}else{
+    						distance = visionDistanceToBoilerTarget;
+    					}
     				}
-    			}else{
-    				distance = visionDistanceToBoilerTarget;
-    			}
         		targetRPM=calcShooterSpeed(distance);
     		    // TODO remove this Hack
         		// approximate motor speed as a percent of the speed at 8ft, which is assumed to be the max RPM
 //    		    double approximateMotorPower = calcShooterSpeed(distanceToBoilerTarget)/calcShooterSpeed(8);
 //        		m_Shooter.SetTalonOutput(approximateMotorPower);
-    		}else// vision is not on target so just use the input value from the dashboard (expect this will go away in favor of last used value or somehow providing tuning with Joystick
-    		{
-    	    	targetRPM = SmartDashboard.getDouble("shooterRPM",1500);//Default to 1500 RPM if don't get a number
-    		}
-
-    		runIndexer();
+//    	    	targetRPM = SmartDashboard.getDouble("shooterRPM",1500);//Default to 1500 RPM if don't get a number
+ 
+//    		runIndexer();
     		
     		//Shoot
     		//Enable the PID Controller for the Shooter
-    		m_Shooter.SetShooterSetpoint(SHOOTER_SPEED);
+    		m_Shooter.SetShooterSetpoint(targetRPM);
     	   	m_Shooter.EnablePID();
     		
         	if(m_Shooter.ShooterOnTarget())

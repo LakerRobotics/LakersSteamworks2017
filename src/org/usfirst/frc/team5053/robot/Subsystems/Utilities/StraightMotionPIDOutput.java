@@ -72,7 +72,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 	    	
 	    	leftPower = motorPower-rotationPower;
 	    	rightPower = motorPower+rotationPower;
-	    	m_driveTrain.tankDrive(leftPower*.5,  rightPower*.5);
+	    	m_driveTrain.tankDrive(leftPower,  rightPower);
 
 		}
 		
@@ -90,7 +90,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		    MotionControlHelper rotationSpeedProfile; 
 	        rotationSpeedProfile = new MotionControlHelper(targetAngle, ramp, maxspeed, start, m_TurnSource, pidOutput);
 	        localRotationSpeedPID = new MotionControlPIDController(Kp,Ki,Kd, rotationSpeedProfile );
-	        localRotationSpeedPID.setOutputRange(-1.0, 1.0);
+	        localRotationSpeedPID.setOutputRange(-1.0*POWER_MODIFIER, 1.0*POWER_MODIFIER);
 	        localRotationSpeedPID.enable();
 		    return localRotationSpeedPID;
 		}
@@ -111,7 +111,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 
 			@Override
 			public void pidWrite(double rotationPower) {
-				this.m_rotationPowerDestination.setRotationPower(rotationPower*POWER_MODIFIER);
+				this.m_rotationPowerDestination.setRotationPower(rotationPower);//Note POWER_MODIFIER moved into createRotationPIDController
 			}
 
 	    }

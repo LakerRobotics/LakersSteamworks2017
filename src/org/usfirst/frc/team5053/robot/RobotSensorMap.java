@@ -50,14 +50,15 @@ public class RobotSensorMap
 
 	public RobotSensorMap()
 	{
+		RobotConstants robotConstants = new RobotConstants();
 		m_LeftDrive = new Encoder(leftDriveEncoderADIO, leftDriveEncoderBDIO);
 		m_RightDrive = new Encoder(rightDriveEncoderADIO, rightDriveEncoderBDIO);
 
 		m_Shooter = new Encoder(shooterEncoderADIO, shooterEncoderBDIO, FORWARD, EncodingType.k1X);// the k1X ensures we get 1024 click per revolution (think otherwise would give us 2048, 1024 from channel A and 1024 from channel B)
 		
-		m_LeftDrive.setDistancePerPulse(RobotConstants.getLeftEncoderDistancePerPulse());//converts click to distance in inches
-		m_RightDrive.setDistancePerPulse(RobotConstants.getRightEncoderDistancePerPulse());//converts click to distance in inches
-		m_Shooter.setDistancePerPulse(RobotConstants.getShooterEncoderDistancePerPulse());// Converts click into RPM	
+		m_LeftDrive.setDistancePerPulse(robotConstants.getLeftEncoderDistancePerPulse());//converts click to distance in inches
+		m_RightDrive.setDistancePerPulse(robotConstants.getRightEncoderDistancePerPulse());//converts click to distance in inches
+		m_Shooter.setDistancePerPulse(robotConstants.getShooterEncoderDistancePerPulse());// Converts click into RPM	
 		
 		m_Gyro = new ADXRS450_Gyro();
 		

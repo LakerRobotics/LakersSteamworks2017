@@ -17,11 +17,12 @@ import edu.wpi.first.wpilibj.Talon;
 
 public class RobotControllerMap
 {
+	RobotConstants robotConstants = new RobotConstants();
 	private final int leftDrivePWM = 0;
 	private final int rightDrivePWM = 1;
-	private final int intakePWM = 2;
-	private final int indexerPWM = 3;
-	private final int shooterPWM = 4;
+	private final int intakePWM = robotConstants.getIntakePWM();//2);
+	private final int indexerPWM = robotConstants.getIndexerPWM();//3);
+	private final int shooterPWM = robotConstants.getShooterPWM();// 4 on Mackinac 2 on Rudy
 	private final int scalerPWM = 5;
 	private final int mixerPWM = 6;
 	
@@ -42,16 +43,18 @@ public class RobotControllerMap
 		
 		m_LeftDrive = new Talon(leftDrivePWM);
 		m_RightDrive = new Talon(rightDrivePWM);
+		System.out.println("intakePWM = "+intakePWM);
 		m_Intake = new Talon(intakePWM);
 		m_Indexer = new Talon(indexerPWM);
 		m_Shooter = new Talon(shooterPWM);
+		
 		m_Scaler = new Talon(scalerPWM);
 		m_Mixer = new Talon(mixerPWM);
 		
 		m_LeftDrive.setInverted(true);
 		m_RightDrive.setInverted(true);
 		m_Intake.setInverted(true);
-		m_Shooter.setInverted(true);
+		m_Shooter.setInverted(false);
 	}
 	
 	public Talon getLeftDrive()

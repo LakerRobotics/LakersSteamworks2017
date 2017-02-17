@@ -31,7 +31,7 @@ public class LidarLiteSensor {
     // I2C WPI using expects 7bit address (changed in 2015 http://wpilib.screenstepslive.com/s/4485/m/13809/l/599750-archive-c-java-porting-guide-2014-to-2015)
 
     public LidarLiteSensor() {
-        mI2C = new I2C(I2C.Port.kOnboard, LIDAR_ADDR);
+        mI2C = new I2C(I2C.Port.kMXP, LIDAR_ADDR);
         mDistance = new byte[2];
         mUpdater = new java.util.Timer();
         mHasSignal = false;
@@ -122,34 +122,35 @@ public class LidarLiteSensor {
 
     private void update() {
     	boolean writeAborted = mI2C.write(LIDAR_CONFIG_REGISTER, LIDAR_CONFIG_START_TAKING_MESUREMENTS);
-        System.out.print("I2C.write("+LIDAR_CONFIG_REGISTER+","+LIDAR_CONFIG_START_TAKING_MESUREMENTS+"):aborted="+writeAborted+ " ");
-        if (writeAborted) {
-            // the write failed to ack
-            mHasSignal = false;
-            return;
-        }else{
-        	mHasSignal=true;
-        }
+ //       System.out.print("I2C.write("+LIDAR_CONFIG_REGISTER+","+LIDAR_CONFIG_START_TAKING_MESUREMENTS+"):aborted="+writeAborted+ " ");
+//        if (writeAborted) {
+//            // the write failed to ack
+//            mHasSignal = false;
+//            return;
+//        }else{
+//        	mHasSignal=true;
+//        }
         
         Timer.delay(0.04); // Delay for measurement to be taken
         
         boolean readAborted = mI2C.read(LIDAR_DISTANCE_REGISTER, 2, mDistance);
-        System.out.print("I2C.read("+LIDAR_DISTANCE_REGISTER+",2,"+mDistance+"):aborted="+readAborted+ " ");
+ //       System.out.print("I2C.read("+LIDAR_DISTANCE_REGISTER+",2,"+mDistance+"):aborted="+readAborted+ " ");
  
-        if (readAborted) {
-            // the read failed
-            mHasSignal = false;
-            return;
-        }
+//        if (readAborted) {
+//            // the read failed
+//            mHasSignal = false;
+//            return;
+//        }
         mHasSignal = true;
-        int distCm = (int) Integer.toUnsignedLong(mDistance[0] << 8) + Byte.toUnsignedInt(mDistance[1]);
-    	System.out.print("I2C mDistance[0]="+mDistance[0]+ " "); 
-    	System.out.print("I2C mDistance[1]="+mDistance[1]+ " ");
-    	System.out.print("Distance="+distCm+" cm  ");
-        System.out.println("Distance="+getDistance()+" ft  ");
-        System.out.print("I2C.read("+LIDAR_REGISTER_HARDWARE_VER+",1,"+mDistance+"):aborted="+readAborted+ " ");
-    	System.out.print("I2C Hardware ver mDistance[0]="+mDistance[0]+ " "); 
+//        int distCm = (int) Integer.toUnsignedLong(mDistance[0] << 8) + Byte.toUnsignedInt(mDistance[1]);
+ //       System.out.print("I2C.read("+LIDAR_REGISTER_HARDWARE_VER+",1,"+mDistance+"):aborted="+readAborted+ " ");
 
+//        System.out.print("I2C Hardware ver mDistance[0]="+mDistance[0]+ " "); 
+//     	System.out.print("I2C mDistance[0]="+mDistance[0]+ " "); 
+//    	System.out.print("I2C mDistance[1]="+mDistance[1]+ " ");
+//    	System.out.print("Distance="+distCm+" cm  ");
+        System.out.println("Distance="+getDistance()+" ft  ");
+ 
 
         Timer.delay(0.005); // Delay to prevent over polling
     }

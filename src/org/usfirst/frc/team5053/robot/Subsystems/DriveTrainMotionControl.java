@@ -2,10 +2,13 @@ package org.usfirst.frc.team5053.robot.Subsystems;
 
 import java.util.HashMap;
 
+import org.usfirst.frc.team5053.robot.RobotConstants;
 import org.usfirst.frc.team5053.robot.Subsystems.Utilities.MotionController;
+import org.usfirst.frc.team5053.robot.Subsystems.Utilities.WrapDriveTrainAvgSpeedPIDSource;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SpeedController;
@@ -45,9 +48,13 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 		m_LeftEncoder = leftEncoder;
 		m_RightEncoder = rightEncoder;
 		
+		
+		
 		m_Gyro = Gyro;
 		
-		m_MotionController = new MotionController(this, (PIDSource) m_RightEncoder, (PIDSource) m_Gyro);
+		WrapDriveTrainAvgSpeedPIDSource avgSpeed = new WrapDriveTrainAvgSpeedPIDSource(this);
+		
+		m_MotionController = new MotionController(this, (PIDSource)avgSpeed , (PIDSource) m_Gyro);
 		
 	}
 	public void DriveDistance(double distance, double maxspeed, double ramp)
@@ -88,6 +95,7 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 	{
 		m_MotionController.DisablePIDControls();
 	}
+	
 	public double GetRightDistance()
 	{
 		return m_RightEncoder.getDistance();
@@ -96,6 +104,7 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 	{
 		return m_RightEncoder.getRate();
 	}
+	
 	public double GetLeftDistance()
 	{
 		return m_LeftEncoder.getDistance();
@@ -104,6 +113,7 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 	{
 		return m_LeftEncoder.getRate();
 	}
+	
 	public void ResetEncoders()
 	{
 		m_LeftEncoder.reset();
@@ -124,6 +134,9 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 	public void ArcadeDrive(double speed, double angle)
 	{
 		this.arcadeDrive(speed, angle);
+	}
+	public void ArcadeDriveGyroAssist(Joystick joystick, int forwardPowerAxis, int rotationSpeedAxis ) {
+		m_MotionController.ExecuteFowardPower_and_RotationSpeedMotion(joystick,  forwardPowerAxis, rotationSpeedAxis );
 	}
 	public double GetAngle()
 	{
