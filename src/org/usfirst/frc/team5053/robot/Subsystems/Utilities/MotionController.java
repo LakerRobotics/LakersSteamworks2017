@@ -71,7 +71,7 @@ public class MotionController {
 				//Instantiates a new MotionControlPIDController() object for the new drive segment using the previous MotionControlHelper()
 				m_StraightPIDController = new MotionControlPIDController(StraightKp, StraightKi, StraightKd, m_StraightControl);
 				m_StraightPIDController.setAbsoluteTolerance(m_straightTolerance);
-				m_StraightPIDController.setOutputRange(-1, 1);
+				m_StraightPIDController.setOutputRange(-1.0, 1.0);
 				
 				//Turns the MotionControlPID ON and it will continue to execute by itself until told otherwise.
 				m_StraightPIDController.enable();
@@ -90,7 +90,7 @@ public class MotionController {
 			
 			//Magic numbers need fixing
 			double maxRPM = 60/*30*/;
-			double ramp = 30/* 3.5 * maxRPM*/;
+			double ramp = 50/* 3.5 * maxRPM*/;
 			
 			double maxSpeed = maxRPM * 6; //360 Degrees/60 seconds to convert RPM to speed or degrees per second
 			double start = m_DriveTrain.GetAngle();
@@ -104,7 +104,7 @@ public class MotionController {
 				
 				//Instantiates a new MotionControlPIDController() object for the new turn segment using the previous MotionControlHelper()
 				m_TurnPIDController = new MotionControlPIDController(TurnKp, TurnKi, TurnKd, m_TurnControl);
-				m_TurnPIDController.setOutputRange(-1.0, 1.0);
+				m_TurnPIDController.setOutputRange(-0.7, 0.7);
 				
 				//Turns the MotionControlPID ON and it will continue to execute by itself until told otherwise.
 				m_TurnPIDController.enable();	

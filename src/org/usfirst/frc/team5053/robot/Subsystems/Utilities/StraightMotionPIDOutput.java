@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		PIDSource m_TurnSource;
 		double m_targetAngle = 0.0d;
 		double rotationPower = 0.0d;
-		private final double POWER_MODIFIER = .5;
 
 		public StraightMotionPIDOutput(DriveTrainMotionControl drivetrain, PIDSource turnSource, double targetAngle) {
 			m_targetAngle = targetAngle;
@@ -111,7 +110,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 
 			@Override
 			public void pidWrite(double rotationPower) {
-				this.m_rotationPowerDestination.setRotationPower(rotationPower*POWER_MODIFIER);
+				this.m_rotationPowerDestination.setRotationPower(rotationPower);
 			}
 
 	    }

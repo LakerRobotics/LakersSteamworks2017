@@ -49,9 +49,10 @@ public class RobotSensorMap
 		m_RightDrive = new Encoder(rightDriveEncoderADIO, rightDriveEncoderBDIO);
 		m_Shooter = new Encoder(shooterEncoderADIO, shooterEncoderBDIO);
 		
-		m_LeftDrive.setDistancePerPulse(6*Math.PI/1024);
-		m_RightDrive.setDistancePerPulse(6*Math.PI/1024);
-		m_Shooter.setDistancePerPulse(1/1024);
+		//TODO 360 -> 1024
+		m_LeftDrive.setDistancePerPulse(6*Math.PI/1024); //Distance in inches
+		m_RightDrive.setDistancePerPulse(6*Math.PI/1024); //Distance in inches
+		m_Shooter.setDistancePerPulse(1/1024); //Ticks per second
 		
 		m_Gyro = new ADXRS450_Gyro();
 		m_Lidar = new LidarLite();

@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Shooter implements Subsystem{
 
@@ -20,6 +21,7 @@ public class Shooter implements Subsystem{
 	public Shooter(Talon shooterTalon, Encoder shooterEncoder) {
 		m_Shooter = shooterTalon;
 		m_Encoder = shooterEncoder;
+		
 		m_Encoder.setPIDSourceType(PIDSourceType.kRate);
 		
 		m_PID = new PIDController(KP, KI, KD, m_Encoder, m_Shooter);
@@ -45,6 +47,7 @@ public class Shooter implements Subsystem{
 		m_Shooter.set(speed);
 	}
 	public void WriteDashboardData() {
-		
+		SmartDashboard.putNumber("shooterDriveEncoder", m_Encoder.getRate());
+		System.out.println("Shooter Encoder Rate: " + Double.toString(m_Encoder.getRate()));
 	}
 }
