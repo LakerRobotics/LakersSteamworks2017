@@ -1,5 +1,7 @@
 package org.usfirst.frc.team5053.robot;
 
+import org.usfirst.frc.team5053.robot.Sensors.LidarLite;
+
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Encoder;
@@ -33,7 +35,9 @@ public class RobotSensorMap
 	private Encoder m_LeftDrive;
 	private Encoder m_RightDrive;
 	private Encoder m_Shooter;
+	
 	private ADXRS450_Gyro m_Gyro;
+	private LidarLite m_Lidar;
 	
 	private DigitalOutput m_Red;
 	private DigitalOutput m_Blue;
@@ -50,6 +54,7 @@ public class RobotSensorMap
 		m_Shooter.setDistancePerPulse(1/1024);
 		
 		m_Gyro = new ADXRS450_Gyro();
+		m_Lidar = new LidarLite();
 		
 		m_Red = new DigitalOutput(redDIO);
 		m_Blue = new DigitalOutput(blueDIO);
@@ -71,6 +76,10 @@ public class RobotSensorMap
 	public ADXRS450_Gyro getGyro() 
 	{
 		return m_Gyro;
+	}
+	public LidarLite getLidar()
+	{
+		return m_Lidar;
 	}
 	public DigitalOutput getRed()
 	{

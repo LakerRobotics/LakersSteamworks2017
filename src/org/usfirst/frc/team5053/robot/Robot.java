@@ -1,12 +1,12 @@
 package org.usfirst.frc.team5053.robot;
 
 import org.usfirst.frc.team5053.robot.RobotInterfaceMap.JoystickType;
+import org.usfirst.frc.team5053.robot.Sensors.LidarLite;
 import org.usfirst.frc.team5053.robot.Subsystems.DriveTrain;
 import org.usfirst.frc.team5053.robot.Subsystems.DriveTrainMotionControl;
 import org.usfirst.frc.team5053.robot.Subsystems.Indexer;
 import org.usfirst.frc.team5053.robot.Subsystems.Intake;
 import org.usfirst.frc.team5053.robot.Subsystems.LightSystem;
-import org.usfirst.frc.team5053.robot.Subsystems.Mixer;
 import org.usfirst.frc.team5053.robot.Subsystems.Scaler;
 import org.usfirst.frc.team5053.robot.Subsystems.Shooter;
 import org.usfirst.frc.team5053.robot.Subsystems.Utilities.GRIPVision;
@@ -52,8 +52,8 @@ public class Robot extends IterativeRobot
 	private Shooter m_Shooter;
 	private Indexer m_Indexer;
 	private Scaler m_Scaler;
-	private Mixer m_Mixer;
 	private LightSystem m_LightSystem;
+	private LidarLite m_Lidar;
 	
 	//Vision declaration
 	private UsbCamera m_Camera;
@@ -63,18 +63,28 @@ public class Robot extends IterativeRobot
 	private boolean isVisionTurnRunning;
 	private final Object m_ImgLock = new Object();
 	
-	//Shooter speeds
-	private final double SHOOTER_SPEED	= .5;
-	
-	//Misc speeds
+	//Subsystem constants
+	private final double DEFAULT_SHOOTER_SPEED	= .7;
+	private final double DEFAULT_SHOOTER_RATE = 100;
 	private final double INTAKE_SPEED = .7;
 	private final double MIXER_SPEED = .7;
 	private final double INDEXER_SPEED = .7;
 	private final double SCALER_SPEED = .7;
 
+	//Vision constants
 	private final int IMG_WIDTH		= 320;
 	private final int IMG_HEIGHT 	= 240;
 	private final int CAMERA_ANGLE 	= 52;
+	
+	//Auton constants
+	//Shoot -> Gear
+	private final double INITAL_FORWARD_DRIVE = 5;
+	private final double TURN_TOWARDS_BOILER = 90;
+	private final double TURN_TOWARDS_BOILER_SIDE_PEG = 100;
+	private final double DRIVE_BOILER_SIDE_GEAR_PEG = 20;
+	private final double ALIGN_TO_GEAR_PEG = 20;
+	private final double ENGAGE_GEAR_PEG = 20;
+	private final double DISENGAGE_GEAR_PEG = -20;
 	
 	//Misc Variables
 	private int autonomousCase;
@@ -99,11 +109,11 @@ public class Robot extends IterativeRobot
     	m_Shooter = new Shooter(m_RobotControllers.getShooter(), m_RobotSensors.getShooterEncoder());
     	m_Intake = new Intake(m_RobotControllers.getIntake());
     	m_Indexer = new Indexer(m_RobotControllers.getIndexer());
-    	m_Mixer = new Mixer(m_RobotControllers.getMixer());
     	m_Scaler = new Scaler(m_RobotControllers.getScaler());
     	
     	m_LightSystem = new LightSystem(m_RobotSensors.getRed(), m_RobotSensors.getBlue(), m_RobotSensors.getGreen(), DriverStation.getInstance().getAlliance());
     	m_LightSystem.setDefault();
+    	m_Lidar = m_RobotSensors.getLidar();
     	
     	m_Camera = CameraServer.getInstance().startAutomaticCapture();
 		
@@ -145,33 +155,92 @@ public class Robot extends IterativeRobot
          */
     	
     	double centerX;
+    	double distanceToBoilerTarget;
     	synchronized (m_ImgLock) {
     		centerX = this.centerX;
     	}
     	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
 
     	SmartDashboard.putNumber("Vision Turn", turn);
-    	//m_DriveTrain.arcadeDrive(-0.6, turn * 0.005);
-        
+
     	switch(autonomousCase)
     	{
     	case 0:
     		m_DriveTrain.ResetEncoders();
     		m_DriveTrain.ResetGyro();
     		//Magic Numbers
-    		m_DriveTrain.DriveDistance(50, 10, 7);
-    		m_DriveTrain.WriteDashboardData();
+    		m_DriveTrain.DriveDistance(INITAL_FORWARD_DRIVE, 10, 7);
     		autonomousCase++;
-    		System.out.println("Incrementing Case");
     		break;
     	case 1:
-    		m_DriveTrain.WriteDashboardData();
     		if(m_DriveTrain.isStraightPIDFinished())
     		{
+    			m_DriveTrain.ResetEncoders();
+        		m_DriveTrain.ResetGyro();
+        		m_DriveTrain.TurnToAngle(TURN_TOWARDS_BOILER);
     			autonomousCase++;
     		}
     		break;
+    	case 2:
+    		if(m_DriveTrain.isTurnPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+        		m_DriveTrain.ResetGyro();
+        		//Shoot?
+    			autonomousCase++;
+    		}
+    		break;
+    	case 3:
+    		m_DriveTrain.ResetEncoders();
+    		m_DriveTrain.ResetGyro();
+    		//Wait for shooter
+    		//Turn to boiler side peg
+    		//m_DriveTrain.TurnToAngle(TURN_TOWARDS_BOILER_SIDE_PEG);
+    		autonomousCase++;
+    		break;
+    	case 4:
+    		if(m_DriveTrain.isTurnPIDFinished())
+    		{
+        		m_DriveTrain.ResetEncoders();
+        		m_DriveTrain.ResetGyro();
+        		//Drive to boiler side peg
+        		//m_DriveTrain.DriveDisance(DRIVE_BOILER_SIDE_PEG);
+        		autonomousCase++;
+    		}
+    		break;
+    	case 5:
+    		if(m_DriveTrain.isStraightPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+    			m_DriveTrain.ResetGyro();
+    			//Align to peg
+    			//m_DriveTrain.TurnToAngle(ALIGN_TO_PEG);
+    			autonomousCase++;
+    		}
+    		break;
+    	case 6:
+    		if(m_DriveTrain.isStraightPIDFinished())
+    		{
+        		m_DriveTrain.ResetEncoders();
+        		m_DriveTrain.ResetGyro();
+        		//Place gear on peg
+        		//m_DriveTrain.DriveDistance(ENGAGE_PEG, 10, 7);
+        		autonomousCase++;
+    		}
+    		break;
+    	case 7:
+    		if(m_DriveTrain.isStraightPIDFinished())
+    		{
+    			//Back up off peg
+    			//m_DriveTrain.DriveDistance(DISENGAGE_PEG, 10, 7);
+    			autonomousCase++;
+    		}
+		default:
+			break;
     	}
+    	
+		m_DriveTrain.WriteDashboardData();
+		m_Shooter.WriteDashboardData();
     }
 
     public void teleopPeriodic()
@@ -187,8 +256,6 @@ public class Robot extends IterativeRobot
     		centerX = this.centerX;
     	}
     	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
-    	
-        SmartDashboard.putString("Alliance", DriverStation.getInstance().getAlliance().toString());
     	
     	//Drivetrain
     	if(m_RobotInterface.GetDriverLeftBumper())
@@ -214,12 +281,10 @@ public class Robot extends IterativeRobot
     	m_DriveTrain.WriteDashboardData();
     	
     	//Shooter methods
-    	shoot();
+    	runShooter();
     	
     	//Other
-    	//Indexer is not run here because AFAIK it should only be run when the shooter is ready to go
     	runIntake();
-    	runIndexer();
     	runScaler();
     	
     	teleopLightLoops++;
@@ -253,21 +318,28 @@ public class Robot extends IterativeRobot
     }
     
     //Shooter methods
-    public void shoot()
+    public void runShooter()
     {
-    	//TODO Determine buttons
     	if(m_RobotInterface.GetDriverRightBumper())
     	{
-    		//TODO Add an encoder to the robot's shooter
-    		m_Shooter.SetTalonOutput(SHOOTER_SPEED);
-    		runIndexer();
-    		
-    		//Shoot
+    		/*
     		//Enable the PID Controller for the Shooter
-    		/*m_Shooter.SetShooterSetpoint(SHOOTER_SPEED);
+    		if(m_Lidar.isWorking())
+    		{
+    			//y = 11.815x2 + 140.58x + 1348.4 
+    			double distanceFt = m_Lidar.getDistanceFt();
+    			double shooterRate = 11.815*(distanceFt*distanceFt) + 140.58*distanceFt+1348.4;
+    			m_Shooter.SetShooterSetpoint(shooterRate);
+    		}
+    		else
+    		{
+        		m_Shooter.SetShooterSetpoint(DEFAULT_SHOOTER_RATE);
+    		}
     	   	m_Shooter.EnablePID();
-    		
-        	if(m_Shooter.ShooterOnTarget())
+    		*/
+    		m_Shooter.SetTalonOutput(DEFAULT_SHOOTER_SPEED);
+        	runIndexer();
+    		if(m_Shooter.ShooterOnTarget())
         	{
         		//Shooter is ready to fire.
         		runIndexer();
@@ -279,21 +351,21 @@ public class Robot extends IterativeRobot
         	else
         	{
         		m_LightSystem.setDefault();
-        	}*/
+        	}
     	}
     	else
     	{
     		//STOP
     		//m_Shooter.DisablePID();
     		m_Shooter.SetTalonOutput(0);
-    		//m_LightSystem.setDefault();
+    		m_LightSystem.setDefault();
     	}
     }
 
     //Intake methods
     public void runIntake()
     {
-	    if(m_RobotInterface.GetDriverA())
+	    if(m_RobotInterface.GetOperatorButton(1))
 		{
 			m_Intake.SetTalonOutput(INTAKE_SPEED);
 		}
@@ -316,24 +388,11 @@ public class Robot extends IterativeRobot
  	    }
     }
     
-    //Mixer methods
-    public void runMixer() 
-    {
-    	if(m_RobotInterface.GetDriverY())
- 		{
-    	    m_Mixer.SetTalonOutput(MIXER_SPEED);
- 		}
- 	    else
- 	    {
- 	    	m_Mixer.SetTalonOutput(0);
- 	    }
-    }
-    
     //Scaler methods
     public void runScaler() 
     {
     	//TODO Determine button
-    	if(m_RobotInterface.GetDriverX())
+    	if(m_RobotInterface.GetOperatorButton(2))
  		{
         	m_Scaler.SetTalonOutput(SCALER_SPEED);
         	
