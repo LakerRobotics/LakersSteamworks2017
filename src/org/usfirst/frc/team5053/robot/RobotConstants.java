@@ -12,7 +12,7 @@ public  class RobotConstants {
 	private static String robotName;
 	
 	static{
-    	robotName = SmartDashboard.getString("robotName","LilGeek");//Default to "Mackinaw" if don't get a value
+    	robotName = SmartDashboard.getString("robotName","Rudy");//Default to "Mackinaw" if don't get a value
     	if("Mackinaw"==robotName){ robotWeAreRunningOn = new RobotValuesMackinac();};
     	if("LilGeek"==robotName){ robotWeAreRunningOn = new RobotValuesLilGeek();};
     	if("Rudy"==robotName){ robotWeAreRunningOn = new RobotValuesRudy();};

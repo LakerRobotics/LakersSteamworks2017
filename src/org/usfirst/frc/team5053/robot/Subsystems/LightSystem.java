@@ -22,31 +22,44 @@ public class LightSystem implements Subsystem {
 	
 	public void setRedState(boolean isOn)
 	{
-		m_Red.set(isOn);
+		//m_Red.set(isOn);
 	}
 	public void setBlueState(boolean isOn)
 	{
-		m_Blue.set(isOn);
+		///m_Blue.set(isOn);
 	}
 	public void setGreenState(boolean isOn)
 	{
 		m_Green.set(isOn);
 	}
+	public boolean getRedState()
+	{
+		return m_Red.get();
+	}
+	public boolean getBlueState()
+	{
+		return m_Blue.get();
+	}
+	public boolean getGreenState()
+	{
+		return m_Green.get();
+	}
+
 	public void setDefault() 
 	{
 		if(m_Alliance.equals(Alliance.Red))
     	{
     		m_Red.set(true);
-    		
+
     		m_Blue.set(false);
-    		m_Green.set(false);
+//    		m_Green.set(false);
     	}
     	else
     	{
     		m_Blue.set(true);
     		
     		m_Red.set(false);
-    		m_Green.set(false);
+//    		m_Green.set(false);
     	}
 	}
 	@Override
