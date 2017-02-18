@@ -24,7 +24,7 @@ public class RobotControllerMap
 	private final int indexerPWM = robotConstants.getIndexerPWM();//3);
 	private final int shooterPWM = robotConstants.getShooterPWM();// 4 on Mackinac 2 on Rudy
 	private final int scalerPWM = 5;
-	private final int mixerPWM = 6;
+//MixerDoesntExist	private final int mixerPWM = 6; // Dont think this exists
 	
 	private Talon m_LeftDrive;
 	private Talon m_RightDrive;
@@ -49,7 +49,7 @@ public class RobotControllerMap
 		m_Shooter = new Talon(shooterPWM);
 		
 		m_Scaler = new Talon(scalerPWM);
-		m_Mixer = new Talon(mixerPWM);
+//MixerDoesntExist		m_Mixer = new Talon(mixerPWM);
 		
 		m_LeftDrive.setInverted(true);
 		m_RightDrive.setInverted(true);

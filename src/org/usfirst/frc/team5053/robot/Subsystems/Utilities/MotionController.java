@@ -106,7 +106,44 @@ public class MotionController {
 			//TODO remove this, it should still work since we are getting m_targetArgle to be TurnAngle + start
 			//TODO remove this, it should still work since we are getting m_targetArgle to be TurnAngle + start
 			//TODO remove this, it should still work since we are getting m_targetArgle to be TurnAngle + start
-			m_DriveTrain.ResetGyro();
+//			m_DriveTrain.ResetGyro();
+			
+			//Magic numbers need fixing
+			double maxRPM = 60/*30*/;
+			double ramp = 30/* 3.5 * maxRPM*/;
+			
+			double maxSpeed = maxRPM * 6; //360 Degrees/60 seconds to convert RPM to speed or degrees per second
+			double start = m_DriveTrain.GetAngle();
+			m_targetAngle = turnAngle + start;
+			
+			if (!(Math.abs(m_DriveTrain.GetAngle()-m_targetAngle) < m_turnTolerance))
+			{
+				//Instantiates a new MotionControlHelper() object for the new turn segment
+				m_SpinControl = new MotionControlHelper(m_targetAngle, ramp, maxSpeed, start, m_TurnSource, new DriveTurnPIDOutput(m_DriveTrain));
+				m_SpinControl.setTargetDistance(m_targetAngle);
+				
+				//Instantiates a new MotionControlPIDController() object for the new turn segment using the previous MotionControlHelper()
+				m_SpinPIDController = new MotionControlPIDController(spinKp, spinKi, spinKd, m_SpinControl);
+				m_SpinPIDController.setOutputRange(-1.0, 1.0);
+				
+				//Turns the MotionControlPID ON and it will continue to execute by itself until told otherwise.
+				m_SpinPIDController.enable();	
+				m_PIDControlType=PIDControlType.SPIN;
+				
+				return true;
+			}
+			return false;
+		}
+		return true;
+	}
+	public boolean ExecuteTurnMotion(double turnAngle, Joystick driverJoystick, int forwardPowerAxis)
+	{
+		if (m_PIDControlType==PIDControlType.OFF)
+		{
+			//TODO remove this, it should still work since we are getting m_targetArgle to be TurnAngle + start
+			//TODO remove this, it should still work since we are getting m_targetArgle to be TurnAngle + start
+			//TODO remove this, it should still work since we are getting m_targetArgle to be TurnAngle + start
+//			m_DriveTrain.ResetGyro();
 			
 			//Magic numbers need fixing
 			double maxRPM = 60/*30*/;
@@ -246,15 +283,39 @@ public class MotionController {
 	{
 		return !(m_PIDControlType==PIDControlType.OFF);
 	}
-	public void DisablePIDControls()
+	public void DisablePIDControlsAll()
+	{
+		DisablePIDControlsTurn();
+		DisablePIDControlsStraight();
+		DisablePIDControlsArch();
+		DisablePIDControlsJoystickGyroAssist();
+	}
+	public void DisablePIDControlsTurn()
 	{
 		if(m_SpinPIDController != null)
 		{
 			m_SpinPIDController.disable();
 		}
+	}
+	public void DisablePIDControlsStraight()
+	{
 		if(m_StraightPIDController != null)
 		{
 			m_StraightPIDController.disable();
+		}
+	}
+	public void DisablePIDControlsArch()
+	{
+		if(m_ArchPIDController != null)
+		{
+			m_ArchPIDController.disable();
+		}
+	}
+	public void DisablePIDControlsJoystickGyroAssist()
+	{
+		if(this.m_JoystickGyroPIDController != null)
+		{
+			m_JoystickGyroPIDController.disable();
 		}
 	}
 }
