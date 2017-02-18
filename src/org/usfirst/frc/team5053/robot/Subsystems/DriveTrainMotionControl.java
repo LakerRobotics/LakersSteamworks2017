@@ -21,9 +21,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 {
-	/**
-	 * Hello There! : I'm the base constructor.
-	 */
 	
 	private SpeedController m_LeftMotor;
 	private SpeedController m_RightMotor;
@@ -48,8 +45,6 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 		m_LeftEncoder = leftEncoder;
 		m_RightEncoder = rightEncoder;
 		
-		
-		
 		m_Gyro = Gyro;
 		
 		WrapDriveTrainAvgSpeedPIDSource avgSpeed = new WrapDriveTrainAvgSpeedPIDSource(this);
@@ -57,22 +52,46 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 		m_MotionController = new MotionController(this, (PIDSource)avgSpeed , (PIDSource) m_Gyro);
 		
 	}
-	public void DriveDistance(double distance, double maxspeed, double ramp)
+	
+	/**
+	 * This will start driving the specified distance, if one is not running, and return "true" when complete
+	 * @param distance
+	 * @param maxspeed
+	 * @param ramp
+	 * @return if the Drive Distance is complete.
+	 */
+	public boolean DriveDistance(double distance, double maxspeed, double ramp)
 	{
 		if(!isPIDRunning)
 		{
 			isPIDRunning = 	m_MotionController.ExecuteStraightMotion(distance, maxspeed, ramp);
-		}
-		
+		}		
+		return m_MotionController.isStraightMotionFinished();
 	}
-	public void TurnToAngle(double turnAngle)
+	
+	/**
+	 * This will start a turn angle (if one is not running)
+	 *  and will report back if the turn angle is complete
+	 * @param turnAngle
+	 * @return if the turn angle is completed 
+	 */
+	public boolean TurnToAngle(double turnAngle)
 	{
 		if(!isPIDRunning)
 		{
 			isPIDRunning = m_MotionController.ExecuteTurnMotion(turnAngle);
-		}
-		
+		}	
+		return m_MotionController.isTurnMotionFinished();
 	}
+	public boolean alignToAngle(double turnAngle, Joystick driverJoyStick, int forwardPowerAxis)
+	{
+		if(!isPIDRunning)
+		{
+			isPIDRunning = m_MotionController.ExecuteTurnMotion(turnAngle, driverJoyStick, forwardPowerAxis);
+		}	
+		return m_MotionController.isTurnMotionFinished();
+	}
+	
 	public boolean isStraightPIDFinished()
 	{
 		if(m_MotionController.isStraightMotionFinished())
@@ -91,28 +110,24 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 		}
 		return false;
 	}
-	public void DisablePIDControl()
+	
+	public void DisablePIDControlsAll()
 	{
-		m_MotionController.DisablePIDControls();
+		m_MotionController.DisablePIDControlsAll();
+	}
+	public void DisablePIDControlTurn()
+	{
+		m_MotionController.DisablePIDControlsTurn();
 	}
 	
-	public double GetRightDistance()
-	{
-		return m_RightEncoder.getDistance();
-	}
-	public double GetRightSpeed()
-	{
-		return m_RightEncoder.getRate();
-	}
+	public double GetRightDistance(){	return m_RightEncoder.getDistance();	}
+	public double GetRightSpeed(){	    return m_RightEncoder.getRate();}
 	
-	public double GetLeftDistance()
-	{
-		return m_LeftEncoder.getDistance();
-	}
-	public double GetLeftSpeed()
-	{
-		return m_LeftEncoder.getRate();
-	}
+	public double GetLeftDistance()	{   return m_LeftEncoder.getDistance(); }
+	public double GetLeftSpeed(){       return m_LeftEncoder.getRate();}
+	
+	public double GetAverageSpeed(){    return ((GetLeftSpeed()   +GetRightSpeed()   )/2);}
+	public double GetAverageDistance(){	return ((GetLeftDistance()+GetRightDistance())/2);}
 	
 	public void ResetEncoders()
 	{
@@ -123,31 +138,27 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 	{
 		m_Gyro.reset();
 	}
-	public double GetAverageSpeed()
-	{
-		return ((GetLeftSpeed() + GetRightSpeed())/2);
-	}
-	public double GetAverageDistance()
-	{
-		return GetLeftDistance();
-	}
+	
 	public void ArcadeDrive(double speed, double angle)
 	{
 		this.arcadeDrive(speed, angle);
 	}
-	public void ArcadeDriveGyroAssist(Joystick joystick, int forwardPowerAxis, int rotationSpeedAxis ) {
+	
+	public void ArcadeDriveGyroAssist(Joystick joystick, int forwardPowerAxis, int rotationSpeedAxis ) 
+	{
 		m_MotionController.ExecuteFowardPower_and_RotationSpeedMotion(joystick,  forwardPowerAxis, rotationSpeedAxis );
 	}
-	public double GetAngle()
-	{
-		return m_Gyro.getAngle();
-	}
 	
-	public HashMap<String, Double> GetDashboardData() {
+	public double GetAngle(){return m_Gyro.getAngle();}
+	
+	public HashMap<String, Double> GetDashboardData() 
+	{
 		return null;
 		// TODO Auto-generated method stub
 	}
-	public void WriteDashboardData() {
+	
+	public void WriteDashboardData() 
+	{
 		SmartDashboard.putNumber("Left Encoder", m_LeftEncoder.getDistance());
 		SmartDashboard.putNumber("Right Encoder", m_RightEncoder.getDistance());
 		SmartDashboard.putBoolean("Is DriveTrain PID Running", isPIDRunning);
