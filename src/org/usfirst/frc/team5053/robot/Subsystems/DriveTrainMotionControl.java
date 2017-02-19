@@ -33,8 +33,7 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 	private ADXRS450_Gyro m_Gyro;
 	
 	public boolean isPIDRunning = false;
-	
-	
+		
 	public DriveTrainMotionControl(SpeedController leftMotor, SpeedController rightMotor, Encoder leftEncoder, Encoder rightEncoder, ADXRS450_Gyro Gyro)
 	{
 		super(leftMotor, rightMotor);
@@ -54,7 +53,8 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 	}
 	
 	/**
-	 * This will start driving the specified distance, if one is not running, and return "true" when complete
+	 * This will start driving the specified distance, if one is not running, 
+	 * or return "false" if already running and "true" when complete
 	 * @param distance
 	 * @param maxspeed
 	 * @param ramp
@@ -62,62 +62,50 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 	 */
 	public boolean DriveDistance(double distance, double maxspeed, double ramp)
 	{
-		if(!isPIDRunning)
-		{
-			isPIDRunning = 	m_MotionController.ExecuteStraightMotion(distance, maxspeed, ramp);
-		}		
-		return m_MotionController.isStraightMotionFinished();
+		System.out.print("DriveTrainMotionControl.DriveDistance isPIDRunning="+isPIDRunning);
+		return 	m_MotionController.ExecuteStraightMotion(distance, maxspeed, ramp);
 	}
 	
 	/**
-	 * This will start a turn angle (if one is not running)
-	 *  and will report back if the turn angle is complete
+	 * This will start a turn angle (if one is not running) and report false that the turn is not yet complete
+	 *  or if running
+	 *    Will report false if the turn is not yet complete
+	 *    Will report true if the turn is done
 	 * @param turnAngle
 	 * @return if the turn angle is completed 
 	 */
 	public boolean TurnToAngle(double turnAngle)
 	{
-		if(!isPIDRunning)
-		{
-			isPIDRunning = m_MotionController.ExecuteTurnMotion(turnAngle);
-		}	
-		return m_MotionController.isTurnMotionFinished();
+		 return m_MotionController.ExecuteTurnMotion(turnAngle);
 	}
 	public boolean alignToAngle(double turnAngle, Joystick driverJoyStick, int forwardPowerAxis)
 	{
-		if(!isPIDRunning)
-		{
-			isPIDRunning = m_MotionController.ExecuteTurnMotion(turnAngle, driverJoyStick, forwardPowerAxis);
-		}	
-		return m_MotionController.isTurnMotionFinished();
-	}
-	
-	public boolean isStraightPIDFinished()
-	{
-		if(m_MotionController.isStraightMotionFinished())
-		{
-			isPIDRunning = false;
-			return true;
-		}
-		return false;
-	}
-	public boolean isTurnPIDFinished() 
-	{
-		if(m_MotionController.isTurnMotionFinished())
-		{
-			isPIDRunning = false;
-			return true;
-		}
-		return false;
+		return m_MotionController.ExecuteAlignMotion(turnAngle, driverJoyStick, forwardPowerAxis);
 	}
 	
 	public void DisablePIDControlsAll()
 	{
 		m_MotionController.DisablePIDControlsAll();
 	}
+
 	public void DisablePIDControlTurn()
 	{
 		m_MotionController.DisablePIDControlsTurn();
+	}
+
+	public void DisablePIDControlStraight()
+	{
+		m_MotionController.DisablePIDControlsStraight();
+	}
+	
+	public void DisablePIDControlArc()
+	{
+		m_MotionController.DisablePIDControlsArch();
+	}
+	
+	public void DisablePIDControlJoystickGyro()
+	{
+		m_MotionController.DisablePIDControlsJoystickGyroAssist();
 	}
 	
 	public double GetRightDistance(){	return m_RightEncoder.getDistance();	}
@@ -146,7 +134,7 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 	
 	public void ArcadeDriveGyroAssist(Joystick joystick, int forwardPowerAxis, int rotationSpeedAxis ) 
 	{
-		m_MotionController.ExecuteFowardPower_and_RotationSpeedMotion(joystick,  forwardPowerAxis, rotationSpeedAxis );
+		m_MotionController.doFowardPower_and_RotationSpeedMotion(joystick,  forwardPowerAxis, rotationSpeedAxis );
 	}
 	
 	public double GetAngle(){return m_Gyro.getAngle();}

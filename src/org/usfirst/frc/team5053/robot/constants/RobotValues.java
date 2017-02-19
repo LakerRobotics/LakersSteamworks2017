@@ -8,6 +8,9 @@ import org.usfirst.frc.team5053.robot.RobotConstants;
  */
 public abstract class RobotValues {
 	
+	public  boolean getRightDriveInverted(){return false;};
+	public  boolean getLeftDriveInverted(){return false;};
+	
 	public  int getIntakePWM(){return 0;};//2);
 	public  int getIndexerPWM(){return 0;};//3);
 	public  int getShooterPWM(){return 0;};

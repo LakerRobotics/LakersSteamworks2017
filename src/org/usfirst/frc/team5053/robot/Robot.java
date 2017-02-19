@@ -91,8 +91,13 @@ public class Robot extends IterativeRobot
 	// http://vrguy.blogspot.com/2013/04/converting-diagonal-field-of-view-and.html
 	
 	//Misc Variables
+	private AutonRoutines autonToRun;
 	private int autonomousCase;
 	private int teleopLightLoops;
+	private enum ButtonStatus{DOWN, UP, JUST_PRESSED, JUST_RELEASED };
+	
+	private ButtonStatus driverLeftBumperButtonLastTime;
+	private ButtonStatus driverRightBumperButtonLastTime;
 	
 	@Override
     public void robotInit()
@@ -121,6 +126,8 @@ public class Robot extends IterativeRobot
     	m_LightSystem = new LightSystem(m_RobotSensors.getRed(), m_RobotSensors.getBlue(), m_RobotSensors.getGreen(), DriverStation.getInstance().getAlliance());
     	m_LightSystem.setDefault();
     	
+
+    	// Vision System
     	m_Camera = CameraServer.getInstance().startAutomaticCapture();
 		
     	m_Camera.setExposureManual(1);
@@ -129,7 +136,6 @@ public class Robot extends IterativeRobot
         m_Camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
     	
         centerX = 0.0;
-    	autonomousCase = 0;
     	previousVisionTurn = 0;
     	teleopLightLoops = 0;
     	isVisionTurnRunning = false;
@@ -189,15 +195,33 @@ public class Robot extends IterativeRobot
     	        m_VisionThread.start();
     }
 
+    private enum AutonRoutines {LEFT, RIGHT, CENTER, TEST_LINE, TEST_SQUARE, TEST_ARCH, NONE};
     public void autonomousInit() 
     {
+    	autonomousCase = 0;
+
     	 /**
          * This function is called once when autonomous begins
          */
     	GetDashboardData();
+    	//basicAutonSelect
+    	String defaultAuton = "Test Square";
+    	String autonSelectString=defaultAuton;
+    	try{
+    		autonSelectString = SmartDashboard.getString("basicAutonSelect",defaultAuton);
+    	}
+    	catch(Exception e){
+    		
+    	}
+    	if("Left" == autonSelectString){autonToRun=AutonRoutines.LEFT;}
+    	else if("Right"==autonSelectString){autonToRun=AutonRoutines.RIGHT;}
+    	else if("Center"==autonSelectString){autonToRun=AutonRoutines.CENTER;}
+    	else if("Test Square"==autonSelectString){autonToRun=AutonRoutines.TEST_SQUARE;}
+    	else if("Test Arc"==autonSelectString){autonToRun=AutonRoutines.TEST_ARCH;}
+    	else if("None"==autonSelectString){autonToRun=AutonRoutines.NONE;}
+    	else{autonToRun=AutonRoutines.LEFT;};
     }
     
-    private enum AutonRoutines {TEST_SQUARE, TEST_ARCH, NONE};
     /**
      * called repeatedly during Autonomous
      */
@@ -212,10 +236,15 @@ public class Robot extends IterativeRobot
 
     	SmartDashboard.putNumber("Vision Turn", angleMissAligned);
     	
-    	AutonRoutines autonToRun = AutonRoutines.TEST_SQUARE; 
+    	AutonRoutines autonToRun = AutonRoutines.TEST_LINE; 
     	switch(autonToRun){
     	case TEST_SQUARE:
+    		System.out.print("Auton Square Running");
         	autonDriveSquare();
+    	break;
+    	case TEST_LINE:
+    		System.out.print("Auton Square Running");
+        	autonDriveLine();
     	break;
     	case TEST_ARCH:
         	autonDriveSquare();
@@ -229,45 +258,90 @@ public class Robot extends IterativeRobot
     	}
     }
 
-	/**
-	 * 
-	 */
-	protected void autonDriveSquare() {
-		double sizeOfSquare = 5;//inches
-		double maxSpeed = 3;// ft/sec
+	protected void autonDriveLine() {
+		double sizeOfSquare = 24;//inches
+		double maxSpeed = 3;// ft/sec        		
+		double ramp = 3;// inches      		
+		System.out.println("");
+		System.out.print("Auton Square Running autonomousCase="+autonomousCase);
 		switch(autonomousCase)
     	{
     	case 0:
 //    		m_DriveTrain.ResetEncoders();
 //    		m_DriveTrain.ResetGyro(); //Don't reset, we want it to keep its field oreintation
 
+//    		System.out.print("Auton Square Running Case0");
     		// will return true when the drive distance is coplete
-    		if(m_DriveTrain.DriveDistance(sizeOfSquare, maxSpeed, 7))// Distance in inches, maxspeed in ft/sec, rampupdown,
+    		if(m_DriveTrain.DriveDistance(sizeOfSquare, maxSpeed, ramp))// Distance in inches, maxspeed in ft/sec, rampupdown,
     		{    			
-        		m_DriveTrain.WriteDashboardData();
+        		System.out.print("Auton Square Case0 Done");
+//        		m_DriveTrain.WriteDashboardData();
         		autonomousCase++;
         		System.out.println("Incrementing Case");
     		}; 
+//    		System.out.print("Auton Square Running Case0 end  ");
     		break;
     	case 1:
+//    		System.out.print("Auton Square Running Case1");
+    		if(m_DriveTrain.TurnToAngle(180)){autonomousCase++;}
+    		break;
+    	case 2:
+    		if(m_DriveTrain.TurnToAngle(-180)){autonomousCase++;}
+    		break;
+       	case 4:
+    		if(m_DriveTrain.DriveDistance(-sizeOfSquare, maxSpeed, ramp))// Distance in inches, maxspeed in ft/sec, rampupdown,
+    		{autonomousCase++;}; 
+    		break;
+    	default:
+    		break;
+    	}
+	}
+	/**
+	 * 
+	 */
+	protected void autonDriveSquare() {
+		double sizeOfSquare = 5;//inches
+		double maxSpeed = 3;// ft/sec        		
+		double ramp = 24;// ft/sec        		
+		System.out.println("");
+		System.out.print("Auton Square Running autonomousCase="+autonomousCase);
+		switch(autonomousCase)
+    	{
+    	case 0:
+//    		m_DriveTrain.ResetEncoders();
+//    		m_DriveTrain.ResetGyro(); //Don't reset, we want it to keep its field oreintation
+
+//    		System.out.print("Auton Square Running Case0");
+    		// will return true when the drive distance is coplete
+    		if(m_DriveTrain.DriveDistance(sizeOfSquare, maxSpeed, ramp))// Distance in inches, maxspeed in ft/sec, rampupdown,
+    		{    			
+        		System.out.print("Auton Square Case0 Done");
+//        		m_DriveTrain.WriteDashboardData();
+        		autonomousCase++;
+        		System.out.println("Incrementing Case");
+    		}; 
+//    		System.out.print("Auton Square Running Case0 end  ");
+    		break;
+    	case 1:
+//    		System.out.print("Auton Square Running Case1");
     		if(m_DriveTrain.TurnToAngle(90)){autonomousCase++;}
     		break;
     	case 2:
-    		if(m_DriveTrain.DriveDistance(sizeOfSquare, maxSpeed, 7))// Distance in inches, maxspeed in ft/sec, rampupdown,
+    		if(m_DriveTrain.DriveDistance(sizeOfSquare, maxSpeed, ramp))// Distance in inches, maxspeed in ft/sec, rampupdown,
     		{autonomousCase++;}; 
     		break;
     	case 3:
     		if(m_DriveTrain.TurnToAngle(90)){autonomousCase++;}
     		break;
        	case 4:
-    		if(m_DriveTrain.DriveDistance(sizeOfSquare, maxSpeed, 7))// Distance in inches, maxspeed in ft/sec, rampupdown,
+    		if(m_DriveTrain.DriveDistance(sizeOfSquare, maxSpeed, ramp))// Distance in inches, maxspeed in ft/sec, rampupdown,
     		{autonomousCase++;}; 
     		break;
      	case 5:
      		if(m_DriveTrain.TurnToAngle(90)){autonomousCase++;}
     		break;
     	case 6:
-    		if(m_DriveTrain.DriveDistance(sizeOfSquare, maxSpeed, 7))// Distance in inches, maxspeed in ft/sec, rampupdown,
+    		if(m_DriveTrain.DriveDistance(sizeOfSquare, maxSpeed, ramp))// Distance in inches, maxspeed in ft/sec, rampupdown,
     		{autonomousCase++;}; 
     		break;
     	case 7:
@@ -299,62 +373,77 @@ public class Robot extends IterativeRobot
 //Instead use light to indicate info about targeting teleopLightLoops++;
     }
 
+    private ButtonStatus buttonTracker(boolean thisTime, ButtonStatus lastTime){
+//    	{DOWN, UP, JUST_PRESSED, JUST_RELEASED };
+    	ButtonStatus toReturn = null;
+
+		if(thisTime==true){
+			if(lastTime==ButtonStatus.DOWN){
+				toReturn = ButtonStatus.DOWN;
+			}
+			// else it was UP, JUST_PRESSED, or JUST_RELEASED in all cases
+			else if (lastTime==ButtonStatus.UP){
+				toReturn =  ButtonStatus.JUST_PRESSED;
+			}
+		}
+		// so must be UP
+		else {
+			if(lastTime==ButtonStatus.UP){
+				toReturn =  ButtonStatus.UP;
+			}
+			// else it was UP, JUST_PRESSED, or JUST_RELEASED in all cases
+			else if (lastTime==ButtonStatus.DOWN){
+				toReturn = ButtonStatus.JUST_RELEASED;
+			}
+		}
+		return toReturn;
+    }
 	/**
 	 * 
 	 */
 	protected void manageShootingAndDriving() {
-
+		ButtonStatus driverLeftBumperButton  = buttonTracker(m_RobotInterface.GetDriverLeftBumper(),driverLeftBumperButtonLastTime); 		
+		ButtonStatus driverRightBumperButton  = buttonTracker(m_RobotInterface.GetDriverRightBumper(),driverRightBumperButtonLastTime); 		
+		
+    	m_DriveTrain.WriteDashboardData();
+        SmartDashboard.putString("Alliance", DriverStation.getInstance().getAlliance().toString());
     	//Drivetrain
         // if button pressed then align, bring shooter up to speed  and Shoot
-    	if(m_RobotInterface.GetDriverRightBumper())
-    	{
-        
-        SmartDashboard.putString("Alliance", DriverStation.getInstance().getAlliance().toString());
-    	
-//    		if(!(Math.abs(previousVisionTurn) == visionAngleMissAligned))
-    		{
-    			previousVisionTurn = visionAngleMissAligned;
-        		visionAlign(visionAngleMissAligned);
-    		}
-    	}
-    	// button not pressed
-    	else
-    	{
-    		
-//    		if(m_DriveTrain.isTurnPIDFinished())
-//        	{
-        		isVisionTurnRunning = false;
-        		m_DriveTrain.DisablePIDControlTurn();
-//        	}
-//    	}
-//    	else if(!isVisionTurnRunning)
+//    	if(m_RobotInterface.GetDriverRightBumper())
 //    	{
+//    		{
+//   			previousVisionTurn = visionAngleMissAligned;
+//        		visionAlign(visionAngleMissAligned);
+//    		}
+//    	}
+//    	// button not pressed
+//    	else
+//    	{
+//        	isVisionTurnRunning = false;
+//        	m_DriveTrain.DisablePIDControlTurn();
+//        	arcadeDrive();
+//        	arcadeDriveGyroAssist();
+//    	}
+        if(driverRightBumperButton == ButtonStatus.DOWN || driverRightBumperButton == ButtonStatus.JUST_PRESSED ){
+        	alignAndShootAutoTrigger();
+        }
+        else if(driverRightBumperButton == ButtonStatus.JUST_RELEASED){
+    		m_DriveTrain.DisablePIDControlsAll();
+    		m_Shooter.DisablePID();
+    		m_Shooter.SetTalonOutput(0);
+        }
+        // Finger is off the AutoShoot button, see if they just want us to align and they will say when to shoot?
+        else if(driverLeftBumperButton == ButtonStatus.DOWN || driverLeftBumperButton == ButtonStatus.JUST_PRESSED){
+        	alignAndShootManualTrigger();
+        }
+        else if(driverLeftBumperButton == ButtonStatus.JUST_RELEASED){
+        	m_DriveTrain.DisablePIDControlsAll();
+        }
+        else{
         	arcadeDrive();
 //        	arcadeDriveGyroAssist();
-    	}
-    	m_DriveTrain.WriteDashboardData();
-    	
-    	//Shooter methods
-//    	shoot();
-//        public void shoot()
-//        {
-        	if(m_RobotInterface.GetDriverRightBumper())//if(the Driver's Joystick's right bumper button is pressed)
-        	{
-        		alignAndShootAutoTrigger();
-        	}
-        	// Finger is off the AutoShoot button, see if they just want us to align and they will say when to shoot?
-        	else if(m_RobotInterface.GetDriverLeftBumper())//if(the Driver's Joystick's right bumper button is pressed)
-            {
-            	alignAndShootManualTrigger();
-            }
-        	else
-        	{
-        		manageLightsForVisionTargetAcquired();
-
-        		m_DriveTrain.DisablePIDControlTurn();
-        		m_Shooter.DisablePID();
-        		m_Shooter.SetTalonOutput(0);
-        	}
+        }
+        manageLightsForVisionTargetAcquired();
 	}
 
 
@@ -363,18 +452,26 @@ public class Robot extends IterativeRobot
 	 */
 	protected void alignAndShootAutoTrigger() {
 		
-		turnOnShooterWheel();
+		runShooterWheel();
 		
 		// Turn Red lights on so know aligned to target
 		if(m_Shooter.ShooterOnTarget())
 		{
 			m_LightSystem.setRedState(true);
 		}
+		else
+		{
+			m_LightSystem.setRedState(false);
+		}
 		
 		// Turn Blue light on to know Shooter Wheel is up to speed
 		if(Math.abs(visionAngleMissAligned)<1 )// if shooter spining at speed and Angle MissAligned is less then 1 Degree
 		{
 			m_LightSystem.setBlueState(true);
+		}
+		else
+		{
+			m_LightSystem.setBlueState(false);
 		}
 		
 		//Shooter is ready to fire, Add the Green ;light indicating we are firing
@@ -392,7 +489,7 @@ public class Robot extends IterativeRobot
 	/**
 	 * 
 	 */
-	protected void turnOnShooterWheel() {
+	protected void runShooterWheel() {
 		
     	double lidarDistanceFt = m_RobotSensors.getLidar().getDistanceFt();
         SmartDashboard.putNumber("LidarDistanceFt", lidarDistanceFt);
@@ -421,7 +518,7 @@ public class Robot extends IterativeRobot
 	}
 
 	protected void alignAndShootManualTrigger() {
-		turnOnShooterWheel();
+		runShooterWheel();
 		// Turn Red lights on so know aligned to target
 		if(m_Shooter.ShooterOnTarget())
 		{
@@ -448,7 +545,7 @@ public class Robot extends IterativeRobot
 	 */
 	protected void manageLightsForVisionTargetAcquired() {
 		//STOP
-		System.out.print("in manageLightsForVisionTargetAcquired visionHasTarget="+visionHasTarget+" BlinkCount="+blinkCounterForHaveTarget);
+//		System.out.print("in manageLightsForVisionTargetAcquired visionHasTarget="+visionHasTarget+" BlinkCount="+blinkCounterForHaveTarget);
 		// Blink the lights if have a vision target
 		if(visionHasTarget){
 			if(m_LightSystem.getGreenState())
@@ -487,9 +584,10 @@ public class Robot extends IterativeRobot
     //Drivetrain methods
     public void arcadeDrive()
     {
+    	m_DriveTrain.DisablePIDControlsAll();
     	m_DriveTrain.ArcadeDrive(
-    			m_RobotInterface.GetDriverJoystick().getRawAxis(m_RobotInterface.GetDriverForwardPowerAxis()),
-    			m_RobotInterface.GetDriverJoystick().getRawAxis(m_RobotInterface.GetDriverRotationPowerAxis()) );
+    		m_RobotInterface.GetDriverJoystick().getRawAxis(m_RobotInterface.GetDriverForwardPowerAxis()),
+   			m_RobotInterface.GetDriverJoystick().getRawAxis(m_RobotInterface.GetDriverRotationPowerAxis()) );
     }
 
     public void arcadeDriveGyroAssist()
@@ -503,12 +601,6 @@ public class Robot extends IterativeRobot
     	
     	m_DriveTrain.TurnToAngle(turn);
 
-		isVisionTurnRunning = true;	
-    	if(m_DriveTrain.isTurnPIDFinished())
-    	{
-    		isVisionTurnRunning = false;
-    		m_DriveTrain.DisablePIDControlsAll();
-    	}
     }
     
     //Shooter methods

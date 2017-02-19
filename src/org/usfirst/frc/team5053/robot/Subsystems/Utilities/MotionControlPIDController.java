@@ -30,6 +30,11 @@ public class MotionControlPIDController extends PIDController {
 	public MotionControlHelper getMotionControlHelper(){
 		return m_motionControlHelper;
 	}
+	
+	public void setMotionControlHelper(MotionControlHelper helper){
+		this.m_pidInput= helper.getM_source();
+		this.m_pidOutput=helper.getM_output();
+	}
 
 
 	public MotionControlPIDController(double Kp, double Ki, double Kd, 

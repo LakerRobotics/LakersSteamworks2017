@@ -2,6 +2,9 @@ package org.usfirst.frc.team5053.robot.constants;
 
 public class RobotValuesMackinac extends RobotValues {
 	
+	public  boolean getRightDriveInverted(){return true;};
+	public  boolean getLeftDriveInverted(){return true;};
+	
 	public  int getIntakePWM(){return 2;};
 	public  int getIndexerPWM(){return 3;};
 	public  int getShooterPWM(){return 4;};

@@ -10,13 +10,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public  class RobotConstants {
 	private static RobotValues robotWeAreRunningOn;
 	private static String robotName;
-	
+	//basicAutonSelect
 	static{
-    	robotName = SmartDashboard.getString("robotName","Rudy");//Default to "Mackinaw" if don't get a value
+    	robotName = SmartDashboard.getString("robotName","LilGeek");//Default to "Mackinaw" if don't get a value
     	if("Mackinaw"==robotName){ robotWeAreRunningOn = new RobotValuesMackinac();};
     	if("LilGeek"==robotName){ robotWeAreRunningOn = new RobotValuesLilGeek();};
     	if("Rudy"==robotName){ robotWeAreRunningOn = new RobotValuesRudy();};
 	}
+
+	public static boolean getRightDriveInverted(){return robotWeAreRunningOn.getRightDriveInverted();};
+	public static boolean getLeftDriveInverted(){return robotWeAreRunningOn.getLeftDriveInverted();};
+	
 	public static int getIntakePWM(){return robotWeAreRunningOn.getIntakePWM();};//2);
 	public static int getIndexerPWM(){return robotWeAreRunningOn.getIndexerPWM();};//3);
 	public static int getShooterPWM(){return robotWeAreRunningOn.getShooterPWM();};
