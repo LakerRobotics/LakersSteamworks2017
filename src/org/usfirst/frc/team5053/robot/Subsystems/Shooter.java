@@ -48,6 +48,5 @@ public class Shooter implements Subsystem{
 	}
 	public void WriteDashboardData() {
 		SmartDashboard.putNumber("shooterDriveEncoder", m_Encoder.getRate());
-		System.out.println("Shooter Encoder Rate: " + Double.toString(m_Encoder.getRate()));
 	}
 }

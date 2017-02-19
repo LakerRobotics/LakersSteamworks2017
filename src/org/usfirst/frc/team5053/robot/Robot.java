@@ -89,6 +89,7 @@ public class Robot extends IterativeRobot
 	//Misc Variables
 	private int autonomousCase;
 	private int autonomousWait;
+	private int allianceSide;
 	private int teleopLightLoops;
 	private double shooterRPM;
 	
@@ -126,6 +127,15 @@ public class Robot extends IterativeRobot
     	
         centerX = 0.0;
     	autonomousCase = 0;
+    	switch(DriverStation.getInstance().getAlliance())
+    	{
+    	case Red:
+    		allianceSide = 1;
+    		break;
+    	case Blue:
+    		allianceSide = -1;
+    		break;
+    	}
     	previousVisionTurn = 0;
     	teleopLightLoops = 0;
     	isVisionTurnRunning = false;
@@ -168,11 +178,8 @@ public class Robot extends IterativeRobot
     	
     	switch(SmartDashboard.getInt("autonRoutine", 0))
     	{
-    	case 0:
-    		autonShootClose(turn);
-    		break;
     	default:
-    		autonShootClose(turn);
+    		autonRightGear();
     		break;
     	}
     	
@@ -180,15 +187,14 @@ public class Robot extends IterativeRobot
 		m_Shooter.WriteDashboardData();
     }
     
-    public void autonShootClose(double visionTurn)
+    public void autonLeftGearShoot(double visionTurn)
     {
     	switch(autonomousCase)
     	{
-    	//TODO Invert
     	case 0: //Drive out from wall
     		m_DriveTrain.ResetEncoders();
     		m_DriveTrain.ResetGyro();
-    		m_DriveTrain.DriveDistance(50 /*Distance to peg-start intersection*/, 4, 2);
+    		m_DriveTrain.DriveDistance(60 /*Distance to peg-start intersection*/, 4, 2);
     		autonomousCase++;
     		break;
     	case 1: //Turn to face the gear peg
@@ -196,7 +202,7 @@ public class Robot extends IterativeRobot
     		{
     			m_DriveTrain.ResetEncoders();
         		m_DriveTrain.ResetGyro();
-        		m_DriveTrain.TurnToAngle(55/*angle to face the boiler*/);
+        		m_DriveTrain.TurnToAngle(55*allianceSide/*angle to face the boiler*/);
     			autonomousCase++;
     		}
     		break;
@@ -205,7 +211,7 @@ public class Robot extends IterativeRobot
     		{
     			m_DriveTrain.ResetEncoders();
     			m_DriveTrain.ResetGyro();
-    			m_DriveTrain.DriveDistance(95/*distance to airship*/, 4, 2);
+    			m_DriveTrain.DriveDistance(80/*distance to airship*/, 4, 2);
     			autonomousCase++;
     		}
     		break;
@@ -217,7 +223,7 @@ public class Robot extends IterativeRobot
     			{
         			m_DriveTrain.ResetEncoders();
             		m_DriveTrain.ResetGyro();
-            		m_DriveTrain.DriveDistance(-95/*distance back to the intersection*/, 4, 2);
+            		m_DriveTrain.DriveDistance(-80/*distance back to the intersection*/, 4, 2);
             		autonomousWait = 0;
         			autonomousCase++;
     			}
@@ -228,7 +234,7 @@ public class Robot extends IterativeRobot
     		{
         		m_DriveTrain.ResetEncoders();
         		m_DriveTrain.ResetGyro();
-        		m_DriveTrain.TurnToAngle(165/*Turns the robot around so the high goal is within view for vision targeting*/);
+        		m_DriveTrain.TurnToAngle(120*allianceSide/*Turns the robot around so the high goal is within view for vision targeting*/);
         		autonomousCase++;
     		}
     		break;
@@ -237,7 +243,11 @@ public class Robot extends IterativeRobot
     		{
         		m_DriveTrain.ResetEncoders();
         		m_DriveTrain.ResetGyro();
-        		visionAlign(visionTurn /*Vision turn aligns to the reflective tape on the high goal*/);
+        		if(!(Math.abs(previousVisionTurn) == visionTurn))
+        		{
+        			previousVisionTurn = visionTurn;
+            		visionAlign(visionTurn /*Vision turn aligns to the reflective tape on the high goal*/);
+        		}
         		autonomousCase++;
     		}
     		break;
@@ -273,7 +283,7 @@ public class Robot extends IterativeRobot
     		{
     			m_DriveTrain.ResetEncoders();
         		m_DriveTrain.ResetGyro();
-        		m_DriveTrain.TurnToAngle(-60/*angle to face the boiler*/);
+        		m_DriveTrain.TurnToAngle(-60*allianceSide/*angle to face the boiler*/);
     			autonomousCase++;
     		}
     		break;
@@ -305,7 +315,7 @@ public class Robot extends IterativeRobot
     		{
         		m_DriveTrain.ResetEncoders();
         		m_DriveTrain.ResetGyro();
-        		m_DriveTrain.TurnToAngle(180/*Turns the robot around so the high goal is within view for vision targeting*/);
+        		m_DriveTrain.TurnToAngle(180*allianceSide/*Turns the robot around so the high goal is within view for vision targeting*/);
         		autonomousCase++;
     		}
     		break;
@@ -335,18 +345,126 @@ public class Robot extends IterativeRobot
     	}
     }
     
+    public void autonCenterGearShoot(double visionTurn)
+    {
+    	switch(autonomousCase)
+    	{
+    	case 0: //Drive out from wall
+    		m_DriveTrain.ResetEncoders();
+    		m_DriveTrain.ResetGyro();
+    		m_DriveTrain.DriveDistance(75 /*Distance to peg-start intersection*/, 10, 1);
+    		autonomousCase++;
+    		break;
+    	case 1: //Turn to face the gear peg
+    		if(m_DriveTrain.isStraightPIDFinished())
+    		{
+    			autonomousWait++;
+    			if(autonomousWait >= 150)
+				{
+					m_DriveTrain.ResetEncoders();
+		    		m_DriveTrain.ResetGyro();
+		    		m_DriveTrain.DriveDistance(-24/*angle to face the boiler*/, 10, 1);
+					autonomousCase++;
+    			}
+    		}
+    		break;
+    	case 2:
+    		if(m_DriveTrain.isStraightPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+    			m_DriveTrain.ResetGyro();
+    			m_DriveTrain.TurnToAngle(-115*allianceSide);
+    			autonomousCase++;
+    		}
+    		break;
+    	case 3:
+    		if(m_DriveTrain.isTurnPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+    			m_DriveTrain.ResetGyro();
+    			if(!(Math.abs(previousVisionTurn) == visionTurn))
+        		{
+        			previousVisionTurn = visionTurn;
+            		visionAlign(visionTurn /*Vision turn aligns to the reflective tape on the high goal*/);
+        		}
+    			autonomousCase++;
+    		}
+    	case 4:
+    		if(!isVisionTurnRunning)
+    		{
+    			m_DriveTrain.ResetEncoders();
+    			m_DriveTrain.ResetGyro();
+    			autonomousCase++;
+    		}
+    	}
+    }
+    
+    public void autonRightGear()
+	{
+		switch(autonomousCase)
+    	{
+    	case 0: //Drive out from wall
+    		m_DriveTrain.ResetEncoders();
+    		m_DriveTrain.ResetGyro();
+    		m_DriveTrain.DriveDistance(60 /*Distance to peg-start intersection*/, 4, 2);
+    		autonomousCase++;
+    		break;
+    	case 1: //Turn to face the gear peg
+    		if(m_DriveTrain.isStraightPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+        		m_DriveTrain.ResetGyro();
+        		m_DriveTrain.TurnToAngle(-55*allianceSide/*angle to face the boiler*/);
+    			autonomousCase++;
+    		}
+    		break;
+    	case 2: //Engage Peg
+    		if(m_DriveTrain.isTurnPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+    			m_DriveTrain.ResetGyro();
+    			m_DriveTrain.DriveDistance(85/*distance to airship*/, 4, 2);
+    			autonomousCase++;
+    		}
+    		break;
+    	case 3: //Disengage Peg
+    		if(m_DriveTrain.isStraightPIDFinished())
+    		{
+    			autonomousWait++;
+    			if(autonomousWait >= 150)
+    			{
+        			m_DriveTrain.ResetEncoders();
+            		m_DriveTrain.ResetGyro();
+            		m_DriveTrain.DriveDistance(-24/*distance back to the intersection*/, 4, 2);
+            		autonomousWait = 0;
+        			autonomousCase++;
+    			}
+    		}
+    		break;
+    	case 4:
+    		if(m_DriveTrain.isStraightPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+    			m_DriveTrain.ResetGyro();
+    			autonomousCase++;
+    		}
+    	}
+	}
     
     
     
     
-    
-    
-
     public void teleopPeriodic()
     {
     	/**
          * This function is called periodically during operator control
          */
+    	
+    	if(autonomousCase != 0)
+    	{
+    		autonomousCase = 0;
+    		m_DriveTrain.DisablePIDControl();
+    	}
     	
     	GetDashboardData();
     	WriteDashboardData();
