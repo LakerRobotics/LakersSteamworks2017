@@ -104,7 +104,7 @@ public class MotionController {
 				
 				//Instantiates a new MotionControlPIDController() object for the new turn segment using the previous MotionControlHelper()
 				m_TurnPIDController = new MotionControlPIDController(TurnKp, TurnKi, TurnKd, m_TurnControl);
-				m_TurnPIDController.setOutputRange(-0.7, 0.7);
+				m_TurnPIDController.setOutputRange(-1.0, 1.0);
 				
 				//Turns the MotionControlPID ON and it will continue to execute by itself until told otherwise.
 				m_TurnPIDController.enable();	

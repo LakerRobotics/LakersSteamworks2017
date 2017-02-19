@@ -117,6 +117,7 @@ public class Robot extends IterativeRobot
     	m_LightSystem = new LightSystem(m_RobotSensors.getRed(), m_RobotSensors.getBlue(), m_RobotSensors.getGreen(), DriverStation.getInstance().getAlliance());
     	m_LightSystem.setDefault();
     	m_Lidar = m_RobotSensors.getLidar();
+    	m_Lidar.start();
     	
     	m_Camera = CameraServer.getInstance().startAutomaticCapture();
 		
@@ -451,6 +452,45 @@ public class Robot extends IterativeRobot
     	}
 	}
     
+    public void temporaryTestAuton()
+    {
+    	switch(autonomousCase)
+    	{
+    	case 0:
+    		m_DriveTrain.ResetEncoders();
+			m_DriveTrain.ResetGyro();
+    		m_DriveTrain.DriveDistance(24, 4, 7);
+			autonomousCase++;
+			break;
+    	case 1:
+    		if(m_DriveTrain.isStraightPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+    			m_DriveTrain.ResetGyro();
+    			m_DriveTrain.DriveDistance(-24, 1, 2);
+    			autonomousCase++;
+    		}
+    		break;
+    	case 2:
+    		if(m_DriveTrain.isStraightPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+    			m_DriveTrain.ResetGyro();
+    			m_DriveTrain.TurnToAngle(90);
+    			autonomousCase++;
+    		}
+    		break;
+    	case 3:
+    		if(m_DriveTrain.isTurnPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+    			m_DriveTrain.ResetGyro();
+    			m_DriveTrain.DisablePIDControl();
+    			autonomousCase++;
+    		}
+    	}
+    }
+    
     
     
     
@@ -540,15 +580,8 @@ public class Robot extends IterativeRobot
     {
     	if(m_RobotInterface.GetDriverRightBumper())
     	{
-    		//Enable the PID Controller for the Shooter
-    		if(m_Lidar.isWorking())
-    		{
-    			m_Shooter.SetShooterSetpoint(calculateShooterRPM());
-    		}
-    		else
-    		{
-        		m_Shooter.SetShooterSetpoint(DEFAULT_SHOOTER_RATE);
-    		}
+    		//Enable the PID controller for the shooter using a rate calculated using our lidar sensor
+			m_Shooter.SetShooterSetpoint(calculateShooterRPM());
     		
     		m_Shooter.EnablePID();
     		
@@ -568,10 +601,9 @@ public class Robot extends IterativeRobot
     	}
     	else if(m_RobotInterface.GetDriverX())
     	{
+    		//Enable the PID controller for the shooter using a rate calculated read from the dashboard
     		m_Shooter.SetShooterSetpoint(shooterRPM);
     	   	m_Shooter.EnablePID();
-
-        	m_Shooter.WriteDashboardData();
         	
     		if(m_Shooter.ShooterOnTarget())
         	{
@@ -671,7 +703,6 @@ public class Robot extends IterativeRobot
     public void GetDashboardData()
     {
     	shooterRPM = SmartDashboard.getNumber("shooterRPM", DEFAULT_SHOOTER_RATE);
-    	System.out.println(shooterRPM);
     	//Use this to retrieve values from the Driver Station
     	//e.g Which autonomous to use or processed image information.
     }
@@ -679,5 +710,6 @@ public class Robot extends IterativeRobot
     {
     	m_DriveTrain.WriteDashboardData();
     	m_Shooter.WriteDashboardData();
+    	SmartDashboard.putNumber("lidar", m_Lidar.getDistanceFt());
     }
 }

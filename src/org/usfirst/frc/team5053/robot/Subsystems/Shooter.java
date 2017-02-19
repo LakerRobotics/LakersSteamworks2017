@@ -12,7 +12,7 @@ public class Shooter implements Subsystem{
 	private Encoder m_Encoder;
 	private PIDController m_PID;
 	
-	private double KP = 0.001;
+	private double KP = 0.0001;
 	private double KI = 5.0E-4;
 	private double KD = 0.0;
 	
@@ -22,9 +22,8 @@ public class Shooter implements Subsystem{
 		m_Shooter = shooterTalon;
 		m_Encoder = shooterEncoder;
 		
-		m_Encoder.setPIDSourceType(PIDSourceType.kRate);
-		
 		m_PID = new PIDController(KP, KI, KD, m_Encoder, m_Shooter);
+		m_PID.setOutputRange(0.0, 1.0);
 		m_PID.setAbsoluteTolerance(PERCENT_TOLERANCE);
 	}
 	
@@ -47,6 +46,6 @@ public class Shooter implements Subsystem{
 		m_Shooter.set(speed);
 	}
 	public void WriteDashboardData() {
-		SmartDashboard.putNumber("shooterDriveEncoder", m_Encoder.getRate());
+		SmartDashboard.putNumber("shooterDriveEncoder", m_Encoder.pidGet());
 	}
 }
