@@ -24,11 +24,12 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		// This is just a simple P control, Proportional control of the line follow
 		// if we assume angle is in degrees and if we were off by 20 Degrees then we would want how much correction
 		// for example id Kp is 0.025 at 20 degrees we would have 0.5 or half the power toward rotating the robot 
-		double Kp = 0d/20d; //0.025;// 
-		DriveTrainMotionControl m_driveTrain;
-		PIDSource m_TurnSource;
-		double m_targetAngle = 0.0d;
-		double rotationPower = 0.0d;
+		private double Kp = 0d/20d; //0.025;// 
+		private DriveTrainMotionControl m_driveTrain;
+		private PIDSource m_TurnSource;
+		private double m_targetAngle = 0.0d;
+		private double rotationPower = 0.0d;
+		private MotionControlPIDController m_RotationController;
 
 		public StraightMotionPIDOutput(DriveTrainMotionControl drivetrain, PIDSource turnSource, double targetAngle) {
 			m_targetAngle = targetAngle;
@@ -38,7 +39,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 			double slowRotation = m_targetAngle + 90;
 			WrapRotationPIDOutput wrappedRotationPIDOutput =  new WrapRotationPIDOutput(this);
 			
-			createRotationPIDController(m_targetAngle, slowRotation, wrappedRotationPIDOutput);
+			m_RotationController = createRotationPIDController(m_targetAngle, slowRotation, wrappedRotationPIDOutput);
 			
 			//WrapRotationPIDInput  wrapRotationPIDInput = new WrapRotationPIDOutput(rotationPID, (PIDSource) m_gyro);
 		}
@@ -114,7 +115,10 @@ import edu.wpi.first.wpilibj.PIDOutput;
 			}
 
 	    }
-
-
-
+	    
+	    public void disableRotationController()
+	    {
+	    	m_RotationController.disable();
+	    	m_RotationController.free();
+	    }
 	}

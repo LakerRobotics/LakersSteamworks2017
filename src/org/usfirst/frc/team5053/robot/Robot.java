@@ -232,8 +232,11 @@ public class Robot extends IterativeRobot
     	case 5: //Vision align to high boiler
     		if(m_DriveTrain.isTurnPIDFinished())
     		{
-        		m_DriveTrain.ResetEncoders();
-        		m_DriveTrain.ResetGyro();
+    			if(!isVisionTurnRunning)
+    			{
+        			m_DriveTrain.ResetEncoders();
+        			m_DriveTrain.ResetGyro();
+    			}
         		if(!(Math.abs(previousVisionTurn) == visionTurn))
         		{
         			previousVisionTurn = visionTurn;
@@ -294,8 +297,11 @@ public class Robot extends IterativeRobot
     	case 3: //Vision align to high goal
     		if(m_DriveTrain.isTurnPIDFinished())
     		{
-    			m_DriveTrain.ResetEncoders();
-    			m_DriveTrain.ResetGyro();
+    			if(!isVisionTurnRunning)
+    			{
+        			m_DriveTrain.ResetEncoders();
+        			m_DriveTrain.ResetGyro();
+    			}
     			if(!(Math.abs(previousVisionTurn) == visionTurn))
         		{
         			previousVisionTurn = visionTurn;

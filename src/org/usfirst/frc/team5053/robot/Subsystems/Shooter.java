@@ -39,6 +39,7 @@ public class Shooter implements Subsystem {
 		if (isPIDEnabled())
 		{
 			m_PID.disable();
+			m_PID.free();
 		}
 	}
 	public boolean isPIDEnabled() {

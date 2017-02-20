@@ -12,6 +12,7 @@ public class MotionController {
 	MotionControlHelper m_TurnControl;
 	
 	MotionControlPIDController m_StraightPIDController;
+	StraightMotionPIDOutput m_StraightPIDOutput;
 	MotionControlPIDController m_TurnPIDController;
 	
 	private double m_targetDistance;
@@ -39,12 +40,13 @@ public class MotionController {
 		m_TurnSource = turnSource;
 		
 		m_StraightPIDController = null;
+		m_StraightPIDOutput = null;
 		m_TurnPIDController = null;
 		
 		
 		m_targetDistance = 0;
 		m_targetAngle = 0;
-		m_straightTolerance = 5;
+		m_straightTolerance = 10;
 		m_turnTolerance = 2;
 		m_PIDEnabled = false;
 		
@@ -66,7 +68,8 @@ public class MotionController {
 			if (!(Math.abs(m_DriveTrain.GetLeftDistance()) > Math.abs(m_targetDistance)))
 			{
 				//Instantiates a new MotionControlHelper() object for the new drive segment
-				m_StraightControl = new MotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_StraightSource, new StraightMotionPIDOutput(m_DriveTrain, m_TurnSource, m_targetAngle));
+				m_StraightPIDOutput = new StraightMotionPIDOutput(m_DriveTrain, m_TurnSource, m_targetAngle);
+				m_StraightControl = new MotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_StraightSource, m_StraightPIDOutput);
 				
 				//Instantiates a new MotionControlPIDController() object for the new drive segment using the previous MotionControlHelper()
 				m_StraightPIDController = new MotionControlPIDController(StraightKp, StraightKi, StraightKd, m_StraightControl);
@@ -122,8 +125,7 @@ public class MotionController {
 		 * Called while waiting for the MotionControlPID to finish. The PID will be disabled when the end condition is met, and
 		 * the return value indicates you can proceed to the next step.
 		 * */
-		//TODO Tolerance
-		if (Math.abs(m_DriveTrain.GetLeftDistance()) > Math.abs(m_targetDistance))
+		if (Math.abs(m_DriveTrain.GetLeftDistance()-m_targetDistance) > Math.abs(m_straightTolerance))
 		{
 			m_StraightPIDController.disable();
 			m_DriveTrain.ArcadeDrive(0, 0);
@@ -156,10 +158,13 @@ public class MotionController {
 		if(m_TurnPIDController != null)
 		{
 			m_TurnPIDController.disable();
+			m_StraightPIDOutput.disableRotationController();
+			m_TurnPIDController.free();
 		}
 		if(m_StraightPIDController != null)
 		{
 			m_StraightPIDController.disable();
+			m_StraightPIDController.free();
 		}
 	}
 }
