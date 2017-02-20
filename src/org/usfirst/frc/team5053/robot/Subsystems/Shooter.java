@@ -6,14 +6,14 @@ import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Shooter implements Subsystem{
+public class Shooter implements Subsystem {
 
 	private Talon m_Shooter;
 	private Encoder m_Encoder;
 	private PIDController m_PID;
 	
-	private double KP = 0.0001;
-	private double KI = 5.0E-4;
+	private double KP = 0.001;
+	private double KI = 0.005;
 	private double KD = 0.0;
 	
 	private double PERCENT_TOLERANCE = 0.5;
@@ -28,16 +28,31 @@ public class Shooter implements Subsystem{
 	}
 	
 	public void EnablePID() {
-		m_PID.enable();
+		if (!isPIDEnabled())
+		{
+			m_PID.enable();
+		}
+		
 	}
 	public void DisablePID() {
 		m_PID.disable();
+		if (isPIDEnabled())
+		{
+			m_PID.disable();
+		}
 	}
 	public boolean isPIDEnabled() {
 		return m_PID.isEnabled();
 	}
 	public boolean ShooterOnTarget() {
-		return m_PID.onTarget();
+		if(Math.abs(m_Encoder.pidGet()) >= Math.abs(m_PID.getSetpoint()*(1-PERCENT_TOLERANCE)) && Math.abs(m_Encoder.pidGet()) <= Math.abs(m_PID.getSetpoint()*(1+PERCENT_TOLERANCE)))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 	public void SetShooterSetpoint(double speed) {
 		m_PID.setSetpoint(speed);
@@ -46,6 +61,7 @@ public class Shooter implements Subsystem{
 		m_Shooter.set(speed);
 	}
 	public void WriteDashboardData() {
+		SmartDashboard.putNumber("Shooter Setpoint", m_PID.getSetpoint());
 		SmartDashboard.putNumber("shooterDriveEncoder", m_Encoder.pidGet());
 	}
 }

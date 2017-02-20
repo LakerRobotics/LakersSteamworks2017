@@ -50,6 +50,8 @@ public class RobotSensorMap
 		m_LeftDrive = new Encoder(leftDriveEncoderADIO, leftDriveEncoderBDIO);
 		m_RightDrive = new Encoder(rightDriveEncoderADIO, rightDriveEncoderBDIO);
 		m_Shooter = new Encoder(shooterEncoderADIO, shooterEncoderBDIO, false, EncodingType.k1X);
+		m_Shooter.setSamplesToAverage(60);
+		m_Shooter.setMaxPeriod(0.02);
 		
 		//TODO 360 -> 1024
 		m_LeftDrive.setDistancePerPulse(6*Math.PI/1024); //Distance in inches
