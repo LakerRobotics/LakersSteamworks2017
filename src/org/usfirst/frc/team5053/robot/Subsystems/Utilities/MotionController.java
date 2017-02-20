@@ -30,13 +30,21 @@ public class MotionController {
 //	private boolean m_PIDEnabled; --> replaced with m_PIDControlType
 	private enum PIDControlType{DISTANCE, SPIN, ALIGN, ARCH, JOYSTICK_GYRO_ASSIST, OFF};
 	private PIDControlType m_PIDControlType;
-	
-	private final double spinKp = 0.9;
-	private final double spinKi = 0.0;
+	/* from Rudy
+	 *     double     ramp =  10; //degrees
+    double maxspeed = 20; //degrees/second
+    double    start =   0; //degrees
+    MotionControlHelper rotationSpeedProfile; 
+    
+    final double Kp = 0.0005;
+    final double Ki = 0.0005;
+	 */
+	private final double spinKp = 0.0005;
+	private final double spinKi = 0.0005;
 	private final double spinKd = 0.0;
 	
-	private final double archKp = 0.9;
-	private final double archKi = 0.0;
+	private final double archKp = 0.0005;
+	private final double archKi = 0.0005;
 	private final double archKd = 0.0;
 	
 	private final double StraightKp = 0.005;

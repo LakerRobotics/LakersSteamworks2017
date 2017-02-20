@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		PIDSource m_TurnSource;
 		double m_targetAngle = 0.0d;
 		double rotationPower = 0.0d;
-		private final double POWER_MODIFIER = .5;
 
 		public StraightMotionPIDOutput(DriveTrainMotionControl drivetrain, PIDSource turnSource, double targetAngle) {
 			m_targetAngle = targetAngle;
@@ -90,7 +89,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		    MotionControlHelper rotationSpeedProfile; 
 	        rotationSpeedProfile = new MotionControlHelper(targetAngle, ramp, maxspeed, start, m_TurnSource, pidOutput);
 	        localRotationSpeedPID = new MotionControlPIDController(Kp,Ki,Kd, rotationSpeedProfile );
-	        localRotationSpeedPID.setOutputRange(-1.0*POWER_MODIFIER, 1.0*POWER_MODIFIER);
+	        localRotationSpeedPID.setOutputRange(-1.0, 1.0);
 	        localRotationSpeedPID.enable();
 		    return localRotationSpeedPID;
 		}
