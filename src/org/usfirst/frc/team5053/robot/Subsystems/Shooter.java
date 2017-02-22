@@ -13,7 +13,7 @@ public class Shooter implements Subsystem {
 	private PIDController m_PID;
 	
 	private double KP = 0.001;
-	private double KI = 0.005;
+	private double KI = 0.05;
 	private double KD = 0.0;
 	
 	private double PERCENT_TOLERANCE = 0.5;

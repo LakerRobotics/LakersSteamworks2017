@@ -69,7 +69,7 @@ public class Robot extends IterativeRobot
 	private final double INTAKE_SPEED = .7;
 	private final double MIXER_SPEED = .7;
 	private final double INDEXER_SPEED = .7;
-	private final double SCALER_SPEED = .7;
+	private final double SCALER_SPEED = -1.0;
 
 	//Vision constants
 	private final int IMG_WIDTH		= 320;
@@ -379,6 +379,8 @@ public class Robot extends IterativeRobot
     	/**
          * This function is called periodically during operator control
          */
+    	runShooter();
+    	runIndexer();
     	
     	if(autonomousCase != 0)
     	{
@@ -458,7 +460,9 @@ public class Robot extends IterativeRobot
     //Shooter methods
     public void runShooter()
     {
-    	if(m_RobotInterface.GetDriverRightBumper())
+    	GetDashboardData();
+    //	if(m_RobotInterface.GetDriverRightBumper())
+    	if(false)
     	{
     		//Enable the PID controller for the shooter using a rate calculated using our lidar sensor
     		m_Shooter.SetShooterSetpoint(calculateShooterRPM());
@@ -479,12 +483,13 @@ public class Robot extends IterativeRobot
         		m_LightSystem.setDefault();
         	}
     	}
-    	else if(m_RobotInterface.GetDriverX())
+    	else if(m_RobotInterface.GetDriverY())
     	{
     		//Enable the PID controller for the shooter using a rate calculated read from the dashboard
     		System.out.println("Dashboard Shooter RPM: " + Double.toString(shooterRPM));
-    		m_Shooter.SetShooterSetpoint(shooterRPM);
-    	   	m_Shooter.EnablePID();
+//    		m_Shooter.SetShooterSetpoint(shooterRPM);
+//    	   	m_Shooter.EnablePID();
+    		m_Shooter.SetTalonOutput(shooterRPM);
 
 			SmartDashboard.putBoolean("Shooter on target", m_Shooter.ShooterOnTarget());
 			
