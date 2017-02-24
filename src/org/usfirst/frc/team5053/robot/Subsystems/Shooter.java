@@ -1,5 +1,6 @@
 package org.usfirst.frc.team5053.robot.Subsystems;
 
+import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDSourceType;
@@ -9,7 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Shooter implements Subsystem {
 
 	private Talon m_Shooter;
-	private Encoder m_Encoder;
+	private Counter m_Encoder;
 	private PIDController m_PID;
 	
 	private double KP = 0.001;
@@ -18,7 +19,7 @@ public class Shooter implements Subsystem {
 	
 	private double PERCENT_TOLERANCE = 0.5;
 	
-	public Shooter(Talon shooterTalon, Encoder shooterEncoder) {
+	public Shooter(Talon shooterTalon, Counter shooterEncoder) {
 		m_Shooter = shooterTalon;
 		m_Encoder = shooterEncoder;
 		
