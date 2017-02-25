@@ -136,9 +136,8 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 		
 	}
 	public void WriteDashboardData() {
-		SmartDashboard.putNumber("Left Encoder", m_LeftEncoder.getDistance());
-		SmartDashboard.putNumber("Right Encoder", m_RightEncoder.getDistance());
-		SmartDashboard.putBoolean("Is DriveTrain PID Running", isPIDRunning);
+		SmartDashboard.putNumber("leftDriveEncoder", m_LeftEncoder.getDistance());
+		SmartDashboard.putNumber("rightDriveEncoder", m_RightEncoder.getDistance());
 	}
 
 }

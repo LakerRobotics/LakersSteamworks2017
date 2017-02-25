@@ -3,8 +3,11 @@ package org.usfirst.frc.team5053.robot;
 import org.usfirst.frc.team5053.robot.Sensors.LidarLite;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.PIDSourceType;
+import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.DigitalOutput;
 
 /**
@@ -34,7 +37,7 @@ public class RobotSensorMap
 	
 	private Encoder m_LeftDrive;
 	private Encoder m_RightDrive;
-	private Encoder m_Shooter;
+	private Counter m_Shooter;
 	
 	private ADXRS450_Gyro m_Gyro;
 	private LidarLite m_Lidar;
@@ -47,12 +50,18 @@ public class RobotSensorMap
 	{
 		m_LeftDrive = new Encoder(leftDriveEncoderADIO, leftDriveEncoderBDIO);
 		m_RightDrive = new Encoder(rightDriveEncoderADIO, rightDriveEncoderBDIO);
-		m_Shooter = new Encoder(shooterEncoderADIO, shooterEncoderBDIO);
+
+//		m_Shooter = new Encoder(shooterEncoderADIO, shooterEncoderBDIO, false, EncodingType.k1X);
+		m_Shooter = new Counter(shooterEncoderADIO);
+		m_Shooter.setDistancePerPulse(/*60/20*/(60.0d/1024.0d)*(72.0d/24.0d)); //(Seconds per minute/Ticks per revolution) * (72 Teeth per revolution primary/ 24 Teeth per revolution secondary)
+		m_Shooter.setPIDSourceType(PIDSourceType.kRate);
+		
+		m_Shooter.setSamplesToAverage(60);
+		m_Shooter.setMaxPeriod(0.02);
 		
 		//TODO 360 -> 1024
 		m_LeftDrive.setDistancePerPulse(6*Math.PI/1024); //Distance in inches
 		m_RightDrive.setDistancePerPulse(6*Math.PI/1024); //Distance in inches
-		m_Shooter.setDistancePerPulse(1/1024); //Ticks per second
 		
 		m_Gyro = new ADXRS450_Gyro();
 		m_Lidar = new LidarLite();
@@ -70,7 +79,7 @@ public class RobotSensorMap
 	{
 		return m_RightDrive;
 	}
-	public Encoder getShooterEncoder() 
+	public Counter getShooterEncoder() 
 	{
 		return m_Shooter;
 	}
