@@ -81,8 +81,8 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		    double     ramp =  30; //degrees
 		    double maxspeed = 10.0*(360/60) ; //60/360 converts the first numbers which is in RPM to degrees/second
 			
-			final double Kp = 1d/200; // so at denominator off in the spin-Rate the power will reach the max
-		    final double Ki = 0.0000;
+			final double Kp = 0.005; // so at denominator off in the spin-Rate the power will reach the max
+		    final double Ki = 0.0;
 		    final double Kd = 0.0;
 		 
 		    MotionControlPIDController localRotationSpeedPID;
@@ -119,6 +119,6 @@ import edu.wpi.first.wpilibj.PIDOutput;
 	    public void disableRotationController()
 	    {
 	    	m_RotationController.disable();
-	    	m_RotationController.free();
+	    	//m_RotationController.free();
 	    }
 	}

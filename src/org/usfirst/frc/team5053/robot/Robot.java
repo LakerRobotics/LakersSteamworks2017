@@ -74,6 +74,7 @@ public class Robot extends IterativeRobot
 	private int allianceSide;
 	private int teleopLightLoops;
 	private double shooterRPM;
+	private boolean autonShoot;
 	
 	@Override
     public void robotInit()
@@ -109,18 +110,6 @@ public class Robot extends IterativeRobot
         m_Camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
     	
         centerX = 0.0;
-    	autonomousCase = 0;
-    	switch(DriverStation.getInstance().getAlliance())
-    	{
-    	case Red:
-    		allianceSide = 1;
-    		break;
-    	case Blue:
-    		allianceSide = -1;
-    		break;
-		default:
-    		allianceSide = 1;
-    	}
     	previousVisionTurn = 0;
     	teleopLightLoops = 0;
     	isVisionTurnRunning = false;
@@ -144,6 +133,18 @@ public class Robot extends IterativeRobot
          * This function is called once when autonomous begins
          */
     	autonomousCase = 0;
+    	autonShoot = SmartDashboard.getBoolean("shoot");
+    	switch(DriverStation.getInstance().getAlliance())
+    	{
+    	case Red:
+    		allianceSide = 1;
+    		break;
+    	case Blue:
+    		allianceSide = -1;
+    		break;
+		default:
+    		allianceSide = 1;
+    	}
     }
 
     public void autonomousPeriodic()
@@ -159,19 +160,19 @@ public class Robot extends IterativeRobot
     	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
 
     	SmartDashboard.putNumber("Vision Turn", turn);
-    	
+    	System.out.println(autonomousCase);
     	switch((int) SmartDashboard.getNumber("autonRoutine", 0))
     	{
     	case 0: //NO AUTON
     		break;
     	case 1: //CENTER
-    		autonCenterGearShoot(turn);
+    		autonCenter(turn);
     		break;
     	case 2: //RIGHT
-    		autonRightGearShoot(turn);
+    		autonFeederSide(turn);
     		break;
     	case 3: //LEFT
-    		autonLeftGearShoot(turn);
+    		autonBoilerSide(turn);
     		break;
 		default: //NO AUTON
 			break;
@@ -181,7 +182,7 @@ public class Robot extends IterativeRobot
 		m_Shooter.WriteDashboardData();
     }
     
-    public void autonLeftGearShoot(double visionTurn)
+    public void autonBoilerSide(double visionTurn)
     {
     	switch(autonomousCase)
     	{
@@ -219,7 +220,14 @@ public class Robot extends IterativeRobot
             		m_DriveTrain.ResetGyro();
             		m_DriveTrain.DriveDistance(-80/*distance back to the intersection*/, 4, 2);
             		autonomousWait = 0;
-        			autonomousCase++;
+            		if(autonShoot)
+            		{
+            			autonomousCase++;
+            		}
+            		else
+            		{
+            			autonomousCase = 900;
+            		}
     			}
     		}
     		break;
@@ -261,18 +269,23 @@ public class Robot extends IterativeRobot
 			}
     		break;
 		default:
-			break;
+			if(m_DriveTrain.isStraightPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+    			m_DriveTrain.ResetGyro();
+    		}
+    		break;
     	}
     }
     
-    public void autonCenterGearShoot(double visionTurn)
+    public void autonCenter(double visionTurn)
     {
     	switch(autonomousCase)
     	{
     	case 0: //Drive out from wall and engage gear peg
     		m_DriveTrain.ResetEncoders();
     		m_DriveTrain.ResetGyro();
-    		m_DriveTrain.DriveDistance(75 /*Distance to engage the gear peg*/, 10, 1);
+    		m_DriveTrain.DriveDistance(75 /*Distance to engage the gear peg*/, 4, 2);
     		autonomousCase++;
     		break;
     	case 1: //Disengage gear peg
@@ -283,8 +296,15 @@ public class Robot extends IterativeRobot
 				{
 					m_DriveTrain.ResetEncoders();
 		    		m_DriveTrain.ResetGyro();
-		    		m_DriveTrain.DriveDistance(-24/*Distance to disengage gear peg*/, 10, 1);
-					autonomousCase++;
+		    		m_DriveTrain.DriveDistance(-24/*Distance to disengage gear peg*/, 4, 2);
+		    		if(autonShoot)
+            		{
+            			autonomousCase++;
+            		}
+            		else
+            		{
+            			autonomousCase = 900;
+            		}
     			}
     		}
     		break;
@@ -315,14 +335,23 @@ public class Robot extends IterativeRobot
         			autonomousCase++;
         		}
     		}
+    		break;
     	case 4: //Shoot
 			m_DriveTrain.ResetEncoders();
 			m_DriveTrain.ResetGyro();
 			autonomousCase++;
+			break;
+		default:
+			if(m_DriveTrain.isStraightPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+    			m_DriveTrain.ResetGyro();
+    		}
+    		break;
     	}
     }
     
-    public void autonRightGearShoot(double visionTurn)
+    public void autonFeederSide(double visionTurn)
 	{
 		switch(autonomousCase)
     	{
@@ -360,7 +389,14 @@ public class Robot extends IterativeRobot
             		m_DriveTrain.ResetGyro();
             		m_DriveTrain.DriveDistance(-115.25/*Distance to disengage the peg*/, 4, 2);
             		autonomousWait = 0;
-        			autonomousCase++;
+            		if(autonShoot)
+            		{
+            			autonomousCase++;
+            		}
+            		else
+            		{
+            			autonomousCase = 900;
+            		}
     			}
     		}
     		break;
@@ -400,10 +436,19 @@ public class Robot extends IterativeRobot
         			autonomousCase++;
         		}
     		}
+    		break;
     	case 9: //Shoot
 			m_DriveTrain.ResetEncoders();
 			m_DriveTrain.ResetGyro();
 			autonomousCase++;
+			break;
+    	default:
+    		if(m_DriveTrain.isStraightPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+    			m_DriveTrain.ResetGyro();
+    		}
+    		break;
     	}
     }
     
@@ -519,7 +564,7 @@ public class Robot extends IterativeRobot
         		m_LightSystem.setDefault();
         	}
     	}
-    	else if(m_RobotInterface.GetDriverRightTrigger())
+    	else if(m_RobotInterface.GetDriverRightTrigger() > 0)
     	{
     		System.out.println("Shooter entered");
     		//Enable the PID controller for the shooter using a rate calculated read from the dashboard
