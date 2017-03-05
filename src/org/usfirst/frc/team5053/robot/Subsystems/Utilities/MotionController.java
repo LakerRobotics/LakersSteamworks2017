@@ -21,11 +21,11 @@ public class MotionController {
 	private double m_turnTolerance;
 	private boolean m_PIDEnabled;
 	
-	private final double TurnKp = 0.9;
-	private final double TurnKi = 0.0;
+	private final double TurnKp = 0.005;
+	private final double TurnKi = 0.0001;
 	private final double TurnKd = 0.0;
-	private final double StraightKp = 0.005;
-	private final double StraightKi = 0.0;
+	private final double StraightKp = 0.1;
+	private final double StraightKi = 0.0001;
 	private final double StraightKd = 0.0;
 	
 	PIDSource m_StraightSource;
@@ -46,8 +46,8 @@ public class MotionController {
 		
 		m_targetDistance = 0;
 		m_targetAngle = 0;
-		m_straightTolerance = 10;
-		m_turnTolerance = 2;
+		m_straightTolerance = 3;
+		m_turnTolerance = 0.5;
 		m_PIDEnabled = false;
 		
 	}
@@ -92,7 +92,7 @@ public class MotionController {
 			m_DriveTrain.ResetGyro();
 			
 			//Magic numbers need fixing
-			double maxRPM = 60/*30*/;
+			double maxRPM = 30/*30*/;
 			double ramp = 50/* 3.5 * maxRPM*/;
 			
 			double maxSpeed = maxRPM * 6; //360 Degrees/60 seconds to convert RPM to speed or degrees per second
@@ -125,8 +125,14 @@ public class MotionController {
 		 * Called while waiting for the MotionControlPID to finish. The PID will be disabled when the end condition is met, and
 		 * the return value indicates you can proceed to the next step.
 		 * */
-		if (Math.abs(m_DriveTrain.GetLeftDistance()) > Math.abs(m_targetDistance))
+		SmartDashboard.putNumber("Distance Left", m_DriveTrain.GetLeftDistance());
+		SmartDashboard.putNumber("Target distance", m_targetDistance);
+		SmartDashboard.putNumber("Straight Tolerance", m_straightTolerance);
+		
+		//TODO Verify this tolerance works... it should...
+		if (Math.abs(m_DriveTrain.GetLeftDistance()-m_targetDistance) < m_straightTolerance)
 		{
+			//Always tripped
 			m_StraightPIDController.disable();
 			m_DriveTrain.ArcadeDrive(0, 0);
 			m_PIDEnabled = false;
@@ -158,13 +164,11 @@ public class MotionController {
 		if(m_TurnPIDController != null)
 		{
 			m_TurnPIDController.disable();
-			//m_TurnPIDController.free();
 		}
 		if(m_StraightPIDController != null)
 		{
 			m_StraightPIDController.disable();
 			m_StraightPIDOutput.disableRotationController();
-			//m_StraightPIDController.free();
 		}
 	}
 }

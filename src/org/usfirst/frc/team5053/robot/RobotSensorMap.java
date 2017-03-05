@@ -51,17 +51,20 @@ public class RobotSensorMap
 		m_LeftDrive = new Encoder(leftDriveEncoderADIO, leftDriveEncoderBDIO);
 		m_RightDrive = new Encoder(rightDriveEncoderADIO, rightDriveEncoderBDIO);
 
-//		m_Shooter = new Encoder(shooterEncoderADIO, shooterEncoderBDIO, false, EncodingType.k1X);
+		//TODO SRX
+		//m_Shooter = new Encoder(shooterEncoderADIO, shooterEncoderBDIO, false, EncodingType.k1X);
 		m_Shooter = new Counter(shooterEncoderADIO);
-		m_Shooter.setDistancePerPulse(/*60/20*/(60.0d/1024.0d)*(72.0d/24.0d)); //(Seconds per minute/Ticks per revolution) * (72 Teeth per revolution primary/ 24 Teeth per revolution secondary)
+		m_Shooter.setDistancePerPulse(RobotConstants.getShooterEncoderDistancePerPulse()); //(Seconds per minute/Ticks per revolution) * (72 Teeth per revolution primary/ 24 Teeth per revolution secondary)
 		m_Shooter.setPIDSourceType(PIDSourceType.kRate);
 		
 		m_Shooter.setSamplesToAverage(60);
 		m_Shooter.setMaxPeriod(0.02);
 		
-		//TODO 360 -> 1024
-		m_LeftDrive.setDistancePerPulse(6*Math.PI/1024); //Distance in inches
-		m_RightDrive.setDistancePerPulse(6*Math.PI/1024); //Distance in inches
+		m_LeftDrive.setDistancePerPulse(RobotConstants.getLeftEncoderDistancePerPulse()); //Distance in inches
+		m_Shooter.setSamplesToAverage(5);
+		
+		m_RightDrive.setDistancePerPulse(RobotConstants.getRightEncoderDistancePerPulse()); //Distance in inches
+		m_Shooter.setSamplesToAverage(5);
 		
 		m_Gyro = new ADXRS450_Gyro();
 		m_Lidar = new LidarLite();
