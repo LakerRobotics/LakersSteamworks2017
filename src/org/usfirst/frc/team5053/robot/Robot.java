@@ -136,10 +136,10 @@ public class Robot extends IterativeRobot
     	switch(DriverStation.getInstance().getAlliance())
     	{
     	case Red:
-    		allianceSide = 1;
+    		allianceSide = -1;
     		break;
     	case Blue:
-    		allianceSide = -1;
+    		allianceSide = 1;
     		break;
 		default:
     		allianceSide = 1;
