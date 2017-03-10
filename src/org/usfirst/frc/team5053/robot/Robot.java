@@ -171,26 +171,26 @@ public class Robot extends IterativeRobot
     	case 1: //CENTER
     		autonCenter(turn);
     		break;
-    	case 2: //RIGHT
-			//autonFeederSide(turn);
-    		if(allianceSide==BLUE)
-    		{
-    			autonFeederSide(turn);
-    		}
-    		else//We are on RED
-    		{
-        		autonBoilerSide(turn);
-    		}
+    	case 2: //FEEDER
+			autonFeederSide(turn);
+    		//if(allianceSide==BLUE)
+    		//{
+    		//	autonFeederSide(turn);
+    		//}
+    		//else//We are on RED
+    		//{
+        	//	autonBoilerSide(turn);
+    		//}
     		break;
-    	case 3: //LEFT
-    		//autonBoilerSide(turn);
-    		if(allianceSide==BLUE){
-        		autonBoilerSide(turn);
-    		}
-    		else//We are on RED
-    		{
-    			autonFeederSide(turn);
-    		}
+    	case 3: //BOILER
+    		autonBoilerSide(turn);
+    		//if(allianceSide==BLUE){
+        	//	autonBoilerSide(turn);
+    		//}
+    		//else//We are on RED
+    		//{
+    		//	autonFeederSide(turn);
+    		//}
     		break;
 		default: //NO AUTON
 			break;
