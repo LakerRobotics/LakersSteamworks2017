@@ -71,9 +71,12 @@ public class Robot extends IterativeRobot
 	private int autonomousCase;
 	private int autonomousWait;
 	private int allianceSide;
+	private int RED = -1;// allianceSide
+	private int BLUE = 1;// allianceSide
 	private int teleopLightLoops;
 	private double shooterRPM;
 	private boolean autonShoot;
+	
 	
 	@Override
     public void robotInit()
@@ -131,7 +134,7 @@ public class Robot extends IterativeRobot
          * This function is called once when autonomous begins
          */
     	autonomousCase = 0;
-    	autonShoot = SmartDashboard.getBoolean("shoot");
+    	autonShoot = SmartDashboard.getBoolean("shoot", true);
     	
     	switch(DriverStation.getInstance().getAlliance())
     	{
@@ -169,10 +172,25 @@ public class Robot extends IterativeRobot
     		autonCenter(turn);
     		break;
     	case 2: //RIGHT
-    		autonFeederSide(turn);
+			//autonFeederSide(turn);
+    		if(allianceSide==BLUE)
+    		{
+    			autonFeederSide(turn);
+    		}
+    		else//We are on RED
+    		{
+        		autonBoilerSide(turn);
+    		}
     		break;
     	case 3: //LEFT
-    		autonBoilerSide(turn);
+    		//autonBoilerSide(turn);
+    		if(allianceSide==BLUE){
+        		autonBoilerSide(turn);
+    		}
+    		else//We are on RED
+    		{
+    			autonFeederSide(turn);
+    		}
     		break;
 		default: //NO AUTON
 			break;
@@ -616,9 +634,11 @@ public class Robot extends IterativeRobot
     
     public double calculateShooterRPM()
     {
-    	//y = 11.815x2 + 140.58x + 1348.4 
+    	//y =  11.815x2 + 140.58x + 1348.4 
+    	//y = -3.6515x2 + 178.43x + 1097.7 based on Byting Bulldogs Bag Day, with spreadsheet doing an angle adjustment to approximate backspin effect
 		double distanceFt = m_Lidar.getDistanceFt();
-		double shooterRate = (11.815*(distanceFt*distanceFt) + 140.58*distanceFt+1348.4);
+//		double shooterRate = (11.815*(distanceFt*distanceFt) + 140.58*distanceFt+1348.4);
+		double shooterRate = (-3.6515*(distanceFt*distanceFt) + 178.43*distanceFt+1097.7);
 		return shooterRate;
     }
     
