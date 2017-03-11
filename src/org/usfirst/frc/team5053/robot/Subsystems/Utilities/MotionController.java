@@ -130,7 +130,7 @@ public class MotionController {
 		SmartDashboard.putNumber("Straight Tolerance", m_straightTolerance);
 		
 		//TODO Verify this tolerance works... it should...
-		if (Math.abs(m_DriveTrain.GetLeftDistance()-m_targetDistance) < m_straightTolerance)
+		if (Math.abs(m_DriveTrain.GetLeftDistance()) >= Math.abs(m_targetDistance - m_straightTolerance))
 		{
 			//Always tripped
 			m_StraightPIDController.disable();

@@ -131,15 +131,16 @@ public class Robot extends IterativeRobot
          * This function is called once when autonomous begins
          */
     	autonomousCase = 0;
+    	autonomousWait = 0;
     	autonShoot = SmartDashboard.getBoolean("shoot");
     	
     	switch(DriverStation.getInstance().getAlliance())
     	{
     	case Red:
-    		allianceSide = 1;
+    		allianceSide = -1;
     		break;
     	case Blue:
-    		allianceSide = -1;
+    		allianceSide = 1;
     		break;
 		default:
     		allianceSide = 1;
@@ -174,6 +175,8 @@ public class Robot extends IterativeRobot
     	case 3: //LEFT
     		autonBoilerSide(turn);
     		break;
+    	case 4:
+    		//debugTurn();
 		default: //NO AUTON
 			break;
     	}
@@ -181,7 +184,29 @@ public class Robot extends IterativeRobot
 		m_DriveTrain.WriteDashboardData();
 		m_Shooter.WriteDashboardData();
     }
-    
+    public void debugTurn()
+    {
+    	switch(autonomousCase)
+    	{
+    	case 0: //Drive out from wall
+    		m_DriveTrain.ResetEncoders();
+        	m_DriveTrain.ResetGyro();
+        	m_DriveTrain.TurnToAngle(90*allianceSide);
+    		autonomousCase++;
+    		System.out.println("Beginning Turn");
+    		break;
+    	case 1:
+    		if (m_DriveTrain.isTurnPIDFinished())
+    		{
+    			System.out.println("Finished Turn");
+    			autonomousCase++;
+    		}
+    		break;
+    	
+    	case 2:
+    		break;
+    	}
+    }
     public void autonBoilerSide(double visionTurn)
     {
     	switch(autonomousCase)
@@ -189,7 +214,7 @@ public class Robot extends IterativeRobot
     	case 0: //Drive out from wall
     		m_DriveTrain.ResetEncoders();
     		m_DriveTrain.ResetGyro();
-    		m_DriveTrain.DriveDistance(60 /*Distance to peg-start intersection*/, 4, 24);
+    		m_DriveTrain.DriveDistance(51 /*Distance to peg-start intersection*/, 4, 24);
     		autonomousCase++;
     		break;
     	case 1: //Turn to face the gear peg
@@ -363,7 +388,7 @@ public class Robot extends IterativeRobot
     	case 0: //Drive out from wall
     		m_DriveTrain.ResetEncoders();
     		m_DriveTrain.ResetGyro();
-    		m_DriveTrain.DriveDistance(75.434 /*Distance to peg-start intersection*/, 2, 24);
+    		m_DriveTrain.DriveDistance(66.434 /*Distance to peg-start intersection*/, 2, 24);
     		autonomousCase++;
     		break;
     	case 1: //Turn to face the gear peg
@@ -487,7 +512,7 @@ public class Robot extends IterativeRobot
     	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
     	
     	//Drivetrain methods
-    	if(m_RobotInterface.GetDriverLeftBumper())
+    	/*if(m_RobotInterface.GetDriverLeftBumper())
     	{
     		if(!(Math.abs(previousVisionTurn) == turn))
     		{
@@ -504,9 +529,10 @@ public class Robot extends IterativeRobot
         	}
     	}
     	else if(!isVisionTurnRunning)
-    	{
-        	arcadeDrive();
-    	}
+    	{*/
+        	
+    	//}
+    	arcadeDrive();
     	m_DriveTrain.WriteDashboardData();
     	
     	//Shooter methods
@@ -516,6 +542,8 @@ public class Robot extends IterativeRobot
     	runIndexer();
     	runIntake();
     	runScaler();
+    	
+    	
     	
     	//Misc variable updates
     	teleopLightLoops++;
@@ -558,7 +586,19 @@ public class Robot extends IterativeRobot
     //Shooter methods
     public void runShooter()
     {
+    	double CLOSE_SPEED = .65;
+    	double MEDIUM_SPEED = .70;
+    	double FAR_SPEED = .75;
     	GetDashboardData();
+    	
+    	/*if (m_RobotInterface.GetOperatorButton(4))
+    	{
+    		shooterRPM = CLOSE_SPEED;
+    	} else if (m_RobotInterface.GetOperatorButton(5)) {
+    		shooterRPM = MEDIUM_SPEED;
+    	} else if (m_RobotInterface.GetOperatorButton(6)) {
+    		shooterRPM = FAR_SPEED;
+    	}*/
     	//if(m_RobotInterface.GetDriverRightBumper())
     	if(false)
     	{
