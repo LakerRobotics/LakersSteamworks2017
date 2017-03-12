@@ -18,7 +18,7 @@ public class DriveTurnPIDOutput implements PIDOutput {
 	@Override
 	public void pidWrite(double output) {
 		m_DriveTrain.tankDrive(-output,output); 
-		System.out.println("DriveSpinPIDOutput Rotation Motor Output:"+output);
+		//System.out.println("DriveSpinPIDOutput Rotation Motor Output:"+output);
 		SmartDashboard.putNumber("DriveSpinPIDOutput Rotation Motor Output",output); 
 	}
 

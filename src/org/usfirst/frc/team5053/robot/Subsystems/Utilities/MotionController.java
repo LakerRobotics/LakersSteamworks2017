@@ -47,7 +47,7 @@ public class MotionController {
 		m_targetDistance = 0;
 		m_targetAngle = 0;
 		m_straightTolerance = 3;
-		m_turnTolerance = 0.5;
+		m_turnTolerance = 1;
 		m_PIDEnabled = false;
 		
 	}
