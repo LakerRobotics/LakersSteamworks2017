@@ -1,6 +1,8 @@
 package org.usfirst.frc.team5053.robot;
 
-import edu.wpi.first.wpilibj.PWM;
+import org.usfirst.frc.team5053.robot.Subsystems.Utilities.TalonCurrentLimited;
+import org.usfirst.frc.team5053.robot.Subsystems.Utilities.TalonVoltageStable;
+
 import edu.wpi.first.wpilibj.Talon;
 
 /**
@@ -25,17 +27,15 @@ public class RobotControllerMap
 	private final int scalerPWM = 5;
 	private final int mixerPWM = 6;
 	
+	private final int scalerPDPSlot = 3;
+	
 	private Talon m_LeftDrive;
 	private Talon m_RightDrive;
 	private Talon m_Intake;
 	private Talon m_Indexer;
-	private Talon m_Shooter;	
-	private Talon m_Scaler;
+	private TalonVoltageStable m_Shooter;	
+	private TalonCurrentLimited m_Scaler;
 	private Talon m_Mixer;
-	
-	/**
-	 * 
-	 */
 	
 	public RobotControllerMap()
 	{
@@ -44,8 +44,8 @@ public class RobotControllerMap
 		m_RightDrive = new Talon(rightDrivePWM);
 		m_Intake = new Talon(intakePWM);
 		m_Indexer = new Talon(indexerPWM);
-		m_Shooter = new Talon(shooterPWM);
-		m_Scaler = new Talon(scalerPWM);
+		m_Shooter = new TalonVoltageStable(new Talon(shooterPWM));
+		m_Scaler = new TalonCurrentLimited(new Talon(scalerPWM), scalerPDPSlot, 9, 9);
 		m_Mixer = new Talon(mixerPWM);
 		
 		m_LeftDrive.setInverted(true);
@@ -70,11 +70,11 @@ public class RobotControllerMap
 	{
 		return m_Indexer;
 	}
-	public Talon getShooter()
+	public TalonVoltageStable getShooter()
 	{
 		return m_Shooter;
 	}
-	public Talon getScaler() 
+	public TalonCurrentLimited getScaler() 
 	{
 		return m_Scaler;
 	}

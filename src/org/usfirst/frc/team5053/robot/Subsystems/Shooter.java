@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDSourceType;
+import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -19,8 +20,8 @@ public class Shooter implements Subsystem {
 	
 	private double PERCENT_TOLERANCE = 0.5;
 	
-	public Shooter(Talon shooterTalon, Counter shooterEncoder) {
-		m_Shooter = shooterTalon;
+	public Shooter(SpeedController shooterTalon, Counter shooterEncoder) {
+		m_Shooter = (Talon) shooterTalon;
 		m_Encoder = shooterEncoder;
 		
 		m_PID = new PIDController(KP, KI, KD, m_Encoder, m_Shooter);
