@@ -15,7 +15,7 @@ public class RobotConstants
 	//basicAutonSelect
 	static
 	{
-    	robotName = SmartDashboard.getString("robotName", "LilGeek");//Default to "Mackinaw" if don't get a value
+    	robotName = SmartDashboard.getString("robotName", "Mackinaw");//Default to "Mackinaw" if don't get a value
     	if("Mackinaw" == robotName)
     	{ robotWeAreRunningOn = new RobotValuesMackinac();
     	}
