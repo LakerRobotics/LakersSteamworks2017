@@ -71,12 +71,9 @@ public class Robot extends IterativeRobot
 	private int autonomousCase;
 	private int autonomousWait;
 	private int allianceSide;
-	private int RED = -1;// allianceSide
-	private int BLUE = 1;// allianceSide
 	private int teleopLightLoops;
 	private double shooterRPM;
 	private boolean autonShoot;
-	
 	
 	@Override
     public void robotInit()
@@ -138,7 +135,6 @@ public class Robot extends IterativeRobot
     	autonomousCase = 0;
     	autonomousWait = 0;
     	autonShoot = SmartDashboard.getBoolean("shoot");
-
     	
     	switch(DriverStation.getInstance().getAlliance())
     	{
@@ -175,26 +171,11 @@ public class Robot extends IterativeRobot
     	case 1: //CENTER
     		autonCenter(turn);
     		break;
-    	case 2: //FEEDER
-			autonFeederSide(turn);
-    		//if(allianceSide==BLUE)
-    		//{
-    		//	autonFeederSide(turn);
-    		//}
-    		//else//We are on RED
-    		//{
-        	//	autonBoilerSide(turn);
-    		//}
+    	case 2: //RIGHT
+    		autonFeederSide(turn);
     		break;
-    	case 3: //BOILER
+    	case 3: //LEFT
     		autonBoilerSide(turn);
-    		//if(allianceSide==BLUE){
-        	//	autonBoilerSide(turn);
-    		//}
-    		//else//We are on RED
-    		//{
-    		//	autonFeederSide(turn);
-    		//}
     		break;
     	case 4:
     		debugTurn(turn);
@@ -687,7 +668,6 @@ public class Robot extends IterativeRobot
     		//m_Shooter.SetShooterSetpoint(shooterRPM);
     		//m_Shooter.EnablePID();
     		m_Shooter.SetTalonOutput(shooterRPM);
-
 			SmartDashboard.putBoolean("Shooter on target", m_Shooter.ShooterOnTarget());
 			
     		if(m_Shooter.ShooterOnTarget())
@@ -715,11 +695,9 @@ public class Robot extends IterativeRobot
     
     public double calculateShooterRPM()
     {
-    	//y =  11.815x2 + 140.58x + 1348.4 
-    	//y = -3.6515x2 + 178.43x + 1097.7 based on Byting Bulldogs Bag Day, with spreadsheet doing an angle adjustment to approximate backspin effect
+    	//y = 11.815x2 + 140.58x + 1348.4 
 		double distanceFt = m_Lidar.getDistanceFt();
-//		double shooterRate = (11.815*(distanceFt*distanceFt) + 140.58*distanceFt+1348.4);
-		double shooterRate = (-3.6515*(distanceFt*distanceFt) + 178.43*distanceFt+1097.7);
+		double shooterRate = (11.815*(distanceFt*distanceFt) + 140.58*distanceFt+1348.4);
 		return shooterRate;
     }
     
