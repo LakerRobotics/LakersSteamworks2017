@@ -1,9 +1,7 @@
 package org.usfirst.frc.team5053.robot;
 
-import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.Talon;
 import com.ctre.CANTalon;
-import edu.wpi.first.wpilibj.CANSpeedController;
 
 /**
  * Maps all of the output controllers on the robot.
@@ -23,7 +21,7 @@ public class RobotControllerMap
 	private final int rightDrivePWM = 1;
 	private final int intakePWM = 2;
 	private final int indexerPWM = 3;
-	private final int shooterPWM = 4;
+//	private final int shooterPWM = 4;
 	private final int scalerPWM = 5;
 	private final int mixerPWM = 6;
 	
@@ -47,13 +45,15 @@ public class RobotControllerMap
 		m_Intake = new Talon(intakePWM);
 		m_Indexer = new Talon(indexerPWM);
 		m_Shooter = new CANTalon(0);// specifies the Talon CAN Bus ID, which is configurable on by website on roborio. defualt is 0
+		
 		m_Scaler = new Talon(scalerPWM);
 		m_Mixer = new Talon(mixerPWM);
 		
 		m_LeftDrive.setInverted(true);
 		m_RightDrive.setInverted(true);
 		m_Intake.setInverted(true);
-		m_Shooter.setInverted(true);
+		m_Shooter.setInverted(true);		
+
 	}
 	
 	public Talon getLeftDrive()

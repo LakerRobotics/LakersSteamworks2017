@@ -99,7 +99,7 @@ public class Robot extends IterativeRobot
     	
     	//Robot Subsystem Initialization
     	m_DriveTrain = new DriveTrainMotionControl(m_RobotControllers.getLeftDrive(), m_RobotControllers.getRightDrive(), m_RobotSensors.getLeftDriveEncoder(), m_RobotSensors.getRightDriveEncoder(), m_RobotSensors.getGyro());
-    	m_Shooter = new Shooter(m_RobotControllers.getShooter(), m_RobotSensors.getShooterEncoder());
+    	m_Shooter = new Shooter(m_RobotControllers.getShooter());//Encoder connected directly to the motor control so Robo Rio dosn't define the encoder since it knows nothing about it directly
     	m_Intake = new Intake(m_RobotControllers.getIntake());
     	m_Indexer = new Indexer(m_RobotControllers.getIndexer());
     	m_Scaler = new Scaler(m_RobotControllers.getScaler());
