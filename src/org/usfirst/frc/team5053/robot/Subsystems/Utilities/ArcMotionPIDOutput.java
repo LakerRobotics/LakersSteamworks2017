@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 		// for example id Kp is 0.025 at 20 degrees we would have 0.5 or half the power toward rotating the robot 
 
 		private DriveTrainMotionControl m_RobotDrive;
-		private double Kp;
 		private Gyro m_Gyro; 
 		private double m_TargetAngle;
 		private double m_RotationPower;
@@ -39,7 +38,6 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 			m_TargetAngle 	= targetAngle;
 			m_ArcRadius 	= arcRadius;
 			
-			Kp 					= 0d/20d; //0.025;//
 			m_TargetAngle 		= 0.0d;
 			m_RotationPower 	= 0.0d;
 			m_ForwardPower  	= 0.0d;
@@ -153,7 +151,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 	        //Constructor
 	        public WrapArcPIDOutput(ArcMotionPIDOutput rotationPowerDesintation) {
 	            if (rotationPowerDesintation == null) {
-	                throw new NullPointerException("Given rotationPowerDestination was null");
+	                throw new NullPointerException("inf WrapeArcPIDOutput constructor the given rotationPowerDestination was null");
 	            }
 	            else{
 	                m_rotationPowerDestination = rotationPowerDesintation;            	
