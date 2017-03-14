@@ -4,16 +4,20 @@ import org.usfirst.frc.team5053.robot.Subsystems.DriveTrainMotionControl;
 import org.usfirst.frc.team5053.robot.Subsystems.Utilities.MotionControlHelper;
 import org.usfirst.frc.team5053.robot.Subsystems.Utilities.MotionControlPIDController;
 import edu.wpi.first.wpilibj.PIDSource;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class MotionController {
-	DriveTrainMotionControl m_DriveTrain;
-	MotionControlHelper m_StraightControl;
-	MotionControlHelper m_TurnControl;
+	private DriveTrainMotionControl m_DriveTrain;
 	
-	MotionControlPIDController m_StraightPIDController;
-	StraightMotionPIDOutput m_StraightPIDOutput;
-	MotionControlPIDController m_TurnPIDController;
+	private MotionControlHelper m_StraightControl;
+	private MotionControlHelper m_TurnControl;
+	private MotionControlHelper m_ArcControl;
+	
+	private MotionControlPIDController m_StraightPIDController;
+	private StraightMotionPIDOutput m_StraightPIDOutput;
+	private MotionControlPIDController m_TurnPIDController;
+	private MotionControlPIDController m_ArcPIDController;
 	
 	private double m_targetDistance;
 	private double m_targetAngle;
@@ -24,12 +28,17 @@ public class MotionController {
 	private final double TurnKp = 0.005;
 	private final double TurnKi = 0.0001;
 	private final double TurnKd = 0.0;
+	
 	private final double StraightKp = 0.1;
 	private final double StraightKi = 0.0001;
 	private final double StraightKd = 0.0;
+
+	private final double ArcKp = 0.1;
+	private final double ArcKi = 0.0001;
+	private final double ArcKd = 0.0;
 	
-	PIDSource m_StraightSource;
-	PIDSource m_TurnSource;
+	private PIDSource m_StraightSource;
+	private PIDSource m_TurnSource;
 	
 	
 	
@@ -42,7 +51,7 @@ public class MotionController {
 		m_StraightPIDController = null;
 		m_StraightPIDOutput = null;
 		m_TurnPIDController = null;
-		
+		m_ArcPIDController = null;
 		
 		m_targetDistance = 0;
 		m_targetAngle = 0;
@@ -91,7 +100,6 @@ public class MotionController {
 		{
 			m_DriveTrain.ResetGyro();
 			
-			//Magic numbers need fixing
 			double maxRPM = 30/*30*/;
 			double ramp = 50/* 3.5 * maxRPM*/;
 			
@@ -113,6 +121,40 @@ public class MotionController {
 				m_TurnPIDController.enable();	
 				m_PIDEnabled = true;
 				
+				return true;
+			}
+			return false;
+		}
+		return true;
+	}
+	public boolean ExecuteArcMotion(double radius, double targetAngle, double maxspeed, double ramp)
+	{
+		if (!m_PIDEnabled)
+		{
+			m_targetAngle = targetAngle;
+			m_targetDistance = radius;
+			m_DriveTrain.ResetEncoders();
+			
+			double start = 0;
+			
+			double convertedDistance = radius;
+			double convertedSpeed = maxspeed * 12; // Inches
+			double convertedRamp = ramp;
+			
+			if (!(Math.abs(m_DriveTrain.GetLeftDistance()) > Math.abs(m_targetDistance)))
+			{
+				//Instantiates a new MotionControlHelper() object for the new drive segment
+				ArcMotionPIDOutput arcOutput = new ArcMotionPIDOutput(m_DriveTrain, (Gyro) m_TurnSource, m_targetAngle, m_targetDistance);
+				m_ArcControl = new MotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_StraightSource, arcOutput);
+				
+				//Instantiates a new MotionControlPIDController() object for the new drive segment using the previous MotionControlHelper()
+				m_ArcPIDController = new MotionControlPIDController(ArcKp, ArcKi, ArcKd, m_ArcControl);
+				m_ArcPIDController.setAbsoluteTolerance(m_straightTolerance);
+				m_ArcPIDController.setOutputRange(-1.0, 1.0);
+				
+				//Turns the MotionControlPID ON and it will continue to execute by itself until told otherwise.
+				m_ArcPIDController.enable();
+				m_PIDEnabled = true;
 				return true;
 			}
 			return false;
@@ -149,6 +191,27 @@ public class MotionController {
 		if (Math.abs(m_DriveTrain.GetAngle()-m_targetAngle) < m_turnTolerance)
 		{
 			m_TurnPIDController.disable();
+			m_DriveTrain.ArcadeDrive(0, 0);
+			m_PIDEnabled = false;
+			return true;
+		}
+		return false;
+	}
+	public boolean isArcMotionFinished()
+	{
+		/*
+		 * Called while waiting for the MotionControlPID to finish. The PID will be disabled when the end condition is met, and
+		 * the return value indicates you can proceed to the next step.
+		 * */
+		SmartDashboard.putNumber("Distance Left", m_DriveTrain.GetLeftDistance());
+		SmartDashboard.putNumber("Target distance", m_targetDistance);
+		SmartDashboard.putNumber("Straight Tolerance", m_straightTolerance);
+		
+		//TODO Verify this tolerance works... it should...
+		if (Math.abs(m_DriveTrain.GetLeftDistance()) >= Math.abs(m_targetDistance - m_straightTolerance))
+		{
+			//Always tripped
+			m_ArcPIDController.disable();
 			m_DriveTrain.ArcadeDrive(0, 0);
 			m_PIDEnabled = false;
 			return true;
