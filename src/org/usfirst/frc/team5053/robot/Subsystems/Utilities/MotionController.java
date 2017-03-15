@@ -142,7 +142,7 @@ public class MotionController {
 		
 		double start = 0;
 
-		ArcMotionPIDOutput motionControlArch ;
+		ArcMotionPIDOutput motionControlArch;
 		
 		if (!isPIDEnabled())
 		{
