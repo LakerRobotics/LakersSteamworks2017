@@ -25,24 +25,24 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 		private DriveTrainMotionControl m_RobotDrive;
 		private double Kp;
-		private Gyro m_Gyro; 
+		private PIDSource m_Gyro; 
 		private double m_TargetAngle;
 		private double m_RotationPower;
 		private double m_ForwardPower;
 		private double m_ArcRadius;
 		MotionControlPIDController m_ArcRotationSpeedPID;
 
-		public ArcMotionPIDOutput(DriveTrainMotionControl drive, Gyro theGyro, double targetAngle, double arcRadius) {
+		public ArcMotionPIDOutput(DriveTrainMotionControl drive, PIDSource anglePIDSource, double arcRadius) {
 			//SmartDashboard.putString("DriveSpinPIDOutput", "constructor called");
 			m_RobotDrive 	= drive;
-			m_Gyro 			= theGyro;
-			m_TargetAngle 	= targetAngle;
+			m_Gyro 			= anglePIDSource	;
+			m_TargetAngle 	= Double.MAX_VALUE;
 			m_ArcRadius 	= arcRadius;
 			
-			Kp 					= 0d/20d; //0.025;//
-			m_TargetAngle 		= 0.0d;
-			m_RotationPower 	= 0.0d;
-			m_ForwardPower  	= 0.0d;
+			Kp 				= 0d/20d; //0.025;//
+			m_TargetAngle 	= 0.0d;
+			m_RotationPower = 0.0d;
+			m_ForwardPower  = 0.0d;
 			
 			double slowRotation 					= m_TargetAngle + 90;
 			WrapArcPIDOutput wrappedArcPIDOutput 	=  new WrapArcPIDOutput(this);
@@ -60,8 +60,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 		protected synchronized void setRotationPower(double rotationPower) {
 			m_RotationPower = rotationPower;
 		}
-
-
+		
 		@Override
 		public synchronized void pidWrite(double forwardPower) {
 		    //rotationPower
@@ -69,47 +68,42 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 		   	//RobotMap.driveTrainRobotDrive21.arcadeDrive(/*moveValue*/ motorPower, /*rotateValue*/ rotationPower);
 			
 			//store it away so rotation can be set appropriately
-			m_ForwardPower = forwardPower;
-			
+			m_ForwardPower = forwardPower;			
 					 
-			//if not at the desired total rotation angle, then adjust the rotation power
-			//abs(m_arcRotationPID.getMotionControlHelper().m_targetDistance - gyro.getAngle()) >
-			if (m_ArcRotationSpeedPID.onTarget())
-			{
-				//we have turned to the correct angle so no rotation power except as needed based on the regular motion controlled angular adjustment				
-			}
-			else
-			{
-				//set the rotation based on the current speed of the robot.
-				//arced-turn for a robot in a big circle of radius R and it seems the the rate of angler change just needs to be proportional to the speed:
-				// RateAngularChange = 360*Speed/2pi*R,
-				//		 where: Speed is the speed of the robot in ft/sec
-				//		 pi is the constant PI
-				//		 R is the Radius of the turn path we want the robot to take in ft.
-				double speed = (m_RobotDrive.GetLeftSpeed() + m_RobotDrive.GetRightSpeed())/2;
-				double angularChangeSpeed = (speed*360)/(2*3.14159265*m_ArcRadius);
-				m_ArcRotationSpeedPID.setSetpoint(angularChangeSpeed);
-			}
-			
+			//Adjust the rotation power to be proportional to the average speed of the Robot to stay on the desired arch
+			m_ArcRotationSpeedPID.setSetpoint(getTargetRotationalSpeed());
 					
-		    SmartDashboard.putNumber("RobotDriveStraightPIDOoutput Motor Output", m_ForwardPower);
+		    SmartDashboard.putNumber("RobotDriveStraightPIDOoutput Motor Output",forwardPower);
 		    SmartDashboard.putNumber("RobotDriveStraightPIDOoutput RotationPower", m_RotationPower);
-	    	
-		    double leftPower; 
+	    	double leftPower; 
 	    	double rightPower;
 	    	
 	    	// Reduce forward power so can get full and even turning effect
-	    	// also may help if quickly reduce from full throttle, to avoid a jerk in the rotation as the PID would convert from 1/2 to all all rotation power.
-	    	
+	    	// also may help if quickly reduce from full throttle, to avoid a jerk in the rotation as the PID would convert from 1/2 to all all rotation power
+	    	// .
 	    	if (forwardPower + m_RotationPower > 1.0)
 	    	{
 	    		forwardPower = 1 - m_RotationPower;
 	    	}
 	    	
-	    	leftPower = m_ForwardPower- m_RotationPower;
-	    	rightPower = m_ForwardPower+ m_RotationPower;
+	    	leftPower = m_ForwardPower - m_RotationPower;
+	    	rightPower = m_ForwardPower + m_RotationPower;
+	    	
 	    	m_RobotDrive.tankDrive(leftPower, rightPower);
+
 		}
+		
+		private double getTargetRotationalSpeed(){
+			//set the rotation based on the current speed of the robot.
+			//arched-turn for a robot in a big circle of radius R and it seems the the rate of angler change just needs to be proportional to the speed:
+			// RateAngularChange = 360*Speed/2pi*R,
+			//		 where: Speed is the speed of the robot in ft/sec
+			//		 pi is the constant pi
+			//		 R is the Radius of the turn path we want the robot to take in ft.
+			double speed = (m_RobotDrive.GetAverageSpeed());
+			double angularChangeSpeed = (speed * 360)/(2 * 3.14159265 * m_ArcRadius);
+			return angularChangeSpeed;
+		}	
 		
 		public  MotionControlPIDController createArcPIDController(double targetAngle, double startAngle, PIDOutput pidOutput) {
 			
@@ -136,6 +130,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 		    localRotationSpeedPID = new MotionControlPIDController(Kp,Ki,Kd, rotationSpeedProfile );
 	        localRotationSpeedPID.setOutputRange(-1.0, 1.0);
 	        localRotationSpeedPID.enable();
+	        
 		    return localRotationSpeedPID;
 		}
 		
@@ -146,24 +141,26 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 
 
+	    
 		private class WrapArcPIDOutput implements PIDOutput {
 
-	        private ArcMotionPIDOutput m_rotationPowerDestination;
+	        private ArcMotionPIDOutput m_RotationPowerDestination;
 
 	        //Constructor
 	        public WrapArcPIDOutput(ArcMotionPIDOutput rotationPowerDesintation) {
-	            if (rotationPowerDesintation == null) {
+	            if (rotationPowerDesintation == null) 
+	            {
 	                throw new NullPointerException("Given rotationPowerDestination was null");
 	            }
-	            else{
-	                m_rotationPowerDestination = rotationPowerDesintation;            	
+	            else
+	            {
+	            	m_RotationPowerDestination = rotationPowerDesintation;            	
 	            }
 	        }
 
 			@Override
 			public void pidWrite(double rotationPower) {
-				this.m_rotationPowerDestination.setRotationPower(rotationPower);
+				this.m_RotationPowerDestination.setRotationPower(rotationPower);
 			}
-
 	    }
 	}

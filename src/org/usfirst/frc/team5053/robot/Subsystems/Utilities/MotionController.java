@@ -127,37 +127,42 @@ public class MotionController {
 		}
 		return true;
 	}
-	public boolean ExecuteArcMotion(double radius, double targetAngle, double maxspeed, double ramp)
+	/**
+	 * 
+	 * @param distance  to travel in inches
+	 * @param maxSpeed  in ft/sec
+	 * @param ramp      in inches
+	 * @param radiusOfArch  The arc travel path of the robot
+	 * @return true if it has completed the arc path
+	 */
+	public boolean ExecuteArcMotion(double distance, double maxSpeed, double ramp, double radiusOfArch)
 	{
-		if (!m_PIDEnabled)
+		m_targetDistance = distance;
+		m_DriveTrain.ResetEncoders();
+		
+		double start = 0;
+
+		ArcMotionPIDOutput motionControlArch ;
+		
+		if (!isPIDEnabled())
 		{
-			m_targetAngle = targetAngle;
-			m_targetDistance = radius;
-			m_DriveTrain.ResetEncoders();
+			double convertedDistance = distance;
+			double convertedSpeed = maxSpeed * 12; // convert to Inches/sec
+			double convertedRamp = ramp; // in inches
 			
-			double start = 0;
+			motionControlArch = new ArcMotionPIDOutput(m_DriveTrain, m_TurnSource, radiusOfArch);
+
+			//Instantiates a new MotionControlHelper() object for the new Arch segment
+			// motionControlForwardSpeed
+			m_ArcControl = new MotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_StraightSource, motionControlArch);
 			
-			double convertedDistance = radius;
-			double convertedSpeed = maxspeed * 12; // Inches
-			double convertedRamp = ramp;
+			//Instantiates a new MotionControlPIDController() object for the new turn segment using the previous MotionControlHelper()
+			m_ArcPIDController = new MotionControlPIDController(ArcKp, ArcKi, ArcKd, m_ArcControl);
+			m_ArcPIDController.setOutputRange(-1.0, 1.0);
 			
-			if (!(Math.abs(m_DriveTrain.GetLeftDistance()) > Math.abs(m_targetDistance)))
-			{
-				//Instantiates a new MotionControlHelper() object for the new drive segment
-				ArcMotionPIDOutput arcOutput = new ArcMotionPIDOutput(m_DriveTrain, (Gyro) m_TurnSource, m_targetAngle, m_targetDistance);
-				m_ArcControl = new MotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_StraightSource, arcOutput);
-				
-				//Instantiates a new MotionControlPIDController() object for the new drive segment using the previous MotionControlHelper()
-				m_ArcPIDController = new MotionControlPIDController(ArcKp, ArcKi, ArcKd, m_ArcControl);
-				m_ArcPIDController.setAbsoluteTolerance(m_straightTolerance);
-				m_ArcPIDController.setOutputRange(-1.0, 1.0);
-				
-				//Turns the MotionControlPID ON and it will continue to execute by itself until told otherwise.
-				m_ArcPIDController.enable();
-				m_PIDEnabled = true;
-				return true;
-			}
-			return false;
+			//Turns the MotionControlPID ON and it will continue to execute by itself until told otherwise.
+			m_ArcPIDController.enable();
+			return true;
 		}
 		return true;
 	}
