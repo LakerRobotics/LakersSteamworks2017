@@ -24,25 +24,22 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 		// for example id Kp is 0.025 at 20 degrees we would have 0.5 or half the power toward rotating the robot 
 
 		private DriveTrainMotionControl m_RobotDrive;
-		private double Kp;
-		private PIDSource m_Gyro; 
+		private Gyro m_Gyro; 
 		private double m_TargetAngle;
 		private double m_RotationPower;
 		private double m_ForwardPower;
 		private double m_ArcRadius;
 		MotionControlPIDController m_ArcRotationSpeedPID;
 
-		public ArcMotionPIDOutput(DriveTrainMotionControl drive, PIDSource anglePIDSource, double arcRadius) {
+		public ArcMotionPIDOutput(DriveTrainMotionControl drive, Gyro anglePIDSource, double arcRadius) {
 			//SmartDashboard.putString("DriveSpinPIDOutput", "constructor called");
 			m_RobotDrive 	= drive;
-			m_Gyro 			= anglePIDSource	;
+			m_Gyro 			= anglePIDSource;
 			m_TargetAngle 	= Double.MAX_VALUE;
 			m_ArcRadius 	= arcRadius;
-			
-			Kp 				= 0d/20d; //0.025;//
-			m_TargetAngle 	= 0.0d;
-			m_RotationPower = 0.0d;
-			m_ForwardPower  = 0.0d;
+			m_TargetAngle 		= 0.0d;
+			m_RotationPower 	= 0.0d;
+			m_ForwardPower  	= 0.0d;
 			
 			double slowRotation 					= m_TargetAngle + 90;
 			WrapArcPIDOutput wrappedArcPIDOutput 	=  new WrapArcPIDOutput(this);
@@ -148,9 +145,8 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 	        //Constructor
 	        public WrapArcPIDOutput(ArcMotionPIDOutput rotationPowerDesintation) {
-	            if (rotationPowerDesintation == null) 
-	            {
-	                throw new NullPointerException("Given rotationPowerDestination was null");
+	            if (rotationPowerDesintation == null) {
+	                throw new NullPointerException("inf WrapeArcPIDOutput constructor the given rotationPowerDestination was null");
 	            }
 	            else
 	            {
