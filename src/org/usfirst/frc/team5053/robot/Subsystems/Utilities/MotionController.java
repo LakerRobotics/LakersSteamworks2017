@@ -135,14 +135,14 @@ public class MotionController {
 	 * @param radiusOfArch  The arc travel path of the robot
 	 * @return true if it has completed the arc path
 	 */
-	public boolean ExecuteArcMotion(double distance, double maxSpeed, double ramp, double radiusOfArch)
+	public boolean ExecuteArcMotion(double distance, double maxSpeed, double ramp, double radiusOfArc)
 	{
 		m_targetDistance = distance;
 		m_DriveTrain.ResetEncoders();
 		
 		double start = 0;
 
-		ArcMotionPIDOutput motionControlArch;
+		ArcMotionPIDOutput motionControlArc;
 		
 		if (!isPIDEnabled())
 		{
@@ -150,11 +150,11 @@ public class MotionController {
 			double convertedSpeed = maxSpeed * 12; // convert to Inches/sec
 			double convertedRamp = ramp; // in inches
 			
-			motionControlArch = new ArcMotionPIDOutput(m_DriveTrain, m_TurnSource, radiusOfArch);
+			motionControlArc = new ArcMotionPIDOutput(m_DriveTrain, m_TurnSource, radiusOfArc);
 
 			//Instantiates a new MotionControlHelper() object for the new Arch segment
 			// motionControlForwardSpeed
-			m_ArcControl = new MotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_StraightSource, motionControlArch);
+			m_ArcControl = new MotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_StraightSource, motionControlArc);
 			
 			//Instantiates a new MotionControlPIDController() object for the new turn segment using the previous MotionControlHelper()
 			m_ArcPIDController = new MotionControlPIDController(ArcKp, ArcKi, ArcKd, m_ArcControl);
@@ -213,7 +213,7 @@ public class MotionController {
 		SmartDashboard.putNumber("Straight Tolerance", m_straightTolerance);
 		
 		//TODO Verify this tolerance works... it should...
-		if (Math.abs(m_DriveTrain.GetLeftDistance()) >= Math.abs(m_targetDistance - m_straightTolerance))
+		if (Math.abs(m_DriveTrain.GetAverageDistance() - m_targetDistance) <= Math.abs(m_straightTolerance))
 		{
 			//Always tripped
 			m_ArcPIDController.disable();

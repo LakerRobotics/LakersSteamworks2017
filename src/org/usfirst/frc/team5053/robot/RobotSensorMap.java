@@ -60,10 +60,10 @@ public class RobotSensorMap
 		m_Shooter.setSamplesToAverage(60);
 		m_Shooter.setMaxPeriod(0.02);
 		
-		m_LeftDrive.setDistancePerPulse(RobotConstants.getLeftEncoderDistancePerPulse()); //Distance in inches
+		m_LeftDrive.setDistancePerPulse(360/*RobotConstants.getLeftEncoderDistancePerPulse()*/); //Distance in inches
 		m_Shooter.setSamplesToAverage(5);
 		
-		m_RightDrive.setDistancePerPulse(RobotConstants.getRightEncoderDistancePerPulse()); //Distance in inches
+		m_RightDrive.setDistancePerPulse(360/*RobotConstants.getRightEncoderDistancePerPulse()*/); //Distance in inches
 		m_Shooter.setSamplesToAverage(5);
 		
 		m_Gyro = new ADXRS450_Gyro();

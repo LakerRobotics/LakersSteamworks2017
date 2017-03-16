@@ -85,11 +85,13 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 	    	{
 	    		forwardPower = 1 - m_RotationPower;
 	    	}
-	    	
+	    	m_RotationPower = 0;
 	    	leftPower = m_ForwardPower - m_RotationPower;
 	    	rightPower = m_ForwardPower + m_RotationPower;
 	    	
-	    	m_RobotDrive.tankDrive(leftPower, rightPower);
+	    	double multiplier = 1.0;
+	    	
+	    	m_RobotDrive.tankDrive(leftPower*multiplier, rightPower*multiplier);
 
 		}
 		
@@ -123,7 +125,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 		    // on the speed of the robot
 		    // Could do this or could just be more generic and follow the speed of the robot, think this is simplier to start
 	        
-		    rotationSpeedProfile = new MotionControlHelper(targetAngle, ramp, maxspeed, startAngle, (PIDSource) m_Gyro, pidOutput);// this is being overiden in this.pidWrite()
+		    rotationSpeedProfile = new MotionControlHelper(targetAngle, ramp, maxspeed, startAngle, m_Gyro, pidOutput);// this is being overiden in this.pidWrite()
 	        
 		    //TODO have the targetAngle stop the adjustment from this.pidWrite(..)
 	        

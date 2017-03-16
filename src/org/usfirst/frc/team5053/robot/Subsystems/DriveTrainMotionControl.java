@@ -66,11 +66,11 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 		}
 		
 	}
-	public void DriveInArc(double radius, double arcAngle, double maxspeed, double ramp)
+	public void DriveInArc(double distance, double maxspeed, double ramp, double radius)
 	{
 		if(!isPIDRunning)
 		{
-			isPIDRunning = m_MotionController.ExecuteArcMotion(radius, arcAngle, maxspeed, ramp);
+			isPIDRunning = m_MotionController.ExecuteArcMotion(distance, maxspeed, ramp, radius);
 		}
 	}
 	public boolean isStraightPIDFinished()
