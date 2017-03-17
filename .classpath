@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="C:/wpi/lib/NetworkTables.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/OpenCV"/>
 	<classpathentry kind="lib" path="jars/CTRLib.jar"/>
+	<classpathentry kind="var" path="USERLIBS_DIR/CTRLib.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

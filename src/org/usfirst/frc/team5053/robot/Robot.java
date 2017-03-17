@@ -154,6 +154,11 @@ public class Robot extends IterativeRobot
 
     public void autonomousPeriodic()
     {
+		m_Shooter.SetShooterSetpoint(1000);
+		SmartDashboard.putNumber("ShooterTalonSrxRpm", m_RobotControllers.getShooter().getEncVelocity());
+		SmartDashboard.putNumber("Shooter Setpoint RPM", m_RobotControllers.getShooter().getSetpoint());
+		SmartDashboard.putNumber("shooterTalonSRXEncoder RPM", m_RobotControllers.getShooter().getSpeed());
+
     	/**
          * This function is called periodically during autonomous
          */
@@ -169,8 +174,12 @@ public class Robot extends IterativeRobot
     	
     	switch(SmartDashboard.getInt("autonRoutine", 0))
     	{
+    	
     	default:
-    		autonRightGear();
+    		
+    	//	autonRightGear();
+			m_Shooter.SetShooterSetpoint(1000);
+			SmartDashboard.putNumber("ShooterTalonSrxRpm", m_RobotControllers.getShooter().getEncVelocity());
     		break;
     	}
     	

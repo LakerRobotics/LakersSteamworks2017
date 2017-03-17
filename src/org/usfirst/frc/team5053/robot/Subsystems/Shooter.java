@@ -80,7 +80,7 @@ public class Shooter implements Subsystem {
 		m_Shooter.set(speed);
 	}
 	public void WriteDashboardData() {
-		SmartDashboard.putNumber("Shooter Setpoint", m_Shooter.getSetpoint());
-		SmartDashboard.putNumber("shooterDriveEncoder", m_Shooter.getSpeed());
+		SmartDashboard.putNumber("Shooter Setpoint RPM", m_Shooter.getSetpoint());
+		SmartDashboard.putNumber("shooterTalonSRXEncoder RPM", m_Shooter.getSpeed());
 	}
 }

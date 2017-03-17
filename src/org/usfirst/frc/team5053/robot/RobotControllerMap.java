@@ -44,7 +44,7 @@ public class RobotControllerMap
 		m_RightDrive = new Talon(rightDrivePWM);
 		m_Intake = new Talon(intakePWM);
 		m_Indexer = new Talon(indexerPWM);
-		m_Shooter = new CANTalon(0);// specifies the Talon CAN Bus ID, which is configurable on by website on roborio. defualt is 0
+		m_Shooter = new CANTalon(1);// specifies the Talon CAN Bus ID, which is configurable on by website on roborio. defualt is 0
 		
 		m_Scaler = new Talon(scalerPWM);
 		m_Mixer = new Talon(mixerPWM);
