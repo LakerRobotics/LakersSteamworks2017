@@ -157,7 +157,7 @@ public class Robot extends IterativeRobot
 		m_Shooter.SetShooterSetpoint(1000);
 		SmartDashboard.putNumber("ShooterTalonSrxRpm", m_RobotControllers.getShooter().getEncVelocity());
 		SmartDashboard.putNumber("Shooter Setpoint RPM", m_RobotControllers.getShooter().getSetpoint());
-		SmartDashboard.putNumber("shooterTalonSRXEncoder RPM", m_RobotControllers.getShooter().getSpeed());
+		SmartDashboard.putNumber("shooterTalonSRXEncoder RPM", m_RobotControllers.getShooter().get());
 
     	/**
          * This function is called periodically during autonomous
