@@ -167,10 +167,6 @@ public class Robot extends IterativeRobot
     	
     	switch((int) SmartDashboard.getNumber("autonRoutine", 0))
     	{
-<<<<<<< HEAD
-    	default:
-			m_Shooter.SetShooterSetpoint(250);
-=======
     	case 0: //NO AUTON
     		break;
     	case 1: //CENTER
@@ -185,8 +181,10 @@ public class Robot extends IterativeRobot
     	case 4:
     		debugTurn(turn);
     		break;
+    	case 5:
+    		m_Shooter.SetShooterSetpoint(250);
+    		break;
 		default: //NO AUTON
->>>>>>> KetteringOpenBagWeek3
 			break;
     	}
     	
@@ -640,6 +638,12 @@ public class Robot extends IterativeRobot
     	} else if (m_RobotInterface.GetOperatorButton(11)) {
     		shooterRPM = 1;
     		m_Shooter.SetTalonOutput(shooterRPM);
+    	} else if (m_RobotInterface.GetDriverY()){
+    		m_Shooter.SetShooterSetpoint(shooterRPM);
+    		if (!m_Shooter.isPIDEnabled())
+    		{
+    			m_Shooter.EnablePID();
+    		}
     	} else {
     		m_Shooter.SetTalonOutput(0);
     	}
@@ -772,7 +776,7 @@ public class Robot extends IterativeRobot
     
     public void GetDashboardData()
     {
-    	//shooterRPM = SmartDashboard.getNumber("shooterRPM", DEFAULT_SHOOTER_RATE);
+    	shooterRPM = SmartDashboard.getNumber("shooterRPM", DEFAULT_SHOOTER_RATE);
     	//Use this to retrieve values from the Driver Station
     	//e.g Which autonomous to use or processed image information.
     }
