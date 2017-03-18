@@ -154,11 +154,7 @@ public class Robot extends IterativeRobot
 
     public void autonomousPeriodic()
     {
-		m_Shooter.SetShooterSetpoint(1000);
-		SmartDashboard.putNumber("ShooterTalonSrxRpm", m_RobotControllers.getShooter().getEncVelocity());
-		SmartDashboard.putNumber("Shooter Setpoint RPM", m_RobotControllers.getShooter().getSetpoint());
-		SmartDashboard.putNumber("shooterTalonSRXEncoder RPM", m_RobotControllers.getShooter().get());
-
+		
     	/**
          * This function is called periodically during autonomous
          */
@@ -174,17 +170,12 @@ public class Robot extends IterativeRobot
     	
     	switch(SmartDashboard.getInt("autonRoutine", 0))
     	{
-    	
     	default:
-    		
-    	//	autonRightGear();
 			m_Shooter.SetShooterSetpoint(1000);
-			SmartDashboard.putNumber("ShooterTalonSrxRpm", m_RobotControllers.getShooter().getEncVelocity());
-    		break;
+			break;
     	}
     	
-		m_DriveTrain.WriteDashboardData();
-		m_Shooter.WriteDashboardData();
+    	WriteDashboardData();
     }
     
     public void autonLeftGearShoot(double visionTurn)
@@ -470,7 +461,7 @@ public class Robot extends IterativeRobot
     public void runShooter()
     {
     	GetDashboardData();
-    //	if(m_RobotInterface.GetDriverRightBumper())
+    	//if(m_RobotInterface.GetDriverRightBumper())
     	if(false)
     	{
     		//Enable the PID controller for the shooter using a rate calculated using our lidar sensor
@@ -495,14 +486,13 @@ public class Robot extends IterativeRobot
     	else if(m_RobotInterface.GetDriverY())
     	{
     		//Enable the PID controller for the shooter using a rate calculated read from the dashboard
-    		System.out.println("Dashboard Shooter RPM: " + Double.toString(shooterRPM));
-//    		m_Shooter.SetShooterSetpoint(shooterRPM);
-//    	   	m_Shooter.EnablePID();
-    		m_Shooter.SetTalonOutput(shooterRPM);
+    		
+    		m_Shooter.EnablePID();
+    		m_Shooter.SetShooterSetpoint(shooterRPM);
 
-			SmartDashboard.putBoolean("Shooter on target", m_Shooter.ShooterOnTarget());
+			//SmartDashboard.putBoolean("Shooter on target", m_Shooter.ShooterOnTarget());
 			
-    		if(m_Shooter.ShooterOnTarget())
+    		/*if(m_Shooter.ShooterOnTarget())
         	{
         		//Shooter is ready to fire.
         		runIndexer();
@@ -514,14 +504,14 @@ public class Robot extends IterativeRobot
         	else
         	{
         		m_LightSystem.setDefault();
-        	}
+        	}*/
     	}
     	else
     	{
     		//STOP
-    		m_Shooter.SetTalonOutput(0);
+    		m_Shooter.SetShooterSetpoint(0);
     		m_Shooter.DisablePID();
-    		m_LightSystem.setDefault();
+    		//m_LightSystem.setDefault();
     	}
     }
     

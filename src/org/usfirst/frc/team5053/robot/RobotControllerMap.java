@@ -21,7 +21,7 @@ public class RobotControllerMap
 	private final int rightDrivePWM = 1;
 	private final int intakePWM = 2;
 	private final int indexerPWM = 3;
-//	private final int shooterPWM = 4;
+	//private final int shooterPWM = 4;
 	private final int scalerPWM = 5;
 	private final int mixerPWM = 6;
 	
