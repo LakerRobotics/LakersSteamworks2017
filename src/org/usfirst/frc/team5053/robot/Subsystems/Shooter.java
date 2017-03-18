@@ -14,9 +14,9 @@ public class Shooter implements Subsystem {
 	//private Encoder m_Encoder;
 	//private PIDController m_PID;
 	
-	private double KP = 0.0001;
-	private double KI = 0.0005;
-	private double KD = 0.0;
+//config through RoboRIO webpage	private double KP = 0.0001;
+//config through RoboRIO webpage	private double KI = 0.0005;
+//config through RoboRIO webpage	private double KD = 0.0;
 	
 	private double TOLERANCE_RPM = 10;
 	
@@ -38,10 +38,10 @@ public class Shooter implements Subsystem {
 		FeedbackDeviceStatus status = m_Shooter.isSensorPresent(FeedbackDevice.CtreMagEncoder_Relative);
 		if(debug) if(status == FeedbackDeviceStatus.FeedbackStatusPresent){ System.out.println ("The TalonSRX detects the Mag Encoder Sensor");} 
 		
-		m_Shooter.SetVelocityMeasurementPeriod(VelocityMeasurementPeriod.Period_100Ms);
-		m_Shooter.SetVelocityMeasurementWindow(64);
+		m_Shooter.SetVelocityMeasurementPeriod(VelocityMeasurementPeriod.Period_20Ms); // think this is best though not as smooth Period_20Ms
+		m_Shooter.SetVelocityMeasurementWindow(32);//think this is best though not as smooth 32
 		
-		m_Shooter.setPID(KP,KI,KD);//(p, i, d); (0.3,0.001,0.0);
+//		m_Shooter.setPID(KP,KI,KD);//(p, i, d); (0.3,0.001,0.0);
 		//more complex, we don't need/not used to.		m_Shooter.setPID(0.01,0.001,0,0,0,0.0,0);//(p, i, d, f, izone, closeLoopRampRate, profile); (0.3,0.001,0.0);
 		//more complex, we don't need.		m_Shooter.setCloseLoopRampRate(0.0);// how fast the voltage going to the motor can change, in this case we specify 0, so no limit
 		//more complex, we don't need.		m_Shooter.setIZone(0);// can define multiple sets of PID settings, we are just using the zero PIDS setting
@@ -83,5 +83,8 @@ public class Shooter implements Subsystem {
 		SmartDashboard.putNumber("Shooter SRX Setpoint (m_Shooter.getSetPoint())", m_Shooter.getSetpoint());
 		SmartDashboard.putNumber("Shooter SRX RPM (m_Shooter.get())", m_Shooter.getSpeed());
 		SmartDashboard.putNumber("Shooter SRX Velocity (m_Shooter.getEncVelocity)", m_Shooter.getEncVelocity());
+		SmartDashboard.putNumber("Shooter SRX OutputVoltage", m_Shooter.getOutputVoltage());
+		SmartDashboard.putNumber("Shooter SRX OutputCurrent", m_Shooter.getOutputCurrent());
+		
 	}
 }
