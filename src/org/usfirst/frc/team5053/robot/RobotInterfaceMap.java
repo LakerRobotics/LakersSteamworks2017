@@ -170,14 +170,14 @@ public class RobotInterfaceMap
 	public boolean GetDriverStart(){                 return driverJoystick.getRawButton(driverStartButton);}
 	public boolean GetDriverLeftBumper(){            return driverJoystick.getRawButton(driverLeftBumper);}
 	public boolean GetDriverRightBumper(){           return driverJoystick.getRawButton(driverRightBumper);}
-	public boolean GetDriverLeftTrigger(){           return driverJoystick.getRawButton(driverLeftTrigger);}
-	public boolean GetDriverRightTrigger(){          return driverJoystick.getRawButton(driverRightTrigger);}
 	public boolean GetDriverLeftJoystickButton(){    return driverJoystick.getRawButton(driverLeftJoystickButton);}
 	public boolean GetDriverRightJoystickButton(){   return driverJoystick.getRawButton(driverRightJoystickButton);}
 	public double GetDriverLeftX(){                  return driverJoystick.getRawAxis(driverLeftX);}
 	public double GetDriverRightX(){                 return driverJoystick.getRawAxis(driverRightX);}
 	public double GetDriverLeftY(){                  return driverJoystick.getRawAxis(driverLeftY);}
 	public double GetDriverRightY(){                 return driverJoystick.getRawAxis(driverRightY);}
+	public double GetDriverLeftTrigger(){            return driverJoystick.getRawAxis(driverLeftTrigger);}
+	public double GetDriverRightTrigger(){			 return driverJoystick.getRawAxis(driverRightTrigger);}
 	public Joystick GetDriverJoystick(){             return driverJoystick;}
 	
 	

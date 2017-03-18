@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		// This is just a simple P control, Proportional control of the line follow
 		// if we assume angle is in degrees and if we were off by 20 Degrees then we would want how much correction
 		// for example id Kp is 0.025 at 20 degrees we would have 0.5 or half the power toward rotating the robot 
-		private double Kp = 0d/20d; //0.025;// 
+		private double Kp = 1d/200d; //0.025;// 
 		private DriveTrainMotionControl m_driveTrain;
 		private PIDSource m_TurnSource;
 		private double m_targetAngle = 0.0d;
@@ -72,7 +72,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 	    	
 	    	leftPower = motorPower-rotationPower;
 	    	rightPower = motorPower+rotationPower;
-	    	m_driveTrain.tankDrive(leftPower,  rightPower);
+	    	m_driveTrain.tankDrive(leftPower*.6,  rightPower*.6);
 
 		}
 		
@@ -81,8 +81,8 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		    double     ramp =  30; //degrees
 		    double maxspeed = 10.0*(360/60) ; //60/360 converts the first numbers which is in RPM to degrees/second
 			
-			final double Kp = 1d/200; // so at denominator off in the spin-Rate the power will reach the max
-		    final double Ki = 0.0000;
+			final double Kp = 0.001; // so at denominator off in the spin-Rate the power will reach the max
+		    final double Ki = 0.0;
 		    final double Kd = 0.0;
 		 
 		    MotionControlPIDController localRotationSpeedPID;
@@ -119,6 +119,6 @@ import edu.wpi.first.wpilibj.PIDOutput;
 	    public void disableRotationController()
 	    {
 	    	m_RotationController.disable();
-	    	m_RotationController.free();
+	    	//m_RotationController.free();
 	    }
 	}

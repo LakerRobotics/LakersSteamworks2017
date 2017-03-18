@@ -2,7 +2,6 @@ package org.usfirst.frc.team5053.robot;
 
 import org.usfirst.frc.team5053.robot.RobotInterfaceMap.JoystickType;
 import org.usfirst.frc.team5053.robot.Sensors.LidarLite;
-import org.usfirst.frc.team5053.robot.Subsystems.DriveTrain;
 import org.usfirst.frc.team5053.robot.Subsystems.DriveTrainMotionControl;
 import org.usfirst.frc.team5053.robot.Subsystems.Indexer;
 import org.usfirst.frc.team5053.robot.Subsystems.Intake;
@@ -16,12 +15,7 @@ import org.opencv.imgproc.Imgproc;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.RobotDrive;
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.vision.VisionPipeline;
-import edu.wpi.first.wpilibj.vision.VisionRunner;
 import edu.wpi.first.wpilibj.vision.VisionThread;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -35,7 +29,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot
 {
-	
 	/* Declare any and all variables here
 	 *  Do not initialize until robotInit()
 	 */
@@ -46,7 +39,6 @@ public class Robot extends IterativeRobot
 	private RobotSensorMap m_RobotSensors;
 	
 	//Robot Subsystem Declaration
-	//DriveTrain m_DriveTrain;
 	private DriveTrainMotionControl m_DriveTrain;
 	private Intake m_Intake;
 	private Shooter m_Shooter;
@@ -67,9 +59,8 @@ public class Robot extends IterativeRobot
 	private final double DEFAULT_SHOOTER_SPEED	= .7;
 	private final double DEFAULT_SHOOTER_RATE = 1000;
 	private final double INTAKE_SPEED = .7;
-	private final double MIXER_SPEED = .7;
 	private final double INDEXER_SPEED = .7;
-	private final double SCALER_SPEED = -1.0;
+	private final double SCALER_SPEED = -.85;
 
 	//Vision constants
 	private final int IMG_WIDTH		= 320;
@@ -82,6 +73,7 @@ public class Robot extends IterativeRobot
 	private int allianceSide;
 	private int teleopLightLoops;
 	private double shooterRPM;
+	private boolean autonShoot;
 	
 	@Override
     public void robotInit()
@@ -91,9 +83,7 @@ public class Robot extends IterativeRobot
          * used for any initialization code.
          */
     	
-    	// the RobotInterfaceMap detects the controller and set the key mapping accordingly
     	m_RobotInterface = new RobotInterfaceMap(JoystickType.XBOX, JoystickType.JOYSTICK);
-
     	m_RobotControllers = new RobotControllerMap();
     	m_RobotSensors = new RobotSensorMap();    	
     	
@@ -104,29 +94,22 @@ public class Robot extends IterativeRobot
     	m_Indexer = new Indexer(m_RobotControllers.getIndexer());
     	m_Scaler = new Scaler(m_RobotControllers.getScaler());
     	
+    	//Misc Subsystem Initialization
     	m_LightSystem = new LightSystem(m_RobotSensors.getRed(), m_RobotSensors.getBlue(), m_RobotSensors.getGreen(), DriverStation.getInstance().getAlliance());
     	m_LightSystem.setDefault();
     	m_Lidar = m_RobotSensors.getLidar();
     	m_Lidar.start();
     	
+    	shooterRPM = .65;
+    	
+    	//Camera Initialization
     	m_Camera = CameraServer.getInstance().startAutomaticCapture();
-		
     	m_Camera.setExposureManual(1);
     	m_Camera.setFPS(30);
     	m_Camera.setBrightness(1);
         m_Camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
     	
-        centerX = 0.0;
-    	autonomousCase = 0;
-    	switch(DriverStation.getInstance().getAlliance())
-    	{
-    	case Red:
-    		allianceSide = 1;
-    		break;
-    	case Blue:
-    		allianceSide = -1;
-    		break;
-    	}
+        centerX = (IMG_WIDTH/2);
     	previousVisionTurn = 0;
     	teleopLightLoops = 0;
     	isVisionTurnRunning = false;
@@ -150,6 +133,20 @@ public class Robot extends IterativeRobot
          * This function is called once when autonomous begins
          */
     	autonomousCase = 0;
+    	autonomousWait = 0;
+    	autonShoot = SmartDashboard.getBoolean("shoot");
+    	
+    	switch(DriverStation.getInstance().getAlliance())
+    	{
+    	case Red:
+    		allianceSide = -1;
+    		break;
+    	case Blue:
+    		allianceSide = 1;
+    		break;
+		default:
+    		allianceSide = 1;
+    	}
     }
 
     public void autonomousPeriodic()
@@ -160,7 +157,7 @@ public class Robot extends IterativeRobot
          */
     	
     	double centerX;
-    	double distanceToBoilerTarget;
+    	//Updates our vision angle
     	synchronized (m_ImgLock) {
     		centerX = this.centerX;
     	}
@@ -168,24 +165,77 @@ public class Robot extends IterativeRobot
 
     	SmartDashboard.putNumber("Vision Turn", turn);
     	
-    	switch(SmartDashboard.getInt("autonRoutine", 0))
+    	switch((int) SmartDashboard.getNumber("autonRoutine", 0))
     	{
+<<<<<<< HEAD
     	default:
 			m_Shooter.SetShooterSetpoint(250);
+=======
+    	case 0: //NO AUTON
+    		break;
+    	case 1: //CENTER
+    		autonCenter(turn);
+    		break;
+    	case 2: //RIGHT
+    		autonFeederSide(turn);
+    		break;
+    	case 3: //LEFT
+    		autonBoilerSide(turn);
+    		break;
+    	case 4:
+    		debugTurn(turn);
+    		break;
+		default: //NO AUTON
+>>>>>>> KetteringOpenBagWeek3
 			break;
     	}
     	
     	WriteDashboardData();
     }
-    
-    public void autonLeftGearShoot(double visionTurn)
+    public void debugTurn(double visionTurn)
+    {
+    	switch(autonomousCase)
+    	{
+    	case 0: 
+    		m_DriveTrain.ResetEncoders();
+        	m_DriveTrain.ResetGyro();
+    		autonomousCase++;
+    		break;
+    	case 1:
+    		autonomousCase++;
+    		System.out.println("Seeking Target");
+    		visionAlign(visionTurn /*Vision turn aligns to the reflective tape on the high goal*/);
+    		break;
+    	
+    	case 2:
+    		if(!(Math.abs(previousVisionTurn) == visionTurn))
+    		{
+    			previousVisionTurn = visionTurn;
+        		visionAlign(visionTurn /*Vision turn aligns to the reflective tape on the high goal*/);
+        		System.out.println(Double.toString(visionTurn));
+    		}
+    		if(!isVisionTurnRunning)
+    		{
+    			autonomousCase++;
+    		}
+    		break;
+    	case 3:
+    		System.out.println("On Target");
+    		autonomousCase++;
+    		break;
+    	case 4:
+    		break;
+    	}
+    }
+    public void autonBoilerSide(double visionTurn)
     {
     	switch(autonomousCase)
     	{
     	case 0: //Drive out from wall
+    		System.out.println("Executing Boiler Side Autonomous");
     		m_DriveTrain.ResetEncoders();
     		m_DriveTrain.ResetGyro();
-    		m_DriveTrain.DriveDistance(60 /*Distance to peg-start intersection*/, 4, 2);
+    		m_DriveTrain.DriveDistance(48 /*Distance to peg-start intersection*/, 4, 24);
     		autonomousCase++;
     		break;
     	case 1: //Turn to face the gear peg
@@ -202,7 +252,7 @@ public class Robot extends IterativeRobot
     		{
     			m_DriveTrain.ResetEncoders();
     			m_DriveTrain.ResetGyro();
-    			m_DriveTrain.DriveDistance(80/*distance to the gear peg*/, 4, 2);
+    			m_DriveTrain.DriveDistance(70/*distance to the gear peg*/, 4, 24);
     			autonomousCase++;
     		}
     		break;
@@ -210,13 +260,21 @@ public class Robot extends IterativeRobot
     		if(m_DriveTrain.isStraightPIDFinished())
     		{
     			autonomousWait++;
+    			System.out.println("Wait Time: " + Integer.toString(autonomousWait));
     			if(autonomousWait >= 150)
     			{
         			m_DriveTrain.ResetEncoders();
             		m_DriveTrain.ResetGyro();
-            		m_DriveTrain.DriveDistance(-80/*distance back to the intersection*/, 4, 2);
+            		m_DriveTrain.DriveDistance(-75/*distance back to the intersection*/, 4, 24);
             		autonomousWait = 0;
-        			autonomousCase++;
+            		if(autonShoot)
+            		{
+            			autonomousCase++;
+            		}
+            		else
+            		{
+            			autonomousCase = 900;
+            		}
     			}
     		}
     		break;
@@ -229,47 +287,56 @@ public class Robot extends IterativeRobot
         		autonomousCase++;
     		}
     		break;
-    	case 5: //Vision align to high boiler
+    	case 5: //Transition to vision align
     		if(m_DriveTrain.isTurnPIDFinished())
     		{
-    			if(!isVisionTurnRunning)
-    			{
-        			m_DriveTrain.ResetEncoders();
-        			m_DriveTrain.ResetGyro();
-    			}
-        		if(!(Math.abs(previousVisionTurn) == visionTurn))
-        		{
-        			previousVisionTurn = visionTurn;
-            		visionAlign(visionTurn /*Vision turn aligns to the reflective tape on the high goal*/);
-        		}
-        		if(!isVisionTurnRunning)
-        		{
-        			autonomousCase++;
-        		}
+    			m_DriveTrain.ResetEncoders();
+    			m_DriveTrain.ResetGyro();
+    			autonomousCase++;
     		}
     		break;
-    	case 6: //Shoot
-			m_DriveTrain.ResetEncoders();
-			m_DriveTrain.ResetGyro();
-			m_Shooter.SetShooterSetpoint(calculateShooterRPM()/*RPM calculated using lidar sensor*/);
-			if(m_Shooter.ShooterOnTarget())
+    	case 6: //Transition to vision align
+    		
+        		m_DriveTrain.DriveDistance(24 /*Distance to engage the gear peg*/, 4, 24);
+        		autonomousCase++;
+    		break;
+    	case 7: //Vision align to high boiler
+    		if(m_DriveTrain.isStraightPIDFinished())
+    		{
+    			m_Shooter.SetTalonOutput(.68);
+    			autonomousCase++;
+    			autonomousWait = 0;
+    		}
+    		break;
+    	case 8: //Shoot
+			autonomousWait++;
+			if (autonomousWait > 50)
 			{
 				m_Indexer.SetTalonOutput(INDEXER_SPEED);
+				autonomousCase++;
 			}
+			break;
+    	case 9:
     		break;
 		default:
-			break;
+			if(m_DriveTrain.isStraightPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+    			m_DriveTrain.ResetGyro();
+    		}
+    		break;
     	}
     }
     
-    public void autonCenterGearShoot(double visionTurn)
+    public void autonCenter(double visionTurn)
     {
     	switch(autonomousCase)
     	{
     	case 0: //Drive out from wall and engage gear peg
+    		System.out.println("Executing Center Autonomous");
     		m_DriveTrain.ResetEncoders();
     		m_DriveTrain.ResetGyro();
-    		m_DriveTrain.DriveDistance(75 /*Distance to engage the gear peg*/, 10, 1);
+    		m_DriveTrain.DriveDistance(70 /*Distance to engage the gear peg*/, 4, 24);
     		autonomousCase++;
     		break;
     	case 1: //Disengage gear peg
@@ -280,8 +347,15 @@ public class Robot extends IterativeRobot
 				{
 					m_DriveTrain.ResetEncoders();
 		    		m_DriveTrain.ResetGyro();
-		    		m_DriveTrain.DriveDistance(-24/*Distance to disengage gear peg*/, 10, 1);
-					autonomousCase++;
+		    		m_DriveTrain.DriveDistance(-24/*Distance to disengage gear peg*/, 4, 24);
+		    		if(autonShoot)
+            		{
+            			autonomousCase++;
+            		}
+            		else
+            		{
+            			autonomousCase = 900;
+            		}
     			}
     		}
     		break;
@@ -290,43 +364,58 @@ public class Robot extends IterativeRobot
     		{
     			m_DriveTrain.ResetEncoders();
     			m_DriveTrain.ResetGyro();
-    			m_DriveTrain.TurnToAngle(-115*allianceSide/*Angle to face the boiler*/);
+    			m_DriveTrain.TurnToAngle(-100*allianceSide/*Angle to face the boiler*/);
     			autonomousCase++;
     		}
     		break;
-    	case 3: //Vision align to high goal
+    	case 3: //Transition to vision align
     		if(m_DriveTrain.isTurnPIDFinished())
     		{
-    			if(!isVisionTurnRunning)
-    			{
-        			m_DriveTrain.ResetEncoders();
-        			m_DriveTrain.ResetGyro();
-    			}
-    			if(!(Math.abs(previousVisionTurn) == visionTurn))
-        		{
-        			previousVisionTurn = visionTurn;
-            		visionAlign(visionTurn /*Vision turn aligns to the reflective tape on the high goal*/);
-        		}
-        		if(!isVisionTurnRunning)
-        		{
-        			autonomousCase++;
-        		}
+    			m_DriveTrain.ResetEncoders();
+        		m_DriveTrain.ResetGyro();
+        		m_DriveTrain.DriveDistance(84 /*Distance to engage the gear peg*/, 8, 24);
+        		autonomousCase++;
     		}
-    	case 4: //Shoot
-			m_DriveTrain.ResetEncoders();
-			m_DriveTrain.ResetGyro();
-			autonomousCase++;
+    		break;
+    	case 4: //Vision align to high boiler
+    		if(m_DriveTrain.isStraightPIDFinished())
+    		{
+    			m_Shooter.SetTalonOutput(.70);
+    			m_DriveTrain.arcadeDrive(.6, 0.0);
+    			autonomousCase++;
+    			autonomousWait = 0;
+    		}
+    		break;
+    	case 5: //Shoot
+			autonomousWait++;
+			if (autonomousWait > 150)
+			{
+				m_Indexer.SetTalonOutput(INDEXER_SPEED);
+				m_DriveTrain.arcadeDrive(0.0, 0.0);
+				autonomousCase++;
+			}
+			break;
+    	case 6:
+    		break;
+		default:
+			if(m_DriveTrain.isStraightPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+    			m_DriveTrain.ResetGyro();
+    		}
+    		break;
     	}
     }
     
-    public void autonRightGear()
+    public void autonFeederSide(double visionTurn)
 	{
 		switch(autonomousCase)
     	{
     	case 0: //Drive out from wall
+    		System.out.println("Executing Feeder Side Autonomous");
     		m_DriveTrain.ResetEncoders();
     		m_DriveTrain.ResetGyro();
-    		m_DriveTrain.DriveDistance(60 /*Distance to peg-start intersection*/, 4, 2);
+    		m_DriveTrain.DriveDistance(63.434 /*Distance to peg-start intersection*/, 2, 24);
     		autonomousCase++;
     		break;
     	case 1: //Turn to face the gear peg
@@ -334,7 +423,7 @@ public class Robot extends IterativeRobot
     		{
     			m_DriveTrain.ResetEncoders();
         		m_DriveTrain.ResetGyro();
-        		m_DriveTrain.TurnToAngle(-55*allianceSide/*Angle to face the gear peg*/);
+        		m_DriveTrain.TurnToAngle(-60*allianceSide/*Angle to face the gear peg*/);
     			autonomousCase++;
     		}
     		break;
@@ -343,31 +432,75 @@ public class Robot extends IterativeRobot
     		{
     			m_DriveTrain.ResetEncoders();
     			m_DriveTrain.ResetGyro();
-    			m_DriveTrain.DriveDistance(85/*Distance to gear peg*/, 4, 2);
+    			m_DriveTrain.DriveDistance(60/*Distance to gear peg*/, 4, 24);
     			autonomousCase++;
     		}
     		break;
-    	case 3: //Disengage Peg
+    	case 3: //Disengage Peg and move back to the intersection
     		if(m_DriveTrain.isStraightPIDFinished())
     		{
     			autonomousWait++;
+    			System.out.println("Wait Time: " + Integer.toString(autonomousWait));
     			if(autonomousWait >= 150)
     			{
         			m_DriveTrain.ResetEncoders();
             		m_DriveTrain.ResetGyro();
-            		m_DriveTrain.DriveDistance(-24/*Distance to disengage the peg*/, 4, 2);
+            		m_DriveTrain.DriveDistance(-115.25/*Distance to disengage the peg*/, 4, 24);
             		autonomousWait = 0;
-        			autonomousCase++;
+            		if(autonShoot)
+            		{
+            			autonomousCase++;
+            		}
+            		else
+            		{
+            			autonomousCase = 900;
+            		}
     			}
     		}
     		break;
-    	case 4:
+    	case 4: //Turn to face the boiler
     		if(m_DriveTrain.isStraightPIDFinished())
     		{
     			m_DriveTrain.ResetEncoders();
     			m_DriveTrain.ResetGyro();
+    			m_DriveTrain.TurnToAngle(138.352*allianceSide/*Turn to have back face the driver station wall*/);
     			autonomousCase++;
     		}
+    		break;
+    	case 5: //Drive to the boiler
+    		if(m_DriveTrain.isTurnPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+    			m_DriveTrain.ResetGyro();
+    			m_DriveTrain.DriveDistance(-228.692/*Distance to the boiler*/, 4, 24);
+    			autonomousCase++;
+    		}
+    		break;
+    	case 7: //Vision align to high boiler
+    		if(m_DriveTrain.isStraightPIDFinished())
+    		{
+    			m_Shooter.SetTalonOutput(.68);
+    			autonomousCase++;
+    			autonomousWait = 0;
+    		}
+    		break;
+    	case 8: //Shoot
+    		autonomousWait++;
+    		if (autonomousWait > 50)
+    		{
+    			m_Indexer.SetTalonOutput(INDEXER_SPEED);
+    			autonomousCase++;
+    		}
+    		break;
+    	case 9:
+    		break;
+    	default:
+    		if(m_DriveTrain.isStraightPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+    			m_DriveTrain.ResetGyro();
+    		}
+    		break;
     	}
     }
     
@@ -379,8 +512,6 @@ public class Robot extends IterativeRobot
     	/**
          * This function is called periodically during operator control
          */
-    	runShooter();
-    	runIndexer();
     	
     	if(autonomousCase != 0)
     	{
@@ -396,9 +527,12 @@ public class Robot extends IterativeRobot
     		centerX = this.centerX;
     	}
     	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
-    	
-    	//Drivetrain
-    	if(m_RobotInterface.GetDriverLeftBumper())
+    	if (centerX == 0)
+    	{
+    		turn = 0;
+    	}
+    	//Drivetrain methods
+    	/*if(m_RobotInterface.GetDriverLeftBumper())
     	{
     		if(!(Math.abs(previousVisionTurn) == turn))
     		{
@@ -415,18 +549,23 @@ public class Robot extends IterativeRobot
         	}
     	}
     	else if(!isVisionTurnRunning)
-    	{
-        	arcadeDrive();
-    	}
+    	{*/
+        	
+    	//}
+    	arcadeDrive();
     	m_DriveTrain.WriteDashboardData();
     	
     	//Shooter methods
     	runShooter();
     	
     	//Other
+    	runIndexer();
     	runIntake();
     	runScaler();
     	
+    	
+    	
+    	//Misc variable updates
     	teleopLightLoops++;
     }
 
@@ -440,10 +579,17 @@ public class Robot extends IterativeRobot
     //Drivetrain methods
     public void arcadeDrive()
     {
-    	m_DriveTrain.ArcadeDrive(m_RobotInterface.GetDriverLeftY(), m_RobotInterface.GetDriverRightX());
-    }
+    	if(m_RobotInterface.GetDriverLeftTrigger() > 0)
+    	{
+    	 	m_DriveTrain.ArcadeDrive(m_RobotInterface.GetDriverLeftY()*0.7, m_RobotInterface.GetDriverRightX()*0.7);
+    	}
+    	else
+    	{
+    	 	m_DriveTrain.ArcadeDrive(m_RobotInterface.GetDriverLeftY(), m_RobotInterface.GetDriverRightX());
+    	}
+   }
     
-    public void visionAlign(double turn) 
+    public void visionAlign(double turn)
     {
     	SmartDashboard.putNumber("Vision Turn", turn);
     	
@@ -460,7 +606,43 @@ public class Robot extends IterativeRobot
     //Shooter methods
     public void runShooter()
     {
+    	double CLOSE_SPEED = .65;
+    	double MEDIUM_SPEED = .70;
+    	double FAR_SPEED = .75;
     	GetDashboardData();
+
+    	
+    	if (m_RobotInterface.GetOperatorButton(3))
+    	{
+    		shooterRPM = .68;
+    		m_Shooter.SetTalonOutput(shooterRPM);
+    	} else if (m_RobotInterface.GetOperatorButton(4)){
+    		shooterRPM = CLOSE_SPEED;
+    		m_Shooter.SetTalonOutput(shooterRPM);
+    	} else if (m_RobotInterface.GetOperatorButton(5)) {
+    		shooterRPM = MEDIUM_SPEED;
+    		m_Shooter.SetTalonOutput(shooterRPM);
+    	} else if (m_RobotInterface.GetOperatorButton(6)) {
+    		shooterRPM = FAR_SPEED;
+    		m_Shooter.SetTalonOutput(shooterRPM);
+    	} else if (m_RobotInterface.GetOperatorButton(7)) {
+    		shooterRPM = .8;
+    		m_Shooter.SetTalonOutput(shooterRPM);
+    	} else if (m_RobotInterface.GetOperatorButton(8)) {
+    		shooterRPM = .85;
+    		m_Shooter.SetTalonOutput(shooterRPM);
+    	} else if (m_RobotInterface.GetOperatorButton(9)) {
+    		shooterRPM = .9;
+    		m_Shooter.SetTalonOutput(shooterRPM);
+    	} else if (m_RobotInterface.GetOperatorButton(10)) {
+    		shooterRPM = .95;
+    		m_Shooter.SetTalonOutput(shooterRPM);
+    	} else if (m_RobotInterface.GetOperatorButton(11)) {
+    		shooterRPM = 1;
+    		m_Shooter.SetTalonOutput(shooterRPM);
+    	} else {
+    		m_Shooter.SetTalonOutput(0);
+    	}
     	//if(m_RobotInterface.GetDriverRightBumper())
     	if(false)
     	{
@@ -483,14 +665,14 @@ public class Robot extends IterativeRobot
         		m_LightSystem.setDefault();
         	}
     	}
-    	else if(m_RobotInterface.GetDriverY())
+    	/*else if(m_RobotInterface.GetDriverRightTrigger() > 0)
     	{
+    		System.out.println("Shooter entered");
     		//Enable the PID controller for the shooter using a rate calculated read from the dashboard
-    		
-    		m_Shooter.EnablePID();
-    		m_Shooter.SetShooterSetpoint(shooterRPM);
-
-			//SmartDashboard.putBoolean("Shooter on target", m_Shooter.ShooterOnTarget());
+    		//m_Shooter.SetShooterSetpoint(shooterRPM);
+    		//m_Shooter.EnablePID();
+    		m_Shooter.SetTalonOutput(shooterRPM);
+			SmartDashboard.putBoolean("Shooter on target", m_Shooter.ShooterOnTarget());
 			
     		/*if(m_Shooter.ShooterOnTarget())
         	{
@@ -504,15 +686,16 @@ public class Robot extends IterativeRobot
         	else
         	{
         		m_LightSystem.setDefault();
-        	}*/
+        	}
     	}
     	else
     	{
     		//STOP
     		m_Shooter.SetShooterSetpoint(0);
     		m_Shooter.DisablePID();
-    		//m_LightSystem.setDefault();
-    	}
+
+    		m_LightSystem.setDefault();
+    	}*/
     }
     
     public double calculateShooterRPM()
@@ -520,8 +703,20 @@ public class Robot extends IterativeRobot
     	//y = 11.815x2 + 140.58x + 1348.4 
 		double distanceFt = m_Lidar.getDistanceFt();
 		double shooterRate = (11.815*(distanceFt*distanceFt) + 140.58*distanceFt+1348.4);
-		System.out.println("Calculated Shooter RPM: " + Double.toString(shooterRate));
 		return shooterRate;
+    }
+    
+    //Indexer methods
+    public void runIndexer() 
+    {
+    	if(m_RobotInterface.GetDriverRightBumper())
+ 		{
+    		m_Indexer.SetTalonOutput(INDEXER_SPEED);
+ 		}
+ 	    else
+ 	    {
+ 	    	m_Indexer.SetTalonOutput(0);
+ 	    }
     }
 
     //Intake methods
@@ -537,23 +732,9 @@ public class Robot extends IterativeRobot
 	    }
     }
     
-    //Indexer methods
-    public void runIndexer() 
-    {
-    	if(m_RobotInterface.GetDriverB())
- 		{
-    		m_Indexer.SetTalonOutput(INDEXER_SPEED);
- 		}
- 	    else
- 	    {
- 	    	m_Indexer.SetTalonOutput(0);
- 	    }
-    }
-    
     //Scaler methods
     public void runScaler() 
     {
-    	//TODO Determine button
     	if(m_RobotInterface.GetOperatorButton(2))
  		{
         	m_Scaler.SetTalonOutput(SCALER_SPEED);
@@ -591,7 +772,7 @@ public class Robot extends IterativeRobot
     
     public void GetDashboardData()
     {
-    	shooterRPM = SmartDashboard.getNumber("shooterRPM", DEFAULT_SHOOTER_RATE);
+    	//shooterRPM = SmartDashboard.getNumber("shooterRPM", DEFAULT_SHOOTER_RATE);
     	//Use this to retrieve values from the Driver Station
     	//e.g Which autonomous to use or processed image information.
     }
