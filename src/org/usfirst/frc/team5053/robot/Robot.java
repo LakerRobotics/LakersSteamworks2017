@@ -89,7 +89,7 @@ public class Robot extends IterativeRobot
     	
     	//Robot Subsystem Initialization
     	m_DriveTrain = new DriveTrainMotionControl(m_RobotControllers.getLeftDrive(), m_RobotControllers.getRightDrive(), m_RobotSensors.getLeftDriveEncoder(), m_RobotSensors.getRightDriveEncoder(), m_RobotSensors.getGyro());
-    	m_Shooter = new Shooter(m_RobotControllers.getShooter(), m_RobotSensors.getShooterEncoder());
+    	m_Shooter = new Shooter(m_RobotControllers.getShooter());//Encoder connected directly to the motor control so Robo Rio dosn't define the encoder since it knows nothing about it directly
     	m_Intake = new Intake(m_RobotControllers.getIntake());
     	m_Indexer = new Indexer(m_RobotControllers.getIndexer());
     	m_Scaler = new Scaler(m_RobotControllers.getScaler());
@@ -151,6 +151,7 @@ public class Robot extends IterativeRobot
 
     public void autonomousPeriodic()
     {
+		
     	/**
          * This function is called periodically during autonomous
          */
@@ -166,6 +167,10 @@ public class Robot extends IterativeRobot
     	
     	switch((int) SmartDashboard.getNumber("autonRoutine", 0))
     	{
+<<<<<<< HEAD
+    	default:
+			m_Shooter.SetShooterSetpoint(250);
+=======
     	case 0: //NO AUTON
     		break;
     	case 1: //CENTER
@@ -181,11 +186,11 @@ public class Robot extends IterativeRobot
     		debugTurn(turn);
     		break;
 		default: //NO AUTON
+>>>>>>> KetteringOpenBagWeek3
 			break;
     	}
     	
-		m_DriveTrain.WriteDashboardData();
-		m_Shooter.WriteDashboardData();
+    	WriteDashboardData();
     }
     public void debugTurn(double visionTurn)
     {
@@ -605,7 +610,7 @@ public class Robot extends IterativeRobot
     	double MEDIUM_SPEED = .70;
     	double FAR_SPEED = .75;
     	GetDashboardData();
-    	
+
     	
     	if (m_RobotInterface.GetOperatorButton(3))
     	{
@@ -638,7 +643,6 @@ public class Robot extends IterativeRobot
     	} else {
     		m_Shooter.SetTalonOutput(0);
     	}
-    	
     	//if(m_RobotInterface.GetDriverRightBumper())
     	if(false)
     	{
@@ -670,7 +674,7 @@ public class Robot extends IterativeRobot
     		m_Shooter.SetTalonOutput(shooterRPM);
 			SmartDashboard.putBoolean("Shooter on target", m_Shooter.ShooterOnTarget());
 			
-    		if(m_Shooter.ShooterOnTarget())
+    		/*if(m_Shooter.ShooterOnTarget())
         	{
         		//Shooter is ready to fire.
         		runIndexer();
@@ -687,8 +691,9 @@ public class Robot extends IterativeRobot
     	else
     	{
     		//STOP
-    		m_Shooter.SetTalonOutput(0);
+    		m_Shooter.SetShooterSetpoint(0);
     		m_Shooter.DisablePID();
+
     		m_LightSystem.setDefault();
     	}*/
     }

@@ -1,7 +1,7 @@
 package org.usfirst.frc.team5053.robot;
 
-import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.Talon;
+import com.ctre.CANTalon;
 
 /**
  * Maps all of the output controllers on the robot.
@@ -19,9 +19,11 @@ public class RobotControllerMap
 {
 	private final int leftDrivePWM = 0;
 	private final int rightDrivePWM = 1;
+
 	private final int intakePWM = RobotConstants.getIntakePWM();
 	private final int indexerPWM = RobotConstants.getIndexerPWM();
 	private final int shooterPWM = RobotConstants.getShooterPWM();
+
 	private final int scalerPWM = 5;
 	private final int mixerPWM = 6;
 	
@@ -29,7 +31,7 @@ public class RobotControllerMap
 	private Talon m_RightDrive;
 	private Talon m_Intake;
 	private Talon m_Indexer;
-	private Talon m_Shooter;	
+	private CANTalon m_Shooter;	
 	private Talon m_Scaler;
 	private Talon m_Mixer;
 	
@@ -44,14 +46,16 @@ public class RobotControllerMap
 		m_RightDrive = new Talon(rightDrivePWM);
 		m_Intake = new Talon(intakePWM);
 		m_Indexer = new Talon(indexerPWM);
-		m_Shooter = new Talon(shooterPWM);
+		m_Shooter = new CANTalon(1);// specifies the Talon CAN Bus ID, which is configurable on by website on roborio. defualt is 0
+		m_Shooter.setInverted(false);		
+		
 		m_Scaler = new Talon(scalerPWM);
 		m_Mixer = new Talon(mixerPWM);
 		
 		m_LeftDrive.setInverted(true);
 		m_RightDrive.setInverted(true);
 		m_Intake.setInverted(true);
-		m_Shooter.setInverted(true);
+
 	}
 	
 	public Talon getLeftDrive()
@@ -70,7 +74,7 @@ public class RobotControllerMap
 	{
 		return m_Indexer;
 	}
-	public Talon getShooter()
+	public CANTalon getShooter()
 	{
 		return m_Shooter;
 	}
