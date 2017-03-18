@@ -28,8 +28,7 @@ public class Shooter implements Subsystem {
 		
 		m_Shooter.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);// Think this sets us up to control RPM so don't need to set RPM per tick, test in the RoboRio control panel self test
 		//m_Shooter.configEncoderCodesPerRev((60.0d/1024.0d)*(72.0d/24.0d));//It wants INT????
-		m_Shooter.reverseSensor(false);
-		//m_Shooter.reverseOutput(true);
+		m_Shooter.reverseSensor(true);
 		m_Shooter.changeControlMode(TalonControlMode.Speed);
 		
 		m_Shooter.configNominalOutputVoltage(0, 0);
