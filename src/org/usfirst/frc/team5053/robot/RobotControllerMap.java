@@ -48,7 +48,6 @@ public class RobotControllerMap
 		m_Indexer = new Talon(indexerPWM);
 		m_Shooter = new CANTalon(1);// specifies the Talon CAN Bus ID, which is configurable on by website on roborio. defualt is 0
 		m_Shooter.setInverted(true);
-		m_Shooter.enableBrakeMode(false);
 		
 		m_Scaler = new Talon(scalerPWM);
 		m_Mixer = new Talon(mixerPWM);

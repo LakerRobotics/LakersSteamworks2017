@@ -31,6 +31,7 @@ public class Shooter implements Subsystem {
 		m_Shooter.reverseSensor(false);
 		//m_Shooter.reverseOutput(true);
 		m_Shooter.changeControlMode(TalonControlMode.Speed);
+		m_Shooter.enableBrakeMode(false);
 		
 		m_Shooter.configNominalOutputVoltage(0, 0);
 		m_Shooter.configPeakOutputVoltage(12.7,-12.7);
@@ -53,9 +54,13 @@ public class Shooter implements Subsystem {
 	
 	public void EnablePID() {
 			m_Shooter.enableControl();
+			m_Shooter.changeControlMode(TalonControlMode.Speed);
+			
 	}
 	public void DisablePID() {
 			m_Shooter.disableControl();
+			m_Shooter.changeControlMode(TalonControlMode.Voltage);
+			
 	}
 	public boolean isPIDEnabled() {
 		return m_Shooter.isControlEnabled();
@@ -78,6 +83,7 @@ public class Shooter implements Subsystem {
 		//m_PID.setSetpoint(speed);
 	}
 	public void SetTalonOutput(double speed) {
+		
 		m_Shooter.set(speed);
 	}
 	public void WriteDashboardData() {

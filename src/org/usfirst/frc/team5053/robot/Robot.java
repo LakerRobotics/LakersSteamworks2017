@@ -59,7 +59,7 @@ public class Robot extends IterativeRobot
 	private final double DEFAULT_SHOOTER_SPEED	= .7;
 	private final double DEFAULT_SHOOTER_RATE = 1000;
 	private final double INTAKE_SPEED = .7;
-	private final double INDEXER_SPEED = .7;
+	private final double INDEXER_SPEED = 1;
 	private final double SCALER_SPEED = -.85;
 
 	//Vision constants
@@ -608,6 +608,7 @@ public class Robot extends IterativeRobot
     	double MEDIUM_SPEED = .70;
     	double FAR_SPEED = .75;
     	GetDashboardData();
+    	
 
     	
     	if (m_RobotInterface.GetOperatorButton(3))
@@ -645,6 +646,10 @@ public class Robot extends IterativeRobot
     			m_Shooter.EnablePID();
     		}
     	} else {
+    		if (m_Shooter.isPIDEnabled())
+    		{
+    			m_Shooter.DisablePID();
+    		}
     		m_Shooter.SetTalonOutput(0);
     	}
     	//if(m_RobotInterface.GetDriverRightBumper())
