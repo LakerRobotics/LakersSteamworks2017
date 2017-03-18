@@ -171,7 +171,7 @@ public class Robot extends IterativeRobot
     	switch(SmartDashboard.getInt("autonRoutine", 0))
     	{
     	default:
-			m_Shooter.SetShooterSetpoint(1000);
+			m_Shooter.SetShooterSetpoint(250);
 			break;
     	}
     	

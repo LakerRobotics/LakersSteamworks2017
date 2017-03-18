@@ -28,11 +28,11 @@ public class Shooter implements Subsystem {
 		
 		m_Shooter.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);// Think this sets us up to control RPM so don't need to set RPM per tick, test in the RoboRio control panel self test
 		//m_Shooter.configEncoderCodesPerRev((60.0d/1024.0d)*(72.0d/24.0d));//It wants INT????
-		m_Shooter.reverseSensor(false);
+		m_Shooter.reverseSensor(true);
 		m_Shooter.changeControlMode(TalonControlMode.Speed);
 		
 		m_Shooter.configNominalOutputVoltage(0, 0);
-		m_Shooter.configPeakOutputVoltage(12,-12);
+		m_Shooter.configPeakOutputVoltage(12.7,-12.7);
 		
 		// Check Sensor Health
 		FeedbackDeviceStatus status = m_Shooter.isSensorPresent(FeedbackDevice.CtreMagEncoder_Relative);
@@ -48,7 +48,6 @@ public class Shooter implements Subsystem {
 
 		//m_Shooter.setAllowableClosedLoopErr(100);// should allow 100 RPM error and still say it is on target
 		
-		m_Shooter.reverseOutput(true);
 	}
 	
 	public void EnablePID() {
