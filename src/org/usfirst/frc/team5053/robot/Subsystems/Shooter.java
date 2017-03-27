@@ -53,14 +53,13 @@ public class Shooter implements Subsystem {
 	}
 	
 	public void EnablePID() {
-			m_Shooter.enableControl();
+			m_Shooter.enable();
 			m_Shooter.changeControlMode(TalonControlMode.Speed);
-			
+			m_Shooter.set(0.0);
 	}
 	public void DisablePID() {
-			m_Shooter.disableControl();
-			m_Shooter.changeControlMode(TalonControlMode.Voltage);
-			
+			m_Shooter.changeControlMode(TalonControlMode.PercentVbus);
+			m_Shooter.set(0.0);
 	}
 	public boolean isPIDEnabled() {
 		return m_Shooter.isControlEnabled();
@@ -76,6 +75,7 @@ public class Shooter implements Subsystem {
 		}
 	}
 	public void SetShooterSetpoint(double speed) {
+		m_Shooter.changeControlMode(TalonControlMode.Speed);
 		m_Shooter.set(speed);
 
 		//talon.SetVelocityMeasurementPeriod(VelocityMeasurementPeriod.Period_100Ms);
@@ -83,7 +83,7 @@ public class Shooter implements Subsystem {
 		//m_PID.setSetpoint(speed);
 	}
 	public void SetTalonOutput(double speed) {
-		
+		m_Shooter.changeControlMode(TalonControlMode.PercentVbus);
 		m_Shooter.set(speed);
 	}
 	public void WriteDashboardData() {

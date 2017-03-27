@@ -176,8 +176,8 @@ public class RobotInterfaceMap
 	public double GetDriverRightX(){                 return driverJoystick.getRawAxis(driverRightX);}
 	public double GetDriverLeftY(){                  return driverJoystick.getRawAxis(driverLeftY);}
 	public double GetDriverRightY(){                 return driverJoystick.getRawAxis(driverRightY);}
-	public double GetDriverLeftTrigger(){            return driverJoystick.getRawAxis(driverLeftTrigger);}
-	public double GetDriverRightTrigger(){			 return driverJoystick.getRawAxis(driverRightTrigger);}
+	public boolean GetDriverLeftTrigger(){            return driverJoystick.getRawAxis(driverLeftTrigger) > 0.0;}
+	public boolean GetDriverRightTrigger(){			 return driverJoystick.getRawAxis(driverRightTrigger) > 0.0;}
 	public Joystick GetDriverJoystick(){             return driverJoystick;}
 	
 	
