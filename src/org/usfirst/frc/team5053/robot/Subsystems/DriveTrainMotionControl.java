@@ -47,7 +47,7 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 		
 		m_Gyro = Gyro;
 		
-		m_MotionController = new MotionController(this, (PIDSource) m_RightEncoder, (PIDSource) m_Gyro);
+		m_MotionController = new MotionController(this, (PIDSource) m_LeftEncoder, (PIDSource) m_Gyro);
 		
 	}
 	public void DriveDistance(double distance, double maxspeed, double ramp)
