@@ -199,8 +199,10 @@ public class Robot extends IterativeRobot
     	
     	GetDashboardData();
     	WriteDashboardData();
+    	
+    	autonomousWait++;
     }
-    public void debugRoutine(double visionTurn)
+    public void debugTurn(double visionTurn)
     {
     	switch(autonomousCase)
     	{
@@ -267,13 +269,13 @@ public class Robot extends IterativeRobot
     			m_DriveTrain.ResetEncoders();
     			m_DriveTrain.ResetGyro();
     			m_DriveTrain.DriveDistance(70/*distance to the gear peg*/, 4, 24);
+    			autonomousWait = 0;
     			autonomousCase++;
     		}
     		break;
     	case 3: //Disengage Peg
     		if(m_DriveTrain.isStraightPIDFinished())
     		{
-    			autonomousWait++;
     			System.out.println("Wait Time: " + Integer.toString(autonomousWait));
     			if(autonomousWait >= 150)
     			{
@@ -324,7 +326,6 @@ public class Robot extends IterativeRobot
     		}
     		break;
     	case 8: //Shoot
-			autonomousWait++;
 			if (autonomousWait > 50)
 			{
 				m_Indexer.SetTalonOutput(INDEXER_SPEED);
@@ -368,7 +369,7 @@ public class Robot extends IterativeRobot
     		{
     			autonomousCase++;
     			m_Intake.SetTalonOutput(INTAKE_SPEED);
-    			
+    			autonomousWait = 0;
     				//m_DriveTrain.ResetEncoders();
         			//m_DriveTrain.ResetGyro();
         			
@@ -379,8 +380,6 @@ public class Robot extends IterativeRobot
     	case 3: //Drive back to boiler
     		//if(m_DriveTrain.isStraightPIDFinished())
     		//{
-
-			autonomousWait++;
 			
 			//Wait two seconds
 			if (autonomousWait > 100)
@@ -443,7 +442,6 @@ public class Robot extends IterativeRobot
     	case 1: //Disengage gear peg
     		if(m_DriveTrain.isStraightPIDFinished())
     		{
-    			autonomousWait++;
     			if(autonomousWait >= 100)
 				{
 					m_DriveTrain.ResetEncoders();
@@ -458,6 +456,10 @@ public class Robot extends IterativeRobot
             			autonomousCase = 900;
             		}
     			}
+    		}
+    		else
+    		{
+    			autonomousWait = 0;
     		}
     		break;
     	case 2: // Turn to face the boiler
@@ -497,7 +499,6 @@ public class Robot extends IterativeRobot
     		}
     		break;
     	case 5: //Shoot
-			autonomousWait++;
 			if (autonomousWait >= 0)
 			{
 				m_Indexer.SetTalonOutput(INDEXER_SPEED);
@@ -543,13 +544,13 @@ public class Robot extends IterativeRobot
     			m_DriveTrain.ResetEncoders();
     			m_DriveTrain.ResetGyro();
     			m_DriveTrain.DriveDistance(63/*Distance to gear peg*/, 4, 25);
+    			autonomousWait = 0;
     			autonomousCase++;
     		}
     		break;
     	case 3: //Disengage Peg and move back to the intersection
     		if(m_DriveTrain.isStraightPIDFinished())
     		{
-    			autonomousWait++;
     			System.out.println("Wait Time: " + Integer.toString(autonomousWait));
     			if(autonomousWait >= 150)
     			{
@@ -566,6 +567,10 @@ public class Robot extends IterativeRobot
             			autonomousCase = 900;
             		}
     			}
+    		}
+    		else
+    		{
+    			autonomousWait = 0;
     		}
     		break;
     	case 4: //Turn to face the boiler
@@ -597,7 +602,6 @@ public class Robot extends IterativeRobot
     		}
     		break;
     	case 8: //Shoot
-    		autonomousWait++;
     		if (autonomousWait > 50)
     		{
     			m_Indexer.SetTalonOutput(INDEXER_SPEED);
@@ -630,7 +634,6 @@ public class Robot extends IterativeRobot
     		}
     		break;
     	case 1:
-    		autonomousWait++;
     		if(autonomousWait >= 100)
     		{
         		autonomousWait = 0;
@@ -638,7 +641,6 @@ public class Robot extends IterativeRobot
     		}
     		break;
     	case 2:
-    		autonomousWait++;
     		m_DriveTrain.ArcadeDrive(-0.6, 0.0);
     		if(autonomousWait >= 25)
     		{
@@ -657,11 +659,10 @@ public class Robot extends IterativeRobot
     		if(m_DriveTrain.isTurnPIDFinished())
     		{
     			autonomousCase++;
+    			autonomousWait = 0;
     		}
     		break;
     	case 5:
-    		autonomousWait++;
-    		
     		m_DriveTrain.ArcadeDrive(0.6, 0);
     		
     		if(autonomousWait >= 150)
@@ -671,13 +672,11 @@ public class Robot extends IterativeRobot
     			autonomousCase++;
     		}
     	case 6:
-    		if(autonomousWait ==0)
+    		if(autonomousWait == 0)
     		{
         		m_Shooter.EnablePID();
     			m_Shooter.SetShooterSetpoint(520);
     		}
-    		
-    		autonomousWait++;
     		
     		if(autonomousWait >= 50)
     		{
