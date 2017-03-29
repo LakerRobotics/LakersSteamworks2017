@@ -61,6 +61,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		   	//RobotMap.driveTrainRobotDrive21.arcadeDrive(/*moveValue*/ motorPower, /*rotateValue*/ rotationPower); 
 		    SmartDashboard.putNumber("RobotDriveStraightPIDOoutput Motor Output",motorPower);
 		    SmartDashboard.putNumber("RobotDriveStraightPIDOoutput RotationPower", rotationPower);
+		    
 	    	double leftPower; 
 	    	double rightPower;
 	    	
@@ -72,7 +73,10 @@ import edu.wpi.first.wpilibj.PIDOutput;
 	    	
 	    	leftPower = motorPower-rotationPower;
 	    	rightPower = motorPower+rotationPower;
-	    	m_driveTrain.tankDrive(leftPower*.7,  rightPower*.7);
+	    	m_driveTrain.tankDrive(leftPower*.6,  rightPower*.6);
+	    	
+	    	//System.out.println("Left Power: " + leftPower);
+	    	//System.out.println("Right power: " + rightPower);
 
 		}
 		
