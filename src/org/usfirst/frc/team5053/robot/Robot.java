@@ -187,12 +187,15 @@ public class Robot extends IterativeRobot
     	case 3: // BOILER
     		autonBoilerSide(turn);
     		break;
-    	case 4:
-    		dumbAutonRoutine();
-    		break;
-    	case 5: // HOPPER
+    	case 4: // HOPPER
     		autonHopper(turn);
     		break;
+    	case 5: // SENSORLESS CENTER
+    		dumbAutonRoutine();
+    		break;
+    	case 6: // DEBUG
+			debugRoutine(turn);
+			break;
 		default: // NO AUTON
 			break;
     	}
@@ -202,7 +205,7 @@ public class Robot extends IterativeRobot
     	
     	autonomousWait++;
     }
-    public void debugTurn(double visionTurn)
+    public void debugRoutine(double visionTurn)
     {
     	switch(autonomousCase)
     	{
