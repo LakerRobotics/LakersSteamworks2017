@@ -802,38 +802,57 @@ public class Robot extends IterativeRobot
     	{
     		shooterRPM = .68;
     		m_Shooter.SetTalonOutput(shooterRPM);
-    	} else if (m_RobotInterface.GetOperatorButton(4)){
+    	} 
+    	else if (m_RobotInterface.GetOperatorButton(4))
+    	{
     		shooterRPM = CLOSE_SPEED;
     		m_Shooter.SetTalonOutput(shooterRPM);
-    	} else if (m_RobotInterface.GetOperatorButton(5)) {
+    	} 
+    	else if (m_RobotInterface.GetOperatorButton(5)) 
+    	{
     		shooterRPM = MEDIUM_SPEED;
     		m_Shooter.SetTalonOutput(shooterRPM);
-    	} else if (m_RobotInterface.GetOperatorButton(6)) {
+    	} 
+    	else if (m_RobotInterface.GetOperatorButton(6)) 
+    	{
     		shooterRPM = FAR_SPEED;
     		m_Shooter.SetTalonOutput(shooterRPM);
-    	} else if (m_RobotInterface.GetOperatorButton(7)) {
+    	}
+    	else if (m_RobotInterface.GetOperatorButton(7)) 
+    	{
     		shooterRPM = .8;
     		m_Shooter.SetTalonOutput(shooterRPM);
-    	} else if (m_RobotInterface.GetOperatorButton(8)) {
+    	}
+    	else if (m_RobotInterface.GetOperatorButton(8)) 
+    	{
     		shooterRPM = .85;
     		m_Shooter.SetTalonOutput(shooterRPM);
-    	} else if (m_RobotInterface.GetOperatorButton(9)) {
+    	} 
+    	else if (m_RobotInterface.GetOperatorButton(9)) 
+    	{
     		shooterRPM = .9;
     		m_Shooter.SetTalonOutput(shooterRPM);
-    	} else if (m_RobotInterface.GetOperatorButton(10)) {
+    	}
+    	else if (m_RobotInterface.GetOperatorButton(10)) 
+    	{
     		shooterRPM = .95;
     		m_Shooter.SetTalonOutput(shooterRPM);
-    	} else if (m_RobotInterface.GetOperatorButton(11)) {
-    		shooterRPM = 1;
-    		m_Shooter.SetTalonOutput(shooterRPM);
-    	} else if (m_RobotInterface.GetOperatorButton(12)){
-    		
+    	}
+    	else if (m_RobotInterface.GetOperatorButton(11)) 
+    	{
+    		m_Shooter.SetShooterSetpoint(520);
+    	}
+    	else if (m_RobotInterface.GetOperatorButton(12))
+    	{
     		m_Shooter.SetShooterSetpoint(shooterRPM);
-    	} else if (m_RobotInterface.GetDriverY()){
+    	}
+    	else if (m_RobotInterface.GetDriverY())
+    	{
     		
     		m_Shooter.SetShooterSetpoint(shooterRPMBF);
-    	} else {
-    		
+    	}
+    	else
+    	{
     		m_Shooter.DisablePID();
     		m_Shooter.SetTalonOutput(0);
     	}
