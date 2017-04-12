@@ -67,14 +67,17 @@ public class Robot extends IterativeRobot
 	private final int IMG_HEIGHT 	= 240;
 	private final int CAMERA_ANGLE 	= 52;
 	
-	//Misc Variables
+	//Autonomous variables
+	private int autonomousRoutine;
 	private int autonomousCase;
 	private int autonomousWait;
+	private boolean autonomousShoot;
 	private int allianceSide;
+	
+	//Misc variables
 	private int teleopLightLoops;
 	private double shooterRPM;
 	private double shooterRPMBF;
-	private boolean autonShoot;
 	
 	@Override
     public void robotInit()
@@ -134,9 +137,11 @@ public class Robot extends IterativeRobot
     	 /**
          * This function is called once when autonomous begins
          */
+    	
+    	autonomousRoutine = (int) SmartDashboard.getNumber("autonRoutine", 0);
     	autonomousCase = 0;
     	autonomousWait = 0;
-    	autonShoot = SmartDashboard.getBoolean("shoot");
+    	autonomousShoot = SmartDashboard.getBoolean("shoot", true);
     	
     	switch(DriverStation.getInstance().getAlliance())
     	{
@@ -169,7 +174,7 @@ public class Robot extends IterativeRobot
 
     	SmartDashboard.putNumber("Vision Turn", turn);
     	
-    	switch((int) SmartDashboard.getNumber("autonRoutine", 0))
+    	switch(autonomousRoutine)
     	{
     	case 0: // NO AUTON
     		break;
@@ -182,32 +187,43 @@ public class Robot extends IterativeRobot
     	case 3: // BOILER
     		autonBoilerSide(turn);
     		break;
-    	case 4:
-    		debugTurn(turn);
-    		break;
-    	case 5: // HOPPER
+    	case 4: // HOPPER
     		autonHopper(turn);
     		break;
+    	case 5: // SENSORLESS CENTER
+    		dumbAutonRoutine();
+    		break;
+    	case 6: // DEBUG
+			debugRoutine(turn);
+			break;
 		default: // NO AUTON
 			break;
     	}
+    	
     	GetDashboardData();
     	WriteDashboardData();
-    	System.out.println("Gyro" + m_DriveTrain.GetAngle());
+    	
+    	autonomousWait++;
     }
-    public void debugTurn(double visionTurn)
+    public void debugRoutine(double visionTurn)
     {
     	switch(autonomousCase)
     	{
     	case 0: 
     		m_DriveTrain.ResetEncoders();
         	m_DriveTrain.ResetGyro();
+        	m_DriveTrain.ArcadeDrive(0.4, 0.0);
     		autonomousCase++;
     		break;
     	case 1:
+    		if(autonomousWait >= 100)
+    		{
+    			m_DriveTrain.ArcadeDrive(0.0, 0.0);
+    		}
+    			
     		autonomousCase++;
-    		System.out.println("Seeking Target");
-    		visionAlign(visionTurn /*Vision turn aligns to the reflective tape on the high goal*/);
+    		//System.out.println("Seeking Target");
+    		//visionAlign(visionTurn /*Vision turn aligns to the reflective tape on the high goal*/);
     		break;
     	
     	case 2:
@@ -256,13 +272,13 @@ public class Robot extends IterativeRobot
     			m_DriveTrain.ResetEncoders();
     			m_DriveTrain.ResetGyro();
     			m_DriveTrain.DriveDistance(70/*distance to the gear peg*/, 4, 24);
+    			autonomousWait = 0;
     			autonomousCase++;
     		}
     		break;
     	case 3: //Disengage Peg
     		if(m_DriveTrain.isStraightPIDFinished())
     		{
-    			autonomousWait++;
     			System.out.println("Wait Time: " + Integer.toString(autonomousWait));
     			if(autonomousWait >= 150)
     			{
@@ -270,7 +286,7 @@ public class Robot extends IterativeRobot
             		m_DriveTrain.ResetGyro();
             		m_DriveTrain.DriveDistance(-75/*distance back to the intersection*/, 4, 24);
             		autonomousWait = 0;
-            		if(autonShoot)
+            		if(autonomousShoot)
             		{
             			autonomousCase++;
             		}
@@ -313,7 +329,6 @@ public class Robot extends IterativeRobot
     		}
     		break;
     	case 8: //Shoot
-			autonomousWait++;
 			if (autonomousWait > 50)
 			{
 				m_Indexer.SetTalonOutput(INDEXER_SPEED);
@@ -331,6 +346,7 @@ public class Robot extends IterativeRobot
     		break;
     	}
     }
+    
     public void autonHopper(double visionTurn)
     {
     	switch(autonomousCase)
@@ -356,7 +372,7 @@ public class Robot extends IterativeRobot
     		{
     			autonomousCase++;
     			m_Intake.SetTalonOutput(INTAKE_SPEED);
-    			
+    			autonomousWait = 0;
     				//m_DriveTrain.ResetEncoders();
         			//m_DriveTrain.ResetGyro();
         			
@@ -367,8 +383,6 @@ public class Robot extends IterativeRobot
     	case 3: //Drive back to boiler
     		//if(m_DriveTrain.isStraightPIDFinished())
     		//{
-
-			autonomousWait++;
 			
 			//Wait two seconds
 			if (autonomousWait > 100)
@@ -431,13 +445,12 @@ public class Robot extends IterativeRobot
     	case 1: //Disengage gear peg
     		if(m_DriveTrain.isStraightPIDFinished())
     		{
-    			autonomousWait++;
     			if(autonomousWait >= 100)
 				{
 					m_DriveTrain.ResetEncoders();
 		    		m_DriveTrain.ResetGyro();
 		    		m_DriveTrain.DriveDistance(-24/*Distance to disengage gear peg*/, 4, 24);
-		    		if(autonShoot)
+		    		if(autonomousShoot)
             		{
             			autonomousCase++;
             		}
@@ -446,6 +459,10 @@ public class Robot extends IterativeRobot
             			autonomousCase = 900;
             		}
     			}
+    		}
+    		else
+    		{
+    			autonomousWait = 0;
     		}
     		break;
     	case 2: // Turn to face the boiler
@@ -485,7 +502,6 @@ public class Robot extends IterativeRobot
     		}
     		break;
     	case 5: //Shoot
-			autonomousWait++;
 			if (autonomousWait >= 0)
 			{
 				m_Indexer.SetTalonOutput(INDEXER_SPEED);
@@ -531,13 +547,13 @@ public class Robot extends IterativeRobot
     			m_DriveTrain.ResetEncoders();
     			m_DriveTrain.ResetGyro();
     			m_DriveTrain.DriveDistance(63/*Distance to gear peg*/, 4, 25);
+    			autonomousWait = 0;
     			autonomousCase++;
     		}
     		break;
     	case 3: //Disengage Peg and move back to the intersection
     		if(m_DriveTrain.isStraightPIDFinished())
     		{
-    			autonomousWait++;
     			System.out.println("Wait Time: " + Integer.toString(autonomousWait));
     			if(autonomousWait >= 150)
     			{
@@ -545,7 +561,7 @@ public class Robot extends IterativeRobot
             		m_DriveTrain.ResetGyro();
             		m_DriveTrain.DriveDistance(-65.25/*Distance to disengage the peg*/, 4, 25);
             		autonomousWait = 0;
-            		if(autonShoot)
+            		if(autonomousShoot)
             		{
             			autonomousCase++;
             		}
@@ -554,6 +570,10 @@ public class Robot extends IterativeRobot
             			autonomousCase = 900;
             		}
     			}
+    		}
+    		else
+    		{
+    			autonomousWait = 0;
     		}
     		break;
     	case 4: //Turn to face the boiler
@@ -585,7 +605,6 @@ public class Robot extends IterativeRobot
     		}
     		break;
     	case 8: //Shoot
-    		autonomousWait++;
     		if (autonomousWait > 50)
     		{
     			m_Indexer.SetTalonOutput(INDEXER_SPEED);
@@ -599,6 +618,72 @@ public class Robot extends IterativeRobot
     		{
     			m_DriveTrain.ResetEncoders();
     			m_DriveTrain.ResetGyro();
+    		}
+    		break;
+    	}
+    }
+    
+    public void dumbAutonRoutine()
+    {
+    	switch(autonomousCase)
+    	{
+    	case 0:
+    		m_DriveTrain.ArcadeDrive(0.6, 0);
+    		autonomousWait++;
+    		if(autonomousWait >= 50)
+    		{
+    			autonomousWait = 0;
+    			autonomousCase++;
+    		}
+    		break;
+    	case 1:
+    		if(autonomousWait >= 100)
+    		{
+        		autonomousWait = 0;
+    			autonomousCase++;
+    		}
+    		break;
+    	case 2:
+    		m_DriveTrain.ArcadeDrive(-0.6, 0.0);
+    		if(autonomousWait >= 25)
+    		{
+    			m_DriveTrain.ArcadeDrive(0.0, 0.0);
+    			autonomousWait = 0;
+    			autonomousCase++;
+    		}
+    		break;
+    	case 3:
+    		if(allianceSide == -1) //RED
+				m_DriveTrain.TurnToAngle(-100*allianceSide/*Angle to face the boiler*/);
+			else //BLUE
+				m_DriveTrain.TurnToAngle(-102.5*allianceSide/*Angle to face the boiler*/);
+    		break;
+    	case 4:
+    		if(m_DriveTrain.isTurnPIDFinished())
+    		{
+    			autonomousCase++;
+    			autonomousWait = 0;
+    		}
+    		break;
+    	case 5:
+    		m_DriveTrain.ArcadeDrive(0.6, 0);
+    		
+    		if(autonomousWait >= 150)
+    		{
+    			m_DriveTrain.ArcadeDrive(0.0, 0.0);
+    			autonomousWait = 0;
+    			autonomousCase++;
+    		}
+    	case 6:
+    		if(autonomousWait == 0)
+    		{
+        		m_Shooter.EnablePID();
+    			m_Shooter.SetShooterSetpoint(520);
+    		}
+    		
+    		if(autonomousWait >= 50)
+    		{
+    			//m_Indexer.SetTalonOutput(INDEXER_SPEED);
     		}
     		break;
     	}
