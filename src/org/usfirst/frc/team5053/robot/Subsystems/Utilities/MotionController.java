@@ -94,7 +94,7 @@ public class MotionController {
 			
 			//Magic numbers need fixing
 			double maxRPM = 30/*30*/;
-			double ramp = 100/* 3.5 * maxRPM*/;
+			double ramp = 85/* 3.5 * maxRPM*/;
 			
 			double maxSpeed = maxRPM * 6; //360 Degrees/60 seconds to convert RPM to speed or degrees per second
 			double start = m_DriveTrain.GetAngle();
