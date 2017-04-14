@@ -48,7 +48,9 @@ public class RobotSensorMap
 	public RobotSensorMap()
 	{
 		m_LeftDrive = new Encoder(leftDriveEncoderADIO, leftDriveEncoderBDIO);
+		m_LeftDrive.setReverseDirection(true);
 		m_RightDrive = new Encoder(rightDriveEncoderADIO, rightDriveEncoderBDIO);
+		m_RightDrive.setReverseDirection(true);
 //		m_Shooter = new Encoder(shooterEncoderADIO, shooterEncoderBDIO, false, EncodingType.k1X);
 //		m_Shooter.setSamplesToAverage(60);
 //		m_Shooter.setMaxPeriod(0.02);

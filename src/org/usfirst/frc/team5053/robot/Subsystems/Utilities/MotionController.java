@@ -25,8 +25,8 @@ public class MotionController {
 	private final double TurnKi = 0.0001;
 	private final double TurnKd = 0.0;
 	
-	private final double StraightKp = 0.1;
-	private final double StraightKi = 0.0001;
+	private final double StraightKp = 0.001;
+	private final double StraightKi = 0.0;
 	private final double StraightKd = 0.0;
 	
 	PIDSource m_StraightSource;
