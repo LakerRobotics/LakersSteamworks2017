@@ -55,14 +55,14 @@ public class Shooter implements Subsystem {
 	
 	public void EnablePID() 
 	{
-			m_Shooter.enable();
-			m_Shooter.changeControlMode(TalonControlMode.Speed);
-			m_Shooter.set(0.0);
+		m_Shooter.enable();
+		m_Shooter.changeControlMode(TalonControlMode.Speed);
+		m_Shooter.set(0.0);
 	}
 	public void DisablePID() 
 	{
-			m_Shooter.changeControlMode(TalonControlMode.PercentVbus);
-			m_Shooter.set(0.0);
+		m_Shooter.changeControlMode(TalonControlMode.PercentVbus);
+		m_Shooter.set(0.0);
 	}
 	public boolean isPIDEnabled() 
 	{
