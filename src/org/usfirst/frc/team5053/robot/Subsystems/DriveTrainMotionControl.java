@@ -136,8 +136,9 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 		
 	}
 	public void WriteDashboardData() {
-		SmartDashboard.putNumber("leftDriveEncoder", m_LeftEncoder.getDistance());
-		SmartDashboard.putNumber("rightDriveEncoder", m_RightEncoder.getDistance());
+		SmartDashboard.putNumber("LeftDriveEncoder Rate", m_LeftEncoder.getRate());
+		SmartDashboard.putNumber("LeftDriveEncoder Distance", m_LeftEncoder.getDistance());
+		SmartDashboard.putNumber("RightDriveEncoder Distance", m_RightEncoder.getDistance());
 	}
 
 }

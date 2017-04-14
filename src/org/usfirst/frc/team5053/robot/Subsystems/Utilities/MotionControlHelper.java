@@ -135,6 +135,8 @@ public class MotionControlHelper {
       // System.out.println("targetSpeed="+targetSpeed);
        SmartDashboard.putNumber("targetSpeed",targetSpeed);
        
+       SmartDashboard.putNumber("getTargetSpeed MotionControlHelper", targetSpeed);
+       System.out.println("getTargetSpeed MotionControlHelper: " + Double.toString(targetSpeed));
        return targetSpeed;
     }
     

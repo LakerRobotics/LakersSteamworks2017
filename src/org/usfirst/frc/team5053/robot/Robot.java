@@ -265,7 +265,7 @@ public class Robot extends IterativeRobot
     		{
     			m_DriveTrain.ResetEncoders();
         		m_DriveTrain.ResetGyro();
-        		m_DriveTrain.TurnToAngle(60*allianceSide);
+        		m_DriveTrain.TurnToAngle(54*allianceSide);
     			autonomousCase++;
     		}
     		break;
@@ -282,11 +282,11 @@ public class Robot extends IterativeRobot
     	case 3: // Disengage Peg
     		if(m_DriveTrain.isStraightPIDFinished())
     		{
-    			if(autonomousWait >= 100)
+    			if(autonomousWait >= 150)
     			{
         			m_DriveTrain.ResetEncoders();
             		m_DriveTrain.ResetGyro();
-            		m_DriveTrain.DriveDistance(-70, 4, 24);
+            		m_DriveTrain.DriveDistance(-75, 4, 24);
             		autonomousWait = 0;
             		if(autonomousShoot)
             		{
@@ -298,20 +298,13 @@ public class Robot extends IterativeRobot
             		}
     			}
     		}
-    		else
-    		{
-    			autonomousWait = 0;
-    		}
     		break;
     	case 4: // Turn to face the boiler
     		if(m_DriveTrain.isStraightPIDFinished())
     		{
         		m_DriveTrain.ResetEncoders();
         		m_DriveTrain.ResetGyro();
-        		if(allianceSide == -1) // RED
-        			m_DriveTrain.TurnToAngle(150*allianceSide);
-        		else // BLUE
-        			m_DriveTrain.TurnToAngle(150*allianceSide);
+        		m_DriveTrain.TurnToAngle(120*allianceSide);
         		autonomousCase++;
     		}
     		break;
@@ -331,7 +324,8 @@ public class Robot extends IterativeRobot
     	case 7: // Start shooter
     		if(m_DriveTrain.isStraightPIDFinished())
     		{
-    			m_Shooter.SetShooterSetpoint(540);
+    			m_Shooter.SetShooterSetpoint(520);
+    			m_Shooter.EnablePID();
     			autonomousCase++;
     			autonomousWait = 0;
     		}
@@ -453,7 +447,7 @@ public class Robot extends IterativeRobot
     	case 1: // Disengage gear peg
     		if(m_DriveTrain.isStraightPIDFinished())
     		{
-    			if(autonomousWait >= 75)
+    			if(autonomousWait >= 100)
 				{
 					m_DriveTrain.ResetEncoders();
 		    		m_DriveTrain.ResetGyro();
@@ -480,10 +474,11 @@ public class Robot extends IterativeRobot
     			m_DriveTrain.ResetEncoders();
     			m_DriveTrain.ResetGyro();
     			
+    			//TODO Blue is very off at 100deg
     			if(allianceSide == -1) // RED
     				m_DriveTrain.TurnToAngle(-100*allianceSide);
     			else // BLUE
-    				m_DriveTrain.TurnToAngle(-102.5*allianceSide);
+    				m_DriveTrain.TurnToAngle(-105.5*allianceSide);
     			
     			autonomousCase++;
     		}
@@ -493,29 +488,25 @@ public class Robot extends IterativeRobot
     		{
     			m_DriveTrain.ResetEncoders();
         		m_DriveTrain.ResetGyro();
-        		m_DriveTrain.DriveDistance(102, 8, 12);
+        		m_DriveTrain.DriveDistance(102, 8, 24);
         		
-        		if(allianceSide == -1) // RED
-        			m_Shooter.SetShooterSetpoint(540);
-        		else // BLUE
-        			m_Shooter.SetShooterSetpoint(525);
+        		
+    			m_Shooter.SetShooterSetpoint(525);
         		autonomousCase++;
     		}
     		break;
     	case 4: // Vision align to high boiler
     		if(m_DriveTrain.isStraightPIDFinished())
     		{
-    			if(allianceSide == 1)
-    				m_DriveTrain.arcadeDrive(0.65, 0.0);
+    			m_DriveTrain.arcadeDrive(0.6, 0.0);
     			autonomousWait = 0;
     			autonomousCase++;
     			
     		}
     		break;
     	case 5: // Shoot
-    		if(allianceSide == 1)
-    			m_DriveTrain.arcadeDrive(0.65, 0.0);
-			if (autonomousWait >= 55)
+    		m_DriveTrain.arcadeDrive(0.6, 0.0);
+			if (autonomousWait >= 50)
 			{
 				m_Indexer.SetTalonOutput(INDEXER_SPEED);
 				m_DriveTrain.arcadeDrive(0.0, 0.0);
@@ -542,7 +533,8 @@ public class Robot extends IterativeRobot
     		System.out.println("Executing Feeder Side Autonomous");
     		m_DriveTrain.ResetEncoders();
     		m_DriveTrain.ResetGyro();
-    		m_DriveTrain.DriveDistance(60.434, 4, 24);
+    		//TODO modified from 60 -> 57
+    		m_DriveTrain.DriveDistance(57.434, 4, 24);
     		autonomousCase++;
     		break;
     	case 1: // Turn to face the gear peg
@@ -672,7 +664,7 @@ public class Robot extends IterativeRobot
     		if(autonomousWait == 0)
     		{
         		m_Shooter.EnablePID();
-    			m_Shooter.SetShooterSetpoint(520);
+    			m_Shooter.SetShooterSetpoint(530);
     		}
     		
     		if(autonomousWait >= 50)
@@ -854,17 +846,17 @@ public class Robot extends IterativeRobot
         	} 
         	else if (m_RobotInterface.GetOperatorButton(6))
         	{
-        		shooterRPM = 525;
+        		shooterRPM = 530;
         		m_Shooter.SetShooterSetpoint(shooterRPM);
         	} 
         	else if (m_RobotInterface.GetOperatorButton(3)) 
         	{
-        		shooterRPM = 530;
+        		shooterRPM = 540;
         		m_Shooter.SetShooterSetpoint(shooterRPM);
         	} 
         	else if (m_RobotInterface.GetOperatorButton(4)) 
         	{
-        		shooterRPM = 540;
+        		shooterRPM = 550;
         		m_Shooter.SetShooterSetpoint(shooterRPM);
         	}
         	else

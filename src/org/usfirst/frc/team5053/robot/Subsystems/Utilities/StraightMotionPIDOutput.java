@@ -30,6 +30,8 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		private double m_targetAngle = 0.0d;
 		private double rotationPower = 0.0d;
 		private MotionControlPIDController m_RotationController;
+		//TODO revert back to 60%
+		private final double SPEED_MODIFIER = 0.60;
 
 		public StraightMotionPIDOutput(DriveTrainMotionControl drivetrain, PIDSource turnSource, double targetAngle) {
 			m_targetAngle = targetAngle;
@@ -73,7 +75,8 @@ import edu.wpi.first.wpilibj.PIDOutput;
 	    	
 	    	leftPower = motorPower-rotationPower;
 	    	rightPower = motorPower+rotationPower;
-	    	m_driveTrain.tankDrive(leftPower*.6,  rightPower*.6);
+	    	
+	    	m_driveTrain.tankDrive(leftPower * SPEED_MODIFIER,  rightPower * SPEED_MODIFIER);
 	    	
 	    	//System.out.println("Left Power: " + leftPower);
 	    	//System.out.println("Right power: " + rightPower);
