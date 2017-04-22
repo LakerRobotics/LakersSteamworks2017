@@ -17,15 +17,17 @@ public class MotionController {
 	
 	private double m_targetDistance;
 	private double m_targetAngle;
-	private double m_straightTolerance;
-	private double m_turnTolerance;
+	private double m_StraightTolerance;
+	private double m_TurnTolerance;
+	private double m_AngularVelocityTolerance;
 	private boolean m_PIDEnabled;
 	
-	private final double TurnKp = 0.005;
-	private final double TurnKi = 0.0001;
+	private final double TurnKp = 0.0075;
+	private final double TurnKi = 0.0005;
 	private final double TurnKd = 0.0;
-	private final double StraightKp = 0.1;
-	private final double StraightKi = 0.0001;
+	
+	private final double StraightKp = 0.001;
+	private final double StraightKi = 0.0;
 	private final double StraightKd = 0.0;
 	
 	PIDSource m_StraightSource;
@@ -46,8 +48,9 @@ public class MotionController {
 		
 		m_targetDistance = 0;
 		m_targetAngle = 0;
-		m_straightTolerance = 3;
-		m_turnTolerance = 1;
+		m_StraightTolerance = 0.5;
+		m_TurnTolerance = 0.25;
+		m_AngularVelocityTolerance = 3;
 		m_PIDEnabled = false;
 		
 	}
@@ -73,7 +76,7 @@ public class MotionController {
 				
 				//Instantiates a new MotionControlPIDController() object for the new drive segment using the previous MotionControlHelper()
 				m_StraightPIDController = new MotionControlPIDController(StraightKp, StraightKi, StraightKd, m_StraightControl);
-				m_StraightPIDController.setAbsoluteTolerance(m_straightTolerance);
+				m_StraightPIDController.setAbsoluteTolerance(m_StraightTolerance);
 				m_StraightPIDController.setOutputRange(-1.0, 1.0);
 				
 				//Turns the MotionControlPID ON and it will continue to execute by itself until told otherwise.
@@ -92,14 +95,14 @@ public class MotionController {
 			m_DriveTrain.ResetGyro();
 			
 			//Magic numbers need fixing
-			double maxRPM = 30/*30*/;
-			double ramp = 50/* 3.5 * maxRPM*/;
+			double maxRPM = 15/*30*/;
+			double ramp = maxRPM * 2/* 3.5 * maxRPM*/;
 			
 			double maxSpeed = maxRPM * 6; //360 Degrees/60 seconds to convert RPM to speed or degrees per second
 			double start = m_DriveTrain.GetAngle();
 			m_targetAngle = turnAngle + start;
 			
-			if (!(Math.abs(m_DriveTrain.GetAngle()-m_targetAngle) < m_turnTolerance))
+			if (!(Math.abs(m_DriveTrain.GetAngle()-m_targetAngle) < m_TurnTolerance))
 			{
 				//Instantiates a new MotionControlHelper() object for the new turn segment
 				m_TurnControl = new MotionControlHelper(m_targetAngle, ramp, maxSpeed, start, m_TurnSource, new DriveTurnPIDOutput(m_DriveTrain));
@@ -127,10 +130,10 @@ public class MotionController {
 		 * */
 		SmartDashboard.putNumber("Distance Left", m_DriveTrain.GetLeftDistance());
 		SmartDashboard.putNumber("Target distance", m_targetDistance);
-		SmartDashboard.putNumber("Straight Tolerance", m_straightTolerance);
+		SmartDashboard.putNumber("Straight Tolerance", m_StraightTolerance);
 		
 		//TODO Verify this tolerance works... it should...
-		if (Math.abs(m_DriveTrain.GetLeftDistance()) >= Math.abs(m_targetDistance - m_straightTolerance))
+		if (Math.abs(m_DriveTrain.GetLeftDistance()) >= Math.abs(m_targetDistance - m_StraightTolerance))
 		{
 			//Always tripped
 			m_StraightPIDController.disable();
@@ -146,7 +149,7 @@ public class MotionController {
 		 * Called while waiting for the MotionControlPID to finish. The PID will be disabled when the end condition is met, and
 		 * the return value indicates you can proceed to the next step.
 		 * */
-		if (Math.abs(m_DriveTrain.GetAngle()-m_targetAngle) < m_turnTolerance)
+		if (Math.abs(m_DriveTrain.GetAngle()-m_targetAngle) < m_TurnTolerance && Math.abs(m_DriveTrain.getAngularVelocity()) < m_AngularVelocityTolerance)
 		{
 			m_TurnPIDController.disable();
 			m_DriveTrain.ArcadeDrive(0, 0);

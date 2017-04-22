@@ -30,6 +30,8 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		private double m_targetAngle = 0.0d;
 		private double rotationPower = 0.0d;
 		private MotionControlPIDController m_RotationController;
+		//TODO revert back to 60%
+		private final double SPEED_MODIFIER = 1.00;
 
 		public StraightMotionPIDOutput(DriveTrainMotionControl drivetrain, PIDSource turnSource, double targetAngle) {
 			m_targetAngle = targetAngle;
@@ -73,7 +75,8 @@ import edu.wpi.first.wpilibj.PIDOutput;
 	    	
 	    	leftPower = motorPower-rotationPower;
 	    	rightPower = motorPower+rotationPower;
-	    	m_driveTrain.tankDrive(leftPower*.6,  rightPower*.6);
+	    	
+	    	m_driveTrain.tankDrive(leftPower * SPEED_MODIFIER,  rightPower * SPEED_MODIFIER);
 	    	
 	    	//System.out.println("Left Power: " + leftPower);
 	    	//System.out.println("Right power: " + rightPower);
@@ -85,8 +88,8 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		    double     ramp =  30; //degrees
 		    double maxspeed = 10.0*(360/60) ; //60/360 converts the first numbers which is in RPM to degrees/second
 			
-			final double Kp = 0.001; // so at denominator off in the spin-Rate the power will reach the max
-		    final double Ki = 0.0;
+			final double Kp = 0.002; // so at denominator off in the spin-Rate the power will reach the max
+		    final double Ki = 0.00001;
 		    final double Kd = 0.0;
 		 
 		    MotionControlPIDController localRotationSpeedPID;

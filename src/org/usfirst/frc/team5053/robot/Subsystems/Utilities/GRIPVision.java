@@ -1,4 +1,4 @@
-package org.usfirst.frc.team5053.robot.Subsystems.Utilities;
+/*package org.usfirst.frc.team5053.robot.Subsystems.Utilities;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj.vision.VisionPipeline;
 *
 * @author GRIP
 */
-public class GRIPVision implements VisionPipeline {
+/*public class GRIPVision implements VisionPipeline {
 
 	//Outputs
 	private Mat hsvThresholdOutput = new Mat();
@@ -40,7 +40,7 @@ public class GRIPVision implements VisionPipeline {
 	/**
 	 * This is the primary method that runs the entire pipeline and updates the outputs.
 	 */
-	public void process(Mat source0) {
+	/*public void process(Mat source0) {
 		// Step HSV_Threshold0:
 		Mat hsvThresholdInput = source0;
 		double[] hsvThresholdHue = {60.0, 120.0};
@@ -78,7 +78,7 @@ public class GRIPVision implements VisionPipeline {
 	 * This method is a generated getter for the output of a HSV_Threshold.
 	 * @return Mat output from HSV_Threshold.
 	 */
-	public Mat hsvThresholdOutput() {
+	/*public Mat hsvThresholdOutput() {
 		return hsvThresholdOutput;
 	}
 
@@ -86,7 +86,7 @@ public class GRIPVision implements VisionPipeline {
 	 * This method is a generated getter for the output of a Find_Contours.
 	 * @return ArrayList<MatOfPoint> output from Find_Contours.
 	 */
-	public ArrayList<MatOfPoint> findContoursOutput() {
+	/*public ArrayList<MatOfPoint> findContoursOutput() {
 		return findContoursOutput;
 	}
 
@@ -94,7 +94,7 @@ public class GRIPVision implements VisionPipeline {
 	 * This method is a generated getter for the output of a Convex_Hulls.
 	 * @return ArrayList<MatOfPoint> output from Convex_Hulls.
 	 */
-	public ArrayList<MatOfPoint> convexHullsOutput() {
+	/*public ArrayList<MatOfPoint> convexHullsOutput() {
 		return convexHullsOutput;
 	}
 
@@ -102,7 +102,7 @@ public class GRIPVision implements VisionPipeline {
 	 * This method is a generated getter for the output of a Filter_Contours.
 	 * @return ArrayList<MatOfPoint> output from Filter_Contours.
 	 */
-	public ArrayList<MatOfPoint> filterContoursOutput() {
+	/*public ArrayList<MatOfPoint> filterContoursOutput() {
 		return filterContoursOutput;
 	}
 
@@ -116,7 +116,7 @@ public class GRIPVision implements VisionPipeline {
 	 * @param val The min and max value
 	 * @param output The image in which to store the output.
 	 */
-	private void hsvThreshold(Mat input, double[] hue, double[] sat, double[] val,
+	/*private void hsvThreshold(Mat input, double[] hue, double[] sat, double[] val,
 	    Mat out) {
 		Imgproc.cvtColor(input, out, Imgproc.COLOR_BGR2HSV);
 		Core.inRange(out, new Scalar(hue[0], sat[0], val[0]),
@@ -130,7 +130,7 @@ public class GRIPVision implements VisionPipeline {
 	 * @param maskSize the size of the mask.
 	 * @param output The image in which to store the output.
 	 */
-	private void findContours(Mat input, boolean externalOnly,
+	/*private void findContours(Mat input, boolean externalOnly,
 		List<MatOfPoint> contours) {
 		Mat hierarchy = new Mat();
 		contours.clear();
@@ -150,7 +150,7 @@ public class GRIPVision implements VisionPipeline {
 	 * @param inputContours The contours on which to perform the operation.
 	 * @param outputContours The contours where the output will be stored.
 	 */
-	private void convexHulls(List<MatOfPoint> inputContours,
+	/*private void convexHulls(List<MatOfPoint> inputContours,
 		ArrayList<MatOfPoint> outputContours) {
 		final MatOfInt hull = new MatOfInt();
 		outputContours.clear();
@@ -185,7 +185,7 @@ public class GRIPVision implements VisionPipeline {
 	 * @param minRatio minimum ratio of width to height
 	 * @param maxRatio maximum ratio of width to height
 	 */
-	private void filterContours(List<MatOfPoint> inputContours, double minArea,
+	/*private void filterContours(List<MatOfPoint> inputContours, double minArea,
 		double minPerimeter, double minWidth, double maxWidth, double minHeight, double
 		maxHeight, double[] solidity, double maxVertexCount, double minVertexCount, double
 		minRatio, double maxRatio, List<MatOfPoint> output) {
@@ -216,5 +216,4 @@ public class GRIPVision implements VisionPipeline {
 			output.add(contour);
 		}
 	}
-}
-
+}*/

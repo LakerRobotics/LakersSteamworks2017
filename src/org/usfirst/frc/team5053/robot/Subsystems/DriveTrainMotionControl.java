@@ -129,6 +129,10 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 	{
 		return m_Gyro.getAngle();
 	}
+	public double getAngularVelocity()
+	{
+		return m_Gyro.getRate();
+	}
 	
 	public HashMap<String, Double> GetDashboardData() {
 		return null;
@@ -136,8 +140,9 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 		
 	}
 	public void WriteDashboardData() {
-		SmartDashboard.putNumber("leftDriveEncoder", m_LeftEncoder.getDistance());
-		SmartDashboard.putNumber("rightDriveEncoder", m_RightEncoder.getDistance());
+		SmartDashboard.putNumber("LeftDriveEncoder Rate", m_LeftEncoder.getRate());
+		SmartDashboard.putNumber("LeftDriveEncoder Distance", m_LeftEncoder.getDistance());
+		SmartDashboard.putNumber("RightDriveEncoder Distance", m_RightEncoder.getDistance());
 	}
 
 }

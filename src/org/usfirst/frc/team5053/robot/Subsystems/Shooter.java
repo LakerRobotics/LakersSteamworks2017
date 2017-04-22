@@ -14,15 +14,16 @@ public class Shooter implements Subsystem {
 	//private Encoder m_Encoder;
 	//private PIDController m_PID;
 	
-//config through RoboRIO webpage	private double KP = 0.0001;
-//config through RoboRIO webpage	private double KI = 0.0005;
-//config through RoboRIO webpage	private double KD = 0.0;
+	//config through RoboRIO webpage	private double KP = 0.0001;
+	//config through RoboRIO webpage	private double KI = 0.0005;
+	//config through RoboRIO webpage	private double KD = 0.0;
 	
 	private double TOLERANCE_RPM = 10;
 	
 	boolean debug = true;
 	
-	public Shooter(CANTalon shooterTalon) {
+	public Shooter(CANTalon shooterTalon) 
+	{
 		m_Shooter = shooterTalon;
 		//m_Encoder = shooterEncoder;
 		
@@ -52,27 +53,24 @@ public class Shooter implements Subsystem {
 		
 	}
 	
-	public void EnablePID() {
-			m_Shooter.enable();
-			m_Shooter.changeControlMode(TalonControlMode.Speed);
-			m_Shooter.set(0.0);
+	public void EnablePID() 
+	{
+		m_Shooter.enable();
+		m_Shooter.changeControlMode(TalonControlMode.Speed);
+		m_Shooter.set(0.0);
 	}
-	public void DisablePID() {
-			m_Shooter.changeControlMode(TalonControlMode.PercentVbus);
-			m_Shooter.set(0.0);
+	public void DisablePID() 
+	{
+		m_Shooter.changeControlMode(TalonControlMode.PercentVbus);
+		m_Shooter.set(0.0);
 	}
-	public boolean isPIDEnabled() {
+	public boolean isPIDEnabled() 
+	{
 		return m_Shooter.isControlEnabled();
 	}
-	public boolean ShooterOnTarget() {		
-		if(Math.abs(m_Shooter.getEncVelocity()-m_Shooter.getSpeed()) < TOLERANCE_RPM)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+	public boolean ShooterOnTarget() 
+	{		
+		return Math.abs(m_Shooter.getEncVelocity()-m_Shooter.getSpeed()) < TOLERANCE_RPM;
 	}
 	public void SetShooterSetpoint(double speed) {
 		m_Shooter.changeControlMode(TalonControlMode.Speed);
@@ -82,16 +80,17 @@ public class Shooter implements Subsystem {
 		//talon.SetVelocityMeasurementWindow(64); 
 		//m_PID.setSetpoint(speed);
 	}
-	public void SetTalonOutput(double speed) {
+	public void SetTalonOutput(double speed) 
+	{
 		m_Shooter.changeControlMode(TalonControlMode.PercentVbus);
 		m_Shooter.set(speed);
 	}
-	public void WriteDashboardData() {
+	public void WriteDashboardData() 
+	{
 		SmartDashboard.putNumber("Shooter SRX Setpoint (m_Shooter.getSetPoint())", m_Shooter.getSetpoint());
 		SmartDashboard.putNumber("Shooter SRX RPM (m_Shooter.get())", m_Shooter.getSpeed());
 		SmartDashboard.putNumber("Shooter SRX Velocity (m_Shooter.getEncVelocity)", m_Shooter.getEncVelocity());
 		SmartDashboard.putNumber("Shooter SRX OutputVoltage", m_Shooter.getOutputVoltage());
-		SmartDashboard.putNumber("Shooter SRX OutputCurrent", m_Shooter.getOutputCurrent());
-		
+		SmartDashboard.putNumber("Shooter SRX OutputCurrent", m_Shooter.getOutputCurrent());	
 	}
 }
