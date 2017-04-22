@@ -257,7 +257,7 @@ public class Robot extends IterativeRobot
     		System.out.println("Executing Boiler Side Autonomous");
     		m_DriveTrain.ResetEncoders();
     		m_DriveTrain.ResetGyro();
-    		m_DriveTrain.DriveDistance(48, 4, 24);
+    		m_DriveTrain.DriveDistance(55, 4, 24);
     		autonomousCase++;
     		break;
     	case 1: // Turn to face the gear peg
@@ -265,7 +265,7 @@ public class Robot extends IterativeRobot
     		{
     			m_DriveTrain.ResetEncoders();
         		m_DriveTrain.ResetGyro();
-        		m_DriveTrain.TurnToAngle(54*allianceSide);
+        		m_DriveTrain.TurnToAngle(60*allianceSide);
     			autonomousCase++;
     		}
     		break;
@@ -313,25 +313,23 @@ public class Robot extends IterativeRobot
     		{
     			m_DriveTrain.ResetEncoders();
     			m_DriveTrain.ResetGyro();
+    			autonomousWait = 0;
+    			m_DriveTrain.ArcadeDrive(0.65, 0);
     			autonomousCase++;
     		}
     		break;
     	case 6: // Drive closer to the boiler
-    		
-        		m_DriveTrain.DriveDistance(24, 4, 24);
-        		autonomousCase++;
+    			m_DriveTrain.ArcadeDrive(0.65, 0);
+    			if(autonomousWait >= 75)
+    				autonomousCase++;
     		break;
     	case 7: // Start shooter
-    		if(m_DriveTrain.isStraightPIDFinished())
-    		{
-    			m_Shooter.SetShooterSetpoint(520);
-    			m_Shooter.EnablePID();
-    			autonomousCase++;
-    			autonomousWait = 0;
-    		}
+			m_Shooter.SetShooterSetpoint(520);
+			autonomousCase++;
+			autonomousWait = 0;
     		break;
     	case 8: // Shoot
-			if (autonomousWait > 50)
+			if (autonomousWait > 25)
 			{
 				m_Indexer.SetTalonOutput(INDEXER_SPEED);
 				autonomousCase++;
@@ -417,9 +415,6 @@ public class Robot extends IterativeRobot
     			m_DriveTrain.ResetGyro();
     			autonomousCase++;
     		}
-			
-				
-			
 			break;
     	case 6:
     		break;
@@ -534,7 +529,7 @@ public class Robot extends IterativeRobot
     		m_DriveTrain.ResetEncoders();
     		m_DriveTrain.ResetGyro();
     		//TODO modified from 60 -> 57
-    		m_DriveTrain.DriveDistance(57.434, 4, 24);
+    		m_DriveTrain.DriveDistance(59, 4, 24);
     		autonomousCase++;
     		break;
     	case 1: // Turn to face the gear peg

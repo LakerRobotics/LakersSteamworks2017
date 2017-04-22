@@ -129,6 +129,10 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 	{
 		return m_Gyro.getAngle();
 	}
+	public double getAngularVelocity()
+	{
+		return m_Gyro.getRate();
+	}
 	
 	public HashMap<String, Double> GetDashboardData() {
 		return null;
