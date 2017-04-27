@@ -193,10 +193,16 @@ public class Robot extends IterativeRobot
     	case 4: // HOPPER
     		autonHopper(turn);
     		break;
-    	case 5: // SENSORLESS CENTER
+    	case 5: //ARC FEEDER
+    		break;
+    	case 6: //ARC BOILER
+    		break;
+    	case 7: //ARC HOPPER
+    		break;
+    	case 8: // SENSORLESS CENTER
     		dumbAutonRoutine();
     		break;
-    	case 6: // DEBUG
+    	case 9: // DEBUG
 			debugRoutine(turn);
 			break;
 		default: // NO AUTON
@@ -215,37 +221,16 @@ public class Robot extends IterativeRobot
     	case 0: 
     		m_DriveTrain.ResetEncoders();
         	m_DriveTrain.ResetGyro();
-        	m_DriveTrain.ArcadeDrive(0.4, 0.0);
     		autonomousCase++;
     		break;
     	case 1:
-    		if(autonomousWait >= 100)
-    		{
-    			m_DriveTrain.ArcadeDrive(0.0, 0.0);
-    		}
-    			
+    		m_DriveTrain.DriveInArc(7*12, 3, 12, 5*12);
     		autonomousCase++;
-    		//System.out.println("Seeking Target");
-    		//visionAlign(visionTurn /*Vision turn aligns to the reflective tape on the high goal*/);
-    		break;
-    	
     	case 2:
-    		if(!(Math.abs(previousVisionTurn) == visionTurn))
-    		{
-    			previousVisionTurn = visionTurn;
-        		visionAlign(visionTurn /*Vision turn aligns to the reflective tape on the high goal*/);
-        		System.out.println(Double.toString(visionTurn));
-    		}
-    		if(!isVisionTurnRunning)
+    		if(m_DriveTrain.isArcPIDFinished())
     		{
     			autonomousCase++;
     		}
-    		break;
-    	case 3:
-    		System.out.println("On Target");
-    		autonomousCase++;
-    		break;
-    	case 4:
     		break;
     	}
     }
@@ -436,7 +421,7 @@ public class Robot extends IterativeRobot
     		System.out.println("Executing Center Autonomous");
     		m_DriveTrain.ResetEncoders();
     		m_DriveTrain.ResetGyro();
-    		m_DriveTrain.DriveDistance(70, 4, 24);
+    		m_DriveTrain.DriveDistance(70, 4.0, 24.0);
     		autonomousCase++;
     		break;
     	case 1: // Disengage gear peg
@@ -602,6 +587,127 @@ public class Robot extends IterativeRobot
     		}
     		break;
     	}
+    }
+    
+    public void arcBoilerAutonRoutine()
+    {
+    	switch(autonomousCase)
+    	{
+    	case 0: // Arc to engage the gear peg
+    		m_DriveTrain.ResetEncoders();
+    		m_DriveTrain.ResetGyro();
+    		m_DriveTrain.DriveInArc(-104.5, 4, 24, 109.5 * allianceSide);
+    		autonomousCase++;
+    		break;
+    	case 1: // Arc to disengage the gear peg
+    		if(m_DriveTrain.isArcPIDFinished())
+    		{
+    			if(autonomousWait >= 75)
+    			{
+    				m_DriveTrain.ResetEncoders();
+    				m_DriveTrain.DriveInArc(45.0, 4, 24, 113.0 * allianceSide);
+    				if(autonomousShoot)
+    					autonomousCase++;
+    				else
+    					autonomousCase = 900;
+    			}
+    		}
+    		else
+    		{
+    			// Make sure autonomousWait isn't incrementing while our robot is still driving to its destination
+    			autonomousWait = 0;
+    		}
+    		break;
+    	case 2: // BLUE ONLY - Drive to boiler after engaging hopper
+    		if(m_DriveTrain.isArcPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+    			m_DriveTrain.DriveDistance(-98, 4, 24);
+    			autonomousCase++;
+    		}
+    		break;
+    	case 3: // Shoot
+    		if(m_DriveTrain.isStraightPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+    			m_Shooter.SetShooterSetpoint(252);
+				m_Indexer.SetTalonOutput(INDEXER_SPEED);
+				autonomousCase++;
+    		}
+    		else
+    		{
+    			autonomousWait = 0;
+    		}
+    		break;
+    	case 4:
+    		break;
+		default:
+			if(m_DriveTrain.isArcPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+    			m_DriveTrain.ArcadeDrive(0, 0);
+    		}
+			break;
+    	}
+    }
+    
+    public void arcFeederAutonRoutine()
+    {
+    	switch(autonomousCase)
+    	{
+    	case 0: // Arc to gear peg
+    		m_DriveTrain.ResetEncoders();
+    		m_DriveTrain.ResetGyro();
+    		m_DriveTrain.DriveInArc(0, 0, 0, 0 * allianceSide);
+    		autonomousCase++;
+    		break;
+    	case 1: // Arc away from gear peg
+    		if(m_DriveTrain.isArcPIDFinished())
+    		{
+    			if(autonomousWait >= 75)
+    			{
+    				m_DriveTrain.ResetEncoders();
+    				m_DriveTrain.DriveInArc(-0, 0, 0, -0 * allianceSide);
+    				if(autonomousShoot)
+    					autonomousCase++;
+    				else
+    					autonomousCase = 900;
+    			}
+    		}
+    		else
+    		{
+    			// Make sure autonomousWait isn't incrementing while our robot is still driving to its destination
+    			autonomousWait = 0;
+    		}
+    		break;
+    	case 2: // Drive down the field to the edge of the neutral zone
+    		if(m_DriveTrain.isArcPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+    			m_DriveTrain.DriveDistance(180, 8, 24);
+    			autonomousCase++;
+    		}
+    		break;
+    	case 3:
+    		if(m_DriveTrain.isStraightPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+    			m_DriveTrain.ArcadeDrive(0, 0);
+    		}
+    		break;
+    	default:
+    		if(m_DriveTrain.isArcPIDFinished())
+    		{
+    			m_DriveTrain.ResetEncoders();
+    			m_DriveTrain.ArcadeDrive(0, 0);
+    		}
+    		break;
+    	}
+    }
+    
+    public void arcHopperAutonRoutine()
+    {
+    	
     }
     
     public void dumbAutonRoutine()

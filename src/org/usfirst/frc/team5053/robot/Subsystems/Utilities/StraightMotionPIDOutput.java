@@ -30,7 +30,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		private double m_targetAngle = 0.0d;
 		private double rotationPower = 0.0d;
 		private MotionControlPIDController m_RotationController;
-		//TODO revert back to 60%
+		
 		private final double SPEED_MODIFIER = 1.00;
 
 		public StraightMotionPIDOutput(DriveTrainMotionControl drivetrain, PIDSource turnSource, double targetAngle) {
@@ -89,7 +89,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		    double maxspeed = 10.0*(360/60) ; //60/360 converts the first numbers which is in RPM to degrees/second
 			
 			final double Kp = 0.002; // so at denominator off in the spin-Rate the power will reach the max
-		    final double Ki = 0.00001;
+		    final double Ki = 0.0001;
 		    final double Kd = 0.0;
 		 
 		    MotionControlPIDController localRotationSpeedPID;

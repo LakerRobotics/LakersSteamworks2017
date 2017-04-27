@@ -6,14 +6,17 @@ import org.usfirst.frc.team5053.robot.Subsystems.Utilities.MotionControlPIDContr
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class MotionController {
-	DriveTrainMotionControl m_DriveTrain;
-	MotionControlHelper m_StraightControl;
-	MotionControlHelper m_TurnControl;
+public class MotionController 
+{
+	private DriveTrainMotionControl m_DriveTrain;
+	private MotionControlHelper m_StraightControl;
+	private MotionControlHelper m_TurnControl;
+	private MotionControlHelper m_ArcControl;
 	
-	MotionControlPIDController m_StraightPIDController;
-	StraightMotionPIDOutput m_StraightPIDOutput;
-	MotionControlPIDController m_TurnPIDController;
+	private MotionControlPIDController m_StraightPIDController;
+	private StraightMotionPIDOutput m_StraightPIDOutput;
+	private MotionControlPIDController m_TurnPIDController;
+	private MotionControlPIDController m_ArcPIDController;
 	
 	private double m_targetDistance;
 	private double m_targetAngle;
@@ -22,13 +25,17 @@ public class MotionController {
 	private double m_AngularVelocityTolerance;
 	private boolean m_PIDEnabled;
 	
-	private final double TurnKp = 0.0075;
+	private final double TurnKp = 0.0050;
 	private final double TurnKi = 0.0005;
 	private final double TurnKd = 0.0;
 	
 	private final double StraightKp = 0.001;
 	private final double StraightKi = 0.0;
 	private final double StraightKd = 0.0;
+
+	private final double ArcKp = 0.001;
+	private final double ArcKi = 0.0;
+	private final double ArcKd = 0.0;
 	
 	PIDSource m_StraightSource;
 	PIDSource m_TurnSource;
@@ -96,7 +103,7 @@ public class MotionController {
 			
 			//Magic numbers need fixing
 			double maxRPM = 15/*30*/;
-			double ramp = maxRPM * 2/* 3.5 * maxRPM*/;
+			double ramp = maxRPM * 3/* 3.5 * maxRPM*/;
 			
 			double maxSpeed = maxRPM * 6; //360 Degrees/60 seconds to convert RPM to speed or degrees per second
 			double start = m_DriveTrain.GetAngle();
@@ -119,6 +126,45 @@ public class MotionController {
 				return true;
 			}
 			return false;
+		}
+		return true;
+	}
+	/**
+	 * 
+	 * @param distance  to travel in inches
+	 * @param maxSpeed  in ft/sec
+	 * @param ramp      in inches
+	 * @param radiusOfArch  The arc travel path of the robot
+	 * @return true if it has completed the arc path
+	 */
+	public boolean ExecuteArcMotion(double distance, double maxSpeed, double ramp, double radiusOfArc)
+	{
+		m_targetDistance = distance;
+		m_DriveTrain.ResetEncoders();
+		
+		double start = 0;
+
+		ArcMotionPIDOutput motionControlArc;
+		
+		if (!isPIDEnabled())
+		{
+			double convertedDistance = distance;
+			double convertedSpeed = maxSpeed * 12; // convert to Inches/sec
+			double convertedRamp = ramp; // in inches
+			
+			motionControlArc = new ArcMotionPIDOutput(m_DriveTrain, m_TurnSource, radiusOfArc);
+
+			//Instantiates a new MotionControlHelper() object for the new Arch segment
+			// motionControlForwardSpeed
+			m_ArcControl = new MotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_StraightSource, motionControlArc);
+			
+			//Instantiates a new MotionControlPIDController() object for the new turn segment using the previous MotionControlHelper()
+			m_ArcPIDController = new MotionControlPIDController(ArcKp, ArcKi, ArcKd, m_ArcControl);
+			m_ArcPIDController.setOutputRange(-1.0, 1.0);
+			
+			//Turns the MotionControlPID ON and it will continue to execute by itself until told otherwise.
+			m_ArcPIDController.enable();
+			return true;
 		}
 		return true;
 	}
@@ -152,6 +198,27 @@ public class MotionController {
 		if (Math.abs(m_DriveTrain.GetAngle()-m_targetAngle) < m_TurnTolerance && Math.abs(m_DriveTrain.getAngularVelocity()) < m_AngularVelocityTolerance)
 		{
 			m_TurnPIDController.disable();
+			m_DriveTrain.ArcadeDrive(0, 0);
+			m_PIDEnabled = false;
+			return true;
+		}
+		return false;
+	}
+	public boolean isArcMotionFinished()
+	{
+		/*
+		 * Called while waiting for the MotionControlPID to finish. The PID will be disabled when the end condition is met, and
+		 * the return value indicates you can proceed to the next step.
+		 * */
+		SmartDashboard.putNumber("Distance Left", m_DriveTrain.GetLeftDistance());
+		SmartDashboard.putNumber("Target distance", m_targetDistance);
+		SmartDashboard.putNumber("Straight Tolerance", m_StraightTolerance);
+		
+		//TODO Verify this tolerance works... it should...
+		if (Math.abs(m_DriveTrain.GetAverageDistance() - m_targetDistance) <= Math.abs(m_StraightTolerance))
+		{
+			//Always tripped
+			m_ArcPIDController.disable();
 			m_DriveTrain.ArcadeDrive(0, 0);
 			m_PIDEnabled = false;
 			return true;

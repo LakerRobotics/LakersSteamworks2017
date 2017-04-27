@@ -66,6 +66,13 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 		}
 		
 	}
+	public void DriveInArc(double distance, double maxspeed, double ramp, double radius)
+	{
+		if(!isPIDRunning)
+		{
+			isPIDRunning = m_MotionController.ExecuteArcMotion(distance, maxspeed, ramp, radius);
+		}
+	}
 	public boolean isStraightPIDFinished()
 	{
 		if(m_MotionController.isStraightMotionFinished())
@@ -78,6 +85,15 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 	public boolean isTurnPIDFinished() 
 	{
 		if(m_MotionController.isTurnMotionFinished())
+		{
+			isPIDRunning = false;
+			return true;
+		}
+		return false;
+	}
+	public boolean isArcPIDFinished()
+	{
+		if(m_MotionController.isArcMotionFinished())
 		{
 			isPIDRunning = false;
 			return true;
@@ -115,11 +131,11 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 	}
 	public double GetAverageSpeed()
 	{
-		return ((GetLeftSpeed() + GetRightSpeed())/2);
+		return (GetLeftSpeed() + GetRightSpeed())/2;
 	}
 	public double GetAverageDistance()
 	{
-		return GetLeftDistance();
+		return (GetLeftDistance() + GetRightDistance())/2;
 	}
 	public void ArcadeDrive(double speed, double angle)
 	{
@@ -141,8 +157,8 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 	}
 	public void WriteDashboardData() {
 		SmartDashboard.putNumber("LeftDriveEncoder Rate", m_LeftEncoder.getRate());
-		SmartDashboard.putNumber("LeftDriveEncoder Distance", m_LeftEncoder.getDistance());
-		SmartDashboard.putNumber("RightDriveEncoder Distance", m_RightEncoder.getDistance());
+		SmartDashboard.putNumber("leftDriveEncoder", m_LeftEncoder.getDistance());
+		SmartDashboard.putNumber("rightDriveEncoder", m_RightEncoder.getDistance());
 	}
 
 }
