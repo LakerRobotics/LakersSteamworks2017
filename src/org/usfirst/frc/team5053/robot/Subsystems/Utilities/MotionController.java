@@ -25,7 +25,7 @@ public class MotionController
 	private double m_AngularVelocityTolerance;
 	private boolean m_PIDEnabled;
 	
-	private final double TurnKp = 0.0050;
+	private final double TurnKp = 0.0025;
 	private final double TurnKi = 0.0005;
 	private final double TurnKd = 0.0;
 	
@@ -103,7 +103,7 @@ public class MotionController
 			
 			//Magic numbers need fixing
 			double maxRPM = 15/*30*/;
-			double ramp = maxRPM * 3/* 3.5 * maxRPM*/;
+			double ramp = maxRPM * 2/* 3.5 * maxRPM*/;
 			
 			double maxSpeed = maxRPM * 6; //360 Degrees/60 seconds to convert RPM to speed or degrees per second
 			double start = m_DriveTrain.GetAngle();

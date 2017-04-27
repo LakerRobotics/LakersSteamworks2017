@@ -88,7 +88,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		    double     ramp =  30; //degrees
 		    double maxspeed = 10.0*(360/60) ; //60/360 converts the first numbers which is in RPM to degrees/second
 			
-			final double Kp = 0.002; // so at denominator off in the spin-Rate the power will reach the max
+			final double Kp = 0.001; // so at denominator off in the spin-Rate the power will reach the max
 		    final double Ki = 0.0001;
 		    final double Kd = 0.0;
 		 
