@@ -25,8 +25,8 @@ public class MotionController
 	private double m_AngularVelocityTolerance;
 	private boolean m_PIDEnabled;
 	
-	private final double TurnKp = 0.0025;
-	private final double TurnKi = 0.0005;
+	private final double TurnKp = 0.00125;
+	private final double TurnKi = 0.00125;
 	private final double TurnKd = 0.0;
 	
 	private final double StraightKp = 0.001;
@@ -57,7 +57,7 @@ public class MotionController
 		m_targetAngle = 0;
 		m_StraightTolerance = 0.5;
 		m_TurnTolerance = 0.25;
-		m_AngularVelocityTolerance = 3;
+		m_AngularVelocityTolerance = 30;
 		m_PIDEnabled = false;
 		
 	}

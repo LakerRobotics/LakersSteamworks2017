@@ -33,7 +33,8 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		
 		private final double SPEED_MODIFIER = 1.00;
 
-		public StraightMotionPIDOutput(DriveTrainMotionControl drivetrain, PIDSource turnSource, double targetAngle) {
+		public StraightMotionPIDOutput(DriveTrainMotionControl drivetrain, PIDSource turnSource, double targetAngle) 
+		{
 			m_targetAngle = targetAngle;
 			m_driveTrain = drivetrain;
 			m_TurnSource = turnSource;
@@ -46,18 +47,21 @@ import edu.wpi.first.wpilibj.PIDOutput;
 			//WrapRotationPIDInput  wrapRotationPIDInput = new WrapRotationPIDOutput(rotationPID, (PIDSource) m_gyro);
 		}
 
-		protected synchronized double getRotationPower() {
+		protected synchronized double getRotationPower() 
+		{
 			return rotationPower;
 		}
 
 
-		protected synchronized void setRotationPower(double rotationPower) {
+		protected synchronized void setRotationPower(double rotationPower) 
+		{
 			this.rotationPower = rotationPower;
 		}
 
 
 		@Override
-		public synchronized void pidWrite(double motorPower) {
+		public synchronized void pidWrite(double motorPower) 
+		{
 		    //rotationPower
 		   	//double rotationPower = 0;
 		   	//RobotMap.driveTrainRobotDrive21.arcadeDrive(/*moveValue*/ motorPower, /*rotateValue*/ rotationPower); 
@@ -83,9 +87,10 @@ import edu.wpi.first.wpilibj.PIDOutput;
 
 		}
 		
-		public  MotionControlPIDController createRotationPIDController(double targetAngle, double start, PIDOutput pidOutput) {
+		public  MotionControlPIDController createRotationPIDController(double targetAngle, double start, PIDOutput pidOutput) 
+		{
 			
-		    double     ramp =  30; //degrees
+		    double ramp 	=  30; //degrees
 		    double maxspeed = 10.0*(360/60) ; //60/360 converts the first numbers which is in RPM to degrees/second
 			
 			final double Kp = 0.001; // so at denominator off in the spin-Rate the power will reach the max
@@ -103,22 +108,25 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		}
 		
 		
-	    private class WrapRotationPIDOutput implements PIDOutput {
+	    private class WrapRotationPIDOutput implements PIDOutput 
+	    {
 
-	        private StraightMotionPIDOutput m_rotationPowerDestination;
+	        private StraightMotionPIDOutput m_RotationPowerDestination;
 
-	        public WrapRotationPIDOutput(StraightMotionPIDOutput rotationPowerDesintation) {
+	        public WrapRotationPIDOutput(StraightMotionPIDOutput rotationPowerDesintation) 
+	        {
 	            if (rotationPowerDesintation == null) {
 	                throw new NullPointerException("Given rotationPowerDestination was null");
 	            }
 	            else{
-	                m_rotationPowerDestination = rotationPowerDesintation;            	
+	                m_RotationPowerDestination = rotationPowerDesintation;            	
 	            }
 	        }
 
 			@Override
-			public void pidWrite(double rotationPower) {
-				this.m_rotationPowerDestination.setRotationPower(rotationPower);
+			public void pidWrite(double rotationPower) 
+			{
+				this.m_RotationPowerDestination.setRotationPower(rotationPower);
 			}
 
 	    }
