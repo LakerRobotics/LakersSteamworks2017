@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
 //import edu.wpi.first.wpilibj.vision.VisionThread;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.vision.USBCamera;
 
 
 /**
@@ -48,7 +49,7 @@ public class Robot extends IterativeRobot
 	private LidarLite m_Lidar;
 	
 	//Vision declaration
-	//private UsbCamera m_Camera;
+	private USBCamera m_Camera;
 	//private VisionThread m_VisionThread;
 	private double centerX;
 	private double previousVisionTurn;
@@ -109,7 +110,8 @@ public class Robot extends IterativeRobot
     	shooterRPMBF = DEFAULT_SHOOTER_RATE;
     	
     	//Camera Initialization
-    	//m_Camera = CameraServer.getInstance().startAutomaticCapture();
+    	CameraServer.getInstance().startAutomaticCapture();
+    	m_Camera.startCapture();
     	//m_Camera.setExposureManual(1);
     	//m_Camera.setFPS(30);
     	//m_Camera.setBrightness(1);
@@ -180,6 +182,7 @@ public class Robot extends IterativeRobot
     	switch(autonomousRoutine)
     	{
     	case 0: // NO AUTON
+    		debugRoutine(turn);
     		break;
     	case 1: // CENTER
     		autonCenter(turn);
@@ -224,7 +227,7 @@ public class Robot extends IterativeRobot
     		autonomousCase++;
     		break;
     	case 1:
-    		m_DriveTrain.DriveInArc(7*12, 3, 12, 5*12);
+    		m_DriveTrain.DriveInArc(36, 1, 12, 60);
     		autonomousCase++;
     	case 2:
     		if(m_DriveTrain.isArcPIDFinished())

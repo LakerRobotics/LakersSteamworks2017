@@ -131,11 +131,11 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 	}
 	public double GetAverageSpeed()
 	{
-		return (GetLeftSpeed() + GetRightSpeed())/2;
+		return -(-GetLeftSpeed() + GetRightSpeed())/2;
 	}
 	public double GetAverageDistance()
 	{
-		return (GetLeftDistance() + GetRightDistance())/2;
+		return -(-GetLeftDistance() + GetRightDistance())/2;
 	}
 	public void ArcadeDrive(double speed, double angle)
 	{
@@ -150,13 +150,19 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 		return m_Gyro.getRate();
 	}
 	
-	public HashMap<String, Double> GetDashboardData() {
+	public HashMap<String, Double> GetDashboardData() 
+	{
 		return null;
 		// TODO Auto-generated method stub
 		
 	}
-	public void WriteDashboardData() {
+	public void WriteDashboardData() 
+	{
+		SmartDashboard.putNumber("Gyro Angle", m_Gyro.getAngle());
+		SmartDashboard.putNumber("Gyro Rate", m_Gyro.getRate());
 		SmartDashboard.putNumber("LeftDriveEncoder Rate", m_LeftEncoder.getRate());
+		
+		// Do not change these names they are used for the DS Dashboard
 		SmartDashboard.putNumber("leftDriveEncoder", m_LeftEncoder.getDistance());
 		SmartDashboard.putNumber("rightDriveEncoder", m_RightEncoder.getDistance());
 	}

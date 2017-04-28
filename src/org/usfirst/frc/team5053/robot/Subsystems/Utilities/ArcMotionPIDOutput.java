@@ -61,7 +61,8 @@ import edu.wpi.first.wpilibj.PIDSource;
 		}
 		
 		@Override
-		public synchronized void pidWrite(double forwardPower) {
+		public synchronized void pidWrite(double forwardPower) 
+		{
 		    //rotationPower
 		   	//double rotationPower = 0;
 		   	//RobotMap.driveTrainRobotDrive21.arcadeDrive(/*moveValue*/ motorPower, /*rotateValue*/ rotationPower);
@@ -71,34 +72,40 @@ import edu.wpi.first.wpilibj.PIDSource;
 					 
 			//Adjust the rotation power to be proportional to the average speed of the Robot to stay on the desired arch
 			m_ArcRotationSpeedPID.setSetpoint(getTargetRotationalSpeed());
-					
-		    SmartDashboard.putNumber("RobotDriveStraightPIDOoutput Motor Output",forwardPower);
-		    SmartDashboard.putNumber("RobotDriveStraightPIDOoutput RotationPower", m_RotationPower);
-	    	double leftPower; 
+			
+			SmartDashboard.putNumber("Arc - Target Rotational Speed", m_ArcRotationSpeedPID.getSetpoint());
+	    	
+		    double leftPower; 
 	    	double rightPower;
 	    	
 	    	// Reduce forward power so can get full and even turning effect
 	    	// also may help if quickly reduce from full throttle, to avoid a jerk in the rotation as the PID would convert from 1/2 to all all rotation power
 	    	// .
-	    	SmartDashboard.putNumber("Target Arc Rotational Power", m_RotationPower);
+	    	
+	    	//m_RotationPower = 0;
+	    	
 	    	if (forwardPower + m_RotationPower > 1.0)
 	    	{
 	    		forwardPower = 1 - m_RotationPower;
 	    	}
 	    	
+	    	SmartDashboard.putNumber("Arc - Rotational Power", m_RotationPower);
+	    	SmartDashboard.putNumber("Arc - Forward Power", forwardPower);
+	    	
 	    	leftPower = m_ForwardPower - m_RotationPower;
 	    	rightPower = m_ForwardPower + m_RotationPower;
 	    	
-	    	SmartDashboard.putNumber("Left Power Arc Output", leftPower);
-	    	SmartDashboard.putNumber("Right Power Arc Output", rightPower);
+	    	SmartDashboard.putNumber("Arc - Left Power Output", leftPower);
+	    	SmartDashboard.putNumber("Arc - Right Power Output", rightPower);
 	    	
 	    	double multiplier = 1.0;
 	    	
-	    	m_RobotDrive.tankDrive(leftPower*multiplier, rightPower*multiplier);
+	    	m_RobotDrive.tankDrive(leftPower * multiplier, rightPower * multiplier);
 
 		}
 		
-		private double getTargetRotationalSpeed(){
+		private double getTargetRotationalSpeed()
+		{
 			//set the rotation based on the current speed of the robot.
 			//arched-turn for a robot in a big circle of radius R and it seems the the rate of angler change just needs to be proportional to the speed:
 			// RateAngularChange = 360*Speed/2pi*R,
