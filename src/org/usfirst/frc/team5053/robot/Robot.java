@@ -354,7 +354,7 @@ public class Robot extends IterativeRobot
     		{
     			m_DriveTrain.ResetEncoders();
     			m_DriveTrain.ResetGyro();
-    			m_DriveTrain.DriveDistance(70, 4, 24);
+    			m_DriveTrain.DriveDistance(75+4, 4, 24);
     			autonomousWait = 0;
     			autonomousCase++;
     		}
