@@ -103,6 +103,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 	        rotationSpeedProfile = new MotionControlHelper(targetAngle, ramp, maxspeed, start, m_TurnSource, pidOutput);
 	        localRotationSpeedPID = new MotionControlPIDController(Kp,Ki,Kd, rotationSpeedProfile );
 	        localRotationSpeedPID.setOutputRange(-1.0, 1.0);
+	        localRotationSpeedPID.setPID(Kp, Ki, Kd, 0);
 	        localRotationSpeedPID.enable();
 		    return localRotationSpeedPID;
 		}

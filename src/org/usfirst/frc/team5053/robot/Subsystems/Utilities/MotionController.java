@@ -26,7 +26,7 @@ public class MotionController
 	private boolean m_PIDEnabled;
 	
 	private final double TurnKp = 0.00125;
-	private final double TurnKi = 0.00125;
+	private final double TurnKi = 0.0020;
 	private final double TurnKd = 0.0;
 	
 	private final double StraightKp = 0.001;
@@ -117,7 +117,7 @@ public class MotionController
 				
 				//Instantiates a new MotionControlPIDController() object for the new turn segment using the previous MotionControlHelper()
 				m_TurnPIDController = new MotionControlPIDController(TurnKp, TurnKi, TurnKd, m_TurnControl);
-				m_TurnPIDController.setOutputRange(-1.0, 1.0);
+				m_TurnPIDController.setOutputRange(-0.75, 0.75);
 				
 				//Turns the MotionControlPID ON and it will continue to execute by itself until told otherwise.
 				m_TurnPIDController.enable();	

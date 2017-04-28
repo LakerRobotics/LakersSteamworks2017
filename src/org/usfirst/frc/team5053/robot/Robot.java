@@ -13,12 +13,14 @@ import org.usfirst.frc.team5053.robot.Subsystems.Shooter;
 //import org.opencv.imgproc.Imgproc;
 
 //import edu.wpi.cscore.UsbCamera;
-import edu.wpi.first.wpilibj.CameraServer;
+//import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.NamedSendable;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 //import edu.wpi.first.wpilibj.vision.VisionThread;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.vision.USBCamera;
+//import edu.wpi.first.wpilibj.vision.USBCamera;
 
 
 /**
@@ -49,7 +51,7 @@ public class Robot extends IterativeRobot
 	private LidarLite m_Lidar;
 	
 	//Vision declaration
-	private USBCamera m_Camera;
+	//private USBCamera m_Camera;
 	//private VisionThread m_VisionThread;
 	private double centerX;
 	private double previousVisionTurn;
@@ -74,6 +76,14 @@ public class Robot extends IterativeRobot
 	private int autonomousWait;
 	private boolean autonomousShoot;
 	private int allianceSide;
+	
+	// Diagnostic variables
+	private NetworkTable m_NetworkTable;
+	private double driveTrainDiagnosticPower;
+	private double[] diagnosticLeftRate;
+	private double[] diagnosticRightRate;
+	private double[] diagnosticPowerSent;
+	private int arrIndex;
 	
 	//Misc variables
 	private int teleopLightLoops;
@@ -109,9 +119,17 @@ public class Robot extends IterativeRobot
     	shooterRPM = DEFAULT_SHOOTER_SPEED;
     	shooterRPMBF = DEFAULT_SHOOTER_RATE;
     	
+    	// Diagnostic variable initialization
+    	m_NetworkTable =  NetworkTable.getTable("SmartDashboard");
+    	driveTrainDiagnosticPower = 0;
+    	diagnosticLeftRate = new double[202];
+    	diagnosticRightRate = new double[202];
+    	diagnosticPowerSent = new double[202];
+    	arrIndex = 0;
+    	
     	//Camera Initialization
-    	CameraServer.getInstance().startAutomaticCapture();
-    	m_Camera.startCapture();
+    	//CameraServer.getInstance().startAutomaticCapture();
+    	//m_Camera.startCapture();
     	//m_Camera.setExposureManual(1);
     	//m_Camera.setFPS(30);
     	//m_Camera.setBrightness(1);
@@ -182,7 +200,6 @@ public class Robot extends IterativeRobot
     	switch(autonomousRoutine)
     	{
     	case 0: // NO AUTON
-    		debugRoutine(turn);
     		break;
     	case 1: // CENTER
     		autonCenter(turn);
@@ -206,7 +223,7 @@ public class Robot extends IterativeRobot
     		dumbAutonRoutine();
     		break;
     	case 9: // DEBUG
-			debugRoutine(turn);
+			diagnosticTest();
 			break;
 		default: // NO AUTON
 			break;
@@ -217,6 +234,81 @@ public class Robot extends IterativeRobot
     	
     	autonomousWait++;
     }
+    
+    public void diagnosticTest()
+    {
+    	m_DriveTrain.arcadeDrive(driveTrainDiagnosticPower/100, 0);
+    	
+    	switch(autonomousCase)
+    	{
+    	case 0:
+    		if(autonomousWait >= 10)
+        	{
+        		if(driveTrainDiagnosticPower <= 99)
+        		{
+            		diagnosticPowerSent[arrIndex] = driveTrainDiagnosticPower/100;
+            		diagnosticLeftRate[arrIndex] = m_DriveTrain.GetLeftSpeed();
+            		diagnosticRightRate[arrIndex] = m_DriveTrain.GetRightSpeed();
+            		
+            		m_NetworkTable.putNumberArray("diagnosticLeftRate", diagnosticLeftRate);
+        			m_NetworkTable.putNumberArray("diagnosticRightRate", diagnosticRightRate);
+        			m_NetworkTable.putNumberArray("diagnosticPower", diagnosticPowerSent);
+        			
+            		arrIndex++;
+            		
+            		driveTrainDiagnosticPower++;
+            		autonomousWait = 0;
+        		}
+        		else
+        		{
+        			m_NetworkTable.putNumberArray("diagnosticLeftRate", diagnosticLeftRate);
+        			m_NetworkTable.putNumberArray("diagnosticRightRate", diagnosticRightRate);
+        			m_NetworkTable.putNumberArray("diagnosticPower", diagnosticPowerSent);
+        			
+        			m_DriveTrain.arcadeDrive(0, 0);
+        			driveTrainDiagnosticPower = 0;
+        			autonomousWait = 0;
+        			autonomousCase++;
+        		}
+        	}
+    		break;
+    	case 1:
+    		if(autonomousWait >= 10)
+        	{
+        		if(driveTrainDiagnosticPower >= -99)
+        		{
+            		diagnosticPowerSent[arrIndex] = driveTrainDiagnosticPower/100;
+            		diagnosticLeftRate[arrIndex] = m_DriveTrain.GetLeftSpeed();
+            		diagnosticRightRate[arrIndex] = m_DriveTrain.GetRightSpeed();
+            		
+            		m_NetworkTable.putNumberArray("diagnosticLeftRate", diagnosticLeftRate);
+        			m_NetworkTable.putNumberArray("diagnosticRightRate", diagnosticRightRate);
+        			m_NetworkTable.putNumberArray("diagnosticPower", diagnosticPowerSent);
+        			
+            		arrIndex++;
+            		
+            		driveTrainDiagnosticPower--;
+            		autonomousWait = 0;
+        		}
+        		else
+        		{
+        			m_NetworkTable.putNumberArray("diagnosticLeftRate", diagnosticLeftRate);
+        			m_NetworkTable.putNumberArray("diagnosticRightRate", diagnosticRightRate);
+        			m_NetworkTable.putNumberArray("diagnosticPower", diagnosticPowerSent);
+        			
+        			m_DriveTrain.arcadeDrive(0, 0);
+        			driveTrainDiagnosticPower = 0;
+        			autonomousWait = 0;
+        			autonomousCase++;
+        		}
+        	}
+    		break;
+		default:
+			break;
+    	}
+    	
+    }
+    
     public void debugRoutine(double visionTurn)
     {
     	switch(autonomousCase)
@@ -720,7 +812,7 @@ public class Robot extends IterativeRobot
     	case 0:
     		m_DriveTrain.ArcadeDrive(0.6, 0);
     		autonomousWait++;
-    		if(autonomousWait >= 50)
+    		if(autonomousWait >= 75)
     		{
     			autonomousWait = 0;
     			autonomousCase++;
