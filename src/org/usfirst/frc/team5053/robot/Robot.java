@@ -551,7 +551,7 @@ public class Robot extends IterativeRobot
     			
     			//TODO Blue is very off at 100deg
     			if(allianceSide == -1) // RED
-    				m_DriveTrain.TurnToAngle(-100*allianceSide);
+    				m_DriveTrain.TurnToAngle(-98*allianceSide);
     			else // BLUE
     				m_DriveTrain.TurnToAngle(-105.5*allianceSide);
     			
@@ -579,7 +579,10 @@ public class Robot extends IterativeRobot
     			
     		}
     		break;
-    	case 5: // Shoot
+    	case 5: // Back off the boiler for the diameter of a fuel ball
+    		m_DriveTrain.DriveDistance(-5, 4, 1);
+    		autonomousCase++;
+    	case 6: // Shoot
     		m_DriveTrain.arcadeDrive(0.6, 0.0);
 			if (autonomousWait >= 50)
 			{
@@ -588,7 +591,7 @@ public class Robot extends IterativeRobot
 				autonomousCase++;
 			}
 			break;
-    	case 6:
+    	case 7:
     		break;
 		default:
 			if(m_DriveTrain.isStraightPIDFinished())
@@ -626,7 +629,7 @@ public class Robot extends IterativeRobot
     		{
     			m_DriveTrain.ResetEncoders();
     			m_DriveTrain.ResetGyro();
-    			m_DriveTrain.DriveDistance(63, 4, 25);
+    			m_DriveTrain.DriveDistance(68, 4, 25);
     			autonomousWait = 0;
     			autonomousCase++;
     		}
