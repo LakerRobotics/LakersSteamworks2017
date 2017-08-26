@@ -28,8 +28,6 @@ public class RobotSensorMap
 	private final int leftDriveEncoderBDIO = 1;
 	private final int rightDriveEncoderADIO = 2;
 	private final int rightDriveEncoderBDIO = 3;
-//	private final int shooterEncoderADIO = 4;
-//	private final int shooterEncoderBDIO = 5;
 	private final int redDIO = 6;
 	private final int blueDIO = 7;
 	private final int greenDIO = 8;
@@ -50,18 +48,10 @@ public class RobotSensorMap
 		m_LeftDrive = new Encoder(leftDriveEncoderADIO, leftDriveEncoderBDIO);
 		m_LeftDrive.setReverseDirection(true);
 		m_RightDrive = new Encoder(rightDriveEncoderADIO, rightDriveEncoderBDIO);
-//		m_RightDrive.setReverseDirection(true);
-		
-//		m_Shooter = new Encoder(shooterEncoderADIO, shooterEncoderBDIO, false, EncodingType.k1X);
-//		m_Shooter.setSamplesToAverage(60);
-//		m_Shooter.setMaxPeriod(0.02);
-		
-		//TODO 360 -> 1024
+
 		m_LeftDrive.setDistancePerPulse(6*Math.PI/1024); //Distance in inches
 		m_RightDrive.setDistancePerPulse(6*Math.PI/1024); //Distance in inches
-//		m_Shooter.setDistancePerPulse(/*60/20*/(60.0d/1024.0d)*(72.0d/24.0d)); //(Seconds per minute/Ticks per revolution) * (72 Teeth per revolution primary/ 24 Teeth per revolution secondary)
-//		m_Shooter.setPIDSourceType(PIDSourceType.kRate);
-		
+
 		m_Gyro = new ADXRS450_Gyro();
 		m_Lidar = new LidarLite();
 		
@@ -78,10 +68,6 @@ public class RobotSensorMap
 	{
 		return m_RightDrive;
 	}
-//	public Encoder getShooterEncoder() 
-//	{
-//		return m_Shooter;
-//	}
 	public ADXRS450_Gyro getGyro() 
 	{
 		return m_Gyro;

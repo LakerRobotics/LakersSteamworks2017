@@ -44,13 +44,6 @@ public class Shooter implements Subsystem {
 		m_Shooter.SetVelocityMeasurementPeriod(VelocityMeasurementPeriod.Period_20Ms); // think this is best though not as smooth Period_20Ms
 		m_Shooter.SetVelocityMeasurementWindow(32);//think this is best though not as smooth 32
 		
-//		m_Shooter.setPID(KP,KI,KD);//(p, i, d); (0.3,0.001,0.0);
-		//more complex, we don't need/not used to.		m_Shooter.setPID(0.01,0.001,0,0,0,0.0,0);//(p, i, d, f, izone, closeLoopRampRate, profile); (0.3,0.001,0.0);
-		//more complex, we don't need.		m_Shooter.setCloseLoopRampRate(0.0);// how fast the voltage going to the motor can change, in this case we specify 0, so no limit
-		//more complex, we don't need.		m_Shooter.setIZone(0);// can define multiple sets of PID settings, we are just using the zero PIDS setting
-
-		//m_Shooter.setAllowableClosedLoopErr(100);// should allow 100 RPM error and still say it is on target
-		
 	}
 	
 	public void EnablePID() 

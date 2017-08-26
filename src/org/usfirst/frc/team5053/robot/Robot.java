@@ -8,19 +8,11 @@ import org.usfirst.frc.team5053.robot.Subsystems.Intake;
 import org.usfirst.frc.team5053.robot.Subsystems.LightSystem;
 import org.usfirst.frc.team5053.robot.Subsystems.Scaler;
 import org.usfirst.frc.team5053.robot.Subsystems.Shooter;
-//import org.usfirst.frc.team5053.robot.Subsystems.Utilities.GRIPVision;
-//import org.opencv.core.Rect;
-//import org.opencv.imgproc.Imgproc;
 
-//import edu.wpi.cscore.UsbCamera;
-//import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.NamedSendable;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
-//import edu.wpi.first.wpilibj.vision.VisionThread;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-//import edu.wpi.first.wpilibj.vision.USBCamera;
 
 
 /**
@@ -51,12 +43,6 @@ public class Robot extends IterativeRobot
 	private LidarLite m_Lidar;
 	
 	//Vision declaration
-	//private USBCamera m_Camera;
-	//private VisionThread m_VisionThread;
-	private double centerX;
-	private double previousVisionTurn;
-	private boolean isVisionTurnRunning;
-	private final Object m_ImgLock = new Object();
 	
 	//Subsystem constants
 	private final double DEFAULT_SHOOTER_SPEED	= .68;
@@ -67,8 +53,6 @@ public class Robot extends IterativeRobot
 
 	//Vision constants
 	private final int IMG_WIDTH		= 320;
-	private final int IMG_HEIGHT 	= 240;
-	private final int CAMERA_ANGLE 	= 52;
 	
 	//Autonomous variables
 	private int autonomousRoutine;
@@ -86,7 +70,7 @@ public class Robot extends IterativeRobot
 	private int arrIndex;
 	
 	//Misc variables
-	private int teleopLightLoops;
+	
 	private double shooterRPM;
 	private double shooterRPMBF;
 	
@@ -127,30 +111,6 @@ public class Robot extends IterativeRobot
     	diagnosticPowerSent = new double[202];
     	arrIndex = 0;
     	
-    	//Camera Initialization
-    	//CameraServer.getInstance().startAutomaticCapture();
-    	//m_Camera.startCapture();
-    	//m_Camera.setExposureManual(1);
-    	//m_Camera.setFPS(30);
-    	//m_Camera.setBrightness(1);
-        //m_Camera.setResolution(IMG_WIDTH, IMG_HEIGHT);
-    	
-        centerX = (IMG_WIDTH/2);
-    	previousVisionTurn = 0;
-    	teleopLightLoops = 0;
-    	isVisionTurnRunning = false;
-       
-        /*m_VisionThread = new VisionThread(m_Camera, new GRIPVision(), pipeline -> {
-        	SmartDashboard.putBoolean("Is empty", pipeline.filterContoursOutput().isEmpty());
-            if (!pipeline.filterContoursOutput().isEmpty()) {
-                Rect r = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
-                synchronized (m_ImgLock) {
-                	centerX = r.x + (r.width / 2);
-                    SmartDashboard.putNumber("Vision CenterX", centerX);
-                }
-            }
-        });
-        m_VisionThread.start();*/
     }
 
     public void autonomousInit() 
@@ -185,15 +145,6 @@ public class Robot extends IterativeRobot
     	/**
          * This function is called periodically during autonomous
          */
-    	
-    	/*double centerX;
-    	//Updates our vision angle
-    	synchronized (m_ImgLock) {
-    		centerX = this.centerX;
-    	}
-    	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
-
-    	SmartDashboard.putNumber("Vision Turn", turn);*/
     	
     	double turn = 0;
     	
@@ -892,36 +843,7 @@ public class Robot extends IterativeRobot
     	GetDashboardData();
     	WriteDashboardData();
     	
-    	/*double centerX;
-    	synchronized (m_ImgLock) {
-    		centerX = this.centerX;
-    	}
-    	double turn = (centerX - (IMG_WIDTH / 2))/(IMG_WIDTH/2) * (CAMERA_ANGLE/2);
-    	if (centerX == 0)
-    	{
-    		turn = 0;
-    	}*/
-    	//Drivetrain methods
-    	/*if(m_RobotInterface.GetDriverLeftBumper())
-    	{
-    		if(!(Math.abs(previousVisionTurn) == turn))
-    		{
-    			previousVisionTurn = turn;
-        		visionAlign(turn);
-    		}
-    	}
-    	else if(isVisionTurnRunning)
-    	{
-    		if(m_DriveTrain.isTurnPIDFinished())
-        	{
-        		isVisionTurnRunning = false;
-        		m_DriveTrain.DisablePIDControl();
-        	}
-    	}
-    	else if(!isVisionTurnRunning)
-    	{*/
-        	
-    	//}
+    	
     	arcadeDrive();
     	m_DriveTrain.WriteDashboardData();
     	
@@ -936,7 +858,7 @@ public class Robot extends IterativeRobot
     	
     	
     	//Misc variable updates
-    	teleopLightLoops++;
+    	
     }
 
     public void testPeriodic()
@@ -959,19 +881,6 @@ public class Robot extends IterativeRobot
     	}
    }
     
-    public void visionAlign(double turn)
-    {
-    	SmartDashboard.putNumber("Vision Turn", turn);
-    	
-    	m_DriveTrain.TurnToAngle(turn);
-
-		isVisionTurnRunning = true;	
-    	if(m_DriveTrain.isTurnPIDFinished())
-    	{
-    		isVisionTurnRunning = false;
-    		m_DriveTrain.DisablePIDControl();
-    	}
-    }
     
     //Shooter methods
     public void runShooter()
@@ -1072,59 +981,15 @@ public class Robot extends IterativeRobot
     		m_Shooter.DisablePID();
     		m_Shooter.SetTalonOutput(0);
     	}
-    	//if(m_RobotInterface.GetDriverRightBumper())
-    	if(false)
-    	{
-    		//Enable the PID controller for the shooter using a rate calculated using our lidar sensor
-    		m_Shooter.SetShooterSetpoint(calculateShooterRPM());
-
-    		m_Shooter.EnablePID();
-    		
-    		if(m_Shooter.ShooterOnTarget())
-        	{
-        		//Shooter is ready to fire.
-        		runIndexer();
-        		
-        		m_LightSystem.setRedState(false);
-        		m_LightSystem.setBlueState(false);
-        		m_LightSystem.setGreenState(true);
-        	}
-        	else
-        	{
-        		m_LightSystem.setDefault();
-        	}
-    	}
-    	/*else if(m_RobotInterface.GetDriverRightTrigger())
+    	if(m_RobotInterface.GetDriverRightTrigger())
     	{
     		System.out.println("Shooter entered");
     		//Enable the PID controller for the shooter using a rate calculated read from the dashboard
-    		//m_Shooter.SetShooterSetpoint(shooterRPM);
-    		//m_Shooter.EnablePID();
+    		
     		m_Shooter.SetTalonOutput(shooterRPM);
 			SmartDashboard.putBoolean("Shooter on target", m_Shooter.ShooterOnTarget());
-			
-    		/*if(m_Shooter.ShooterOnTarget())
-        	{
-        		//Shooter is ready to fire.
-        		runIndexer();
-        		
-        		m_LightSystem.setRedState(false);
-        		m_LightSystem.setBlueState(false);
-        		m_LightSystem.setGreenState(true);
-        	}
-        	else
-        	{
-        		m_LightSystem.setDefault();
-        	}
     	}
-    	else
-    	{
-    		//STOP
-    		m_Shooter.SetShooterSetpoint(0);
-    		m_Shooter.DisablePID();
-
-    		m_LightSystem.setDefault();
-    	}*/
+		
     }
     
     public double calculateShooterRPM()
@@ -1168,34 +1033,10 @@ public class Robot extends IterativeRobot
  		{
         	m_Scaler.SetTalonOutput(SCALER_SPEED);
         	
-        	if(teleopLightLoops <= 50)
-        	{
-        		m_LightSystem.setGreenState(true);
-        		
-        		m_LightSystem.setRedState(false);
-        		m_LightSystem.setBlueState(false);
-        	}
-        	else if(teleopLightLoops > 50 && teleopLightLoops <= 100)
-        	{
-        		m_LightSystem.setRedState(true);
-        		
-        		m_LightSystem.setBlueState(false);
-        		m_LightSystem.setGreenState(false);
-        	}
-        	else if(teleopLightLoops > 100)
-        	{
-        		m_LightSystem.setRedState(true);
-        		
-        		m_LightSystem.setBlueState(false);
-        		m_LightSystem.setGreenState(false);
-        		if(teleopLightLoops == 150)
-        			teleopLightLoops = 0;
-        	}
  		}
  	    else
  	    {
  	    	m_Scaler.SetTalonOutput(0);
- 	    	m_LightSystem.setDefault();
  	    }
     }
     

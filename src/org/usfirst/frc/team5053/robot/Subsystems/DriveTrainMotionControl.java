@@ -22,9 +22,6 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 	 * Hello There! : I'm the base constructor.
 	 */
 	
-	private SpeedController m_LeftMotor;
-	private SpeedController m_RightMotor;
-	
 	private Encoder m_LeftEncoder;
 	private Encoder m_RightEncoder;
 	
@@ -39,8 +36,6 @@ public class DriveTrainMotionControl extends RobotDrive implements Subsystem
 	{
 		super(leftMotor, rightMotor);
 		
-		m_LeftMotor = leftMotor;
-		m_RightMotor = rightMotor;
 		
 		m_LeftEncoder = leftEncoder;
 		m_RightEncoder = rightEncoder;
